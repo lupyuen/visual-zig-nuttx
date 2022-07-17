@@ -1,4 +1,4 @@
-# Visual Programming for NuttX Sensors with Zig
+# Visual Programming for Zig with NuttX Sensors
 
 TODO
 
