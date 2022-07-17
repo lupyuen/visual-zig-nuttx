@@ -145,3 +145,37 @@ Because Zig Translate doesn't support `goto`.
 Here's the original C code: [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
 
 And the auto-translation from C to Zig: [translated/sensortest.zig](translated/sensortest.zig)
+
+# Sensor App in Zig
+
+We compile our Zig Sensor App...
+
+```bash
+##  Download our Zig Sensor App for NuttX
+git clone --recursive https://github.com/lupyuen/visual-zig-nuttx
+cd visual-zig-nuttx
+
+##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
+zig build-obj \
+  --verbose-cimport \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -I "$HOME/nuttx/apps/include" \
+  sensortest.zig
+
+##  Patch the ELF Header of `sensortest.o` from Soft-Float ABI to Hard-Float ABI
+xxd -c 1 sensortest.o \
+  | sed 's/00000024: 01/00000024: 03/' \
+  | xxd -r -c 1 - sensortest2.o
+cp sensortest2.o sensortest.o
+
+##  Copy the compiled app to NuttX and overwrite `sensortest.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cp sensortest.o $HOME/nuttx/apps/testing/sensortest/sensortest*.o
+
+##  Build NuttX to link the Zig Object from `sensortest.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
+make
+```
