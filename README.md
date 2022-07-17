@@ -1,6 +1,16 @@
 # Visual Programming for Zig with NuttX Sensors
 
-TODO
+Can we use Scratch / Blockly to write Zig programs the drag-n-drop way?
+
+Let's create a Visual Programming Tool for Zig that will make IoT Sensor Apps with Apache NuttX RTOS.
+
+_Why limit to IoT Sensor Apps?_
+
+-   Types are simpler: Only floating-point numbers supported, no strings needed
+
+-   Blockly is Typeless. With Zig we can use Type Inference to fill in the missing Struct Types
+
+-   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
 
 # Sensor Test App in C
 
