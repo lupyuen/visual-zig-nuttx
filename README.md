@@ -1,2 +1,1 @@
-# visual-zig-nuttx
-Visual Programming for NuttX Sensors with Zig
+# Visual Programming for NuttX Sensors with Zig
