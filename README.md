@@ -197,7 +197,7 @@ We connect BME280 to Pine64's [__PineCone BL602 Board__](https://lupyuen.github.
 
 # Run Zig Sensor App
 
-We run the Zig Sensor App...
+Let's run the Zig Sensor App to read the BME280 Sensor...
 
 ```bash
 NuttShell (NSH) NuttX-10.3.0
