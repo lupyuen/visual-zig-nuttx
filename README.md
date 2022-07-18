@@ -1,3 +1,7 @@
+> ![TODO: Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/2022-07-18%2012.30.20~2.JPG)
+
+> (TODO)
+
 # Visual Programming for Zig with NuttX Sensors
 
 Can we use Scratch / Blockly to write Zig programs the drag-n-drop way?
