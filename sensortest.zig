@@ -198,10 +198,16 @@ fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
     //     @floatCast(f64, event.*.pressure), 
     //     @floatCast(f64, event.*.temperature)
     // );
-    _ = printf("name: %s\n", name);
-    _ = event;
+    _ = printf("%s: timestamp:%llu value1:%d value2:%d\n", 
+        name, 
+        event.*.timestamp, 
+        @floatToInt(i32, event.*.pressure), 
+        @floatToInt(i32, event.*.temperature)
+    );
+    // _ = printf("name: %s\n", name);
+    // _ = event;
     // debug("timestamp: {}", .{ event.*.timestamp });
-    debug("value1: {}", .{ @floatToInt(i32, event.*.pressure) });
+    // debug("value1: {}", .{ @floatToInt(i32, event.*.pressure) });
     // debug("value2: {}", .{ @floatToInt(i32, event.*.temperature) });
     // debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
 }
@@ -214,8 +220,13 @@ fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
     //     event.*.timestamp, 
     //     @floatCast(f64, event.*.proximity)
     // );
-    _ = printf("name: %s\n", name);
-    _ = event;
+    _ = printf("%s: timestamp:%llu value:%d\n", 
+        name, 
+        event.*.timestamp, 
+        @floatToInt(i32, event.*.proximity)
+    );
+    // _ = printf("name: %s\n", name);
+    // _ = event;
     // debug("timestamp: {}", .{ event.*.timestamp });
     // debug("value: {}", .{ @floatToInt(i32, event.*.proximity) });
     // debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_prox))) });
