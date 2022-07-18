@@ -253,3 +253,40 @@ Something got messed up in the Auto-Translation from C [(sensortest.c)](https://
 # Fix Sensor App
 
 TODO
+
+# Floating-Point Link Error
+
+TODO
+
+This code that prints two 32-bit Floating-Point numbers...
+
+```zig
+var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+debug("pressure: {}", .{ event.*.pressure });
+debug("temperature: {}", .{ event.*.temperature });
+```
+
+Fails to link...
+
+```text
+riscv64-unknown-elf-ld: nuttx/nuttx/staging/libapps.a(sensortest.c.home.user.nuttx.apps.testing.sensortest.o): in function `std.fmt.errol.errolInt':
+zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:305: undefined reference to `__fixunsdfti'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:305: undefined reference to `__floatuntidf'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:315: undefined reference to `__umodti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:316: undefined reference to `__udivti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:316: undefined reference to `__umodti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:318: undefined reference to `__umodti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:319: undefined reference to `__udivti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:319: undefined reference to `__umodti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:324: undefined reference to `__udivti3'
+riscv64-unknown-elf-ld: zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:335: undefined reference to `__udivti3'
+riscv64-unknown-elf-ld: nuttx/nuttx/staging/libapps.a(sensortest.c.home.user.nuttx.apps.testing.sensortest.o): in function `std.fmt.errol.fpeint':
+zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:677: undefined reference to `__ashlti3'
+```
+
+So we print as Integers instead...
+
+```zig
+debug("pressure: {}", .{ @floatToInt(i32, event.*.pressure) });
+debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
+```
