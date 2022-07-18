@@ -152,7 +152,7 @@ We copy the relevant snippets from the Auto-Translation to create our Zig Sensor
 
 https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417
 
-We compile our Zig Sensor App...
+Then we compile our Zig Sensor App...
 
 ```bash
 ##  Download our Zig Sensor App for NuttX
@@ -186,7 +186,7 @@ make
 
 # Connect BME280 Sensor
 
-We connect BME280 to Pine64's [__PineCone BL602 Board__](https://lupyuen.github.io/articles/pinecone)...
+For testing the Zig Sensor App, we connect the BME280 Sensor (Temperature / Humidity / Air Pressure) to Pine64's [__PineCone BL602 Board__](https://lupyuen.github.io/articles/pinecone)...
 
 | BL602 Pin | BME280 Pin | Wire Colour
 |:---:|:---:|:---|
