@@ -148,7 +148,9 @@ And the auto-translation from C to Zig: [translated/sensortest.zig](translated/s
 
 # Sensor App in Zig
 
-Based on the Auto-Translation, we created our Zig Sensor App: [sensortest.zig](sensortest.zig)
+We copy the relevant snippets from the Auto-Translation to create our Zig Sensor App: [sensortest.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417)
+
+https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417
 
 We compile our Zig Sensor App...
 
