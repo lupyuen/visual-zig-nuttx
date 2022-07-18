@@ -14,7 +14,7 @@ _Why limit to IoT Sensor Apps?_
 
 # Sensor Test App in C
 
-We start with the Sensor Test App (in C) from Apache NuttX RTOS.
+We start with the Sensor Test App (in C) from Apache NuttX RTOS: [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
 
 NuttX compiles the Sensor Test App [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c) with this GCC command...
 
@@ -107,7 +107,7 @@ zig translate-c \
   >sensortest.zig
 ```
 
-To fix the translation we need to insert this...
+To fix the translation (Zig Translate doesn't support `goto`) we need to insert this...
 
 ```c
 #ifdef __clang__  //  Workaround for zig cc
@@ -141,8 +141,6 @@ name_err:
 [(Source)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c#L403-L413)
 
 [(See the changes)](https://github.com/lupyuen/incubator-nuttx-apps/commit/907e1cc3755e9699acdefd99fc76939ddd387e34)
-
-Because Zig Translate doesn't support `goto`.
 
 Here's the original C code: [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
 
