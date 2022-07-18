@@ -200,17 +200,24 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
         name, 
         event.*.timestamp, 
     );
-    _ = printf("value1:%.2f value2:%.2f\n", 
-        event.*.pressure, 
-        event.*.temperature
+    _ = printf("value1:%d value2:%d\n", 
+        @floatToInt(i32, event.*.pressure), 
+        @floatToInt(i32, event.*.temperature)
     );
 }
 fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
     var event: [*c]c.struct_sensor_event_prox = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
-    _ = printf("%s: timestamp:%llu value:%.2f\n", 
+    // _ = printf("%s: timestamp:%llu value:%.2f\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     @floatCast(f64, event.*.proximity)
+    // );
+    _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
-        @floatCast(f64, event.*.proximity)
+    );
+    _ = printf("value:%d\n", 
+        @floatToInt(i32, event.*.proximity)
     );
 }
 fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
