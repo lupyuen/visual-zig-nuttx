@@ -188,11 +188,16 @@ pub fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-    _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.pressure), @floatCast(f64, event.*.temperature));
-    debug("timestamp: {}", .{ event.*.timestamp });
+    _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
+        name, 
+        event.*.timestamp, 
+        @floatCast(f32, event.*.pressure), ////@floatCast(f64, event.*.pressure), 
+        @floatCast(f32, event.*.temperature) ////@floatCast(f64, event.*.temperature)
+    );
+    ////debug("timestamp: {}", .{ event.*.timestamp });
+    debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
     debug("pressure: {}", .{ @floatToInt(i32, event.*.pressure) });
     debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
-    debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
 }
 pub fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
