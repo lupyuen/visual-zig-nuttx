@@ -334,3 +334,26 @@ riscv_registerdump: S8: 00000081 S9: 00000025 S10: 23068e25 S11: 4201bec4
 riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
 ```
 
+```text
+bme280_fetch: temperature=31.570000 Â°C, pressure=1025.396118 mbar, humidity=64.624023 %
+name: baro0
+timestamp: 27270000
+value1: 1025
+value2: 31
+size: 16
+SensorTest: Received message: , number:1/1
+decode_insn_compressed: Compressed: a783
+riscv_exception: EXCEPTION: Load access fault. MCAUSE: 00000005
+riscv_exception: PANIC!!! Exception = 00000005
+up_assert: Assertion failed at file:common/riscv_exception.c line: 89 task: sensortest
+backtrace| 3: 0x2300c698
+riscv_registerdump: EPC: 2300c698
+riscv_registerdump: A0: 4201b9a0 A1: 0000a80 A2: 4201bf48 A3: 00000000
+riscv_registerdump: A4: 2307a5e8 A5: 00583000 A6: 2307a000 A7: 00000000
+riscv_registerdump: T0: 000001ff T1: 23005830 T2: 0000002d T3: 00000068
+riscv_registerdump: T4: 00000009 T5: 0000002a T6: 0000002e
+riscv_registerdump: S0: 4201b9a0 S1: 2307a000 S2: 00000a80 S3: 4201bdef
+riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
+riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
+riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
+```

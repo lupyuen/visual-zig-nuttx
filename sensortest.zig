@@ -166,9 +166,13 @@ pub export fn sensortest_main(
         _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
         return ret;
     }
+    debug("close", .{});
     _ = c.close(fd);
+    debug("free", .{});
     c.free(@ptrCast(?*anyopaque, buffer));
+    debug("getoptindp", .{});
     c.getoptindp().* = 0;
+    debug("return", .{});
     return ret;
 }
 
@@ -188,22 +192,27 @@ pub fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-    _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
-        name, 
-        event.*.timestamp, 
-        @floatCast(f32, event.*.pressure), ////@floatCast(f64, event.*.pressure), 
-        @floatCast(f32, event.*.temperature) ////@floatCast(f64, event.*.temperature)
-    );
-    ////debug("timestamp: {}", .{ event.*.timestamp });
+    // _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     @floatCast(f64, event.*.pressure), 
+    //     @floatCast(f64, event.*.temperature)
+    // );
+    _ = printf("name: %s\n", name);
+    debug("timestamp: {}", .{ event.*.timestamp });
+    debug("value1: {}", .{ @floatToInt(i32, event.*.pressure) });
+    debug("value2: {}", .{ @floatToInt(i32, event.*.temperature) });
     debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
-    debug("pressure: {}", .{ @floatToInt(i32, event.*.pressure) });
-    debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
 }
 pub fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_prox = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
-    _ = printf("%s: timestamp:%llu value:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.proximity));
+    // _ = printf("%s: timestamp:%llu value:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.proximity));
+    _ = printf("name: %s\n", name);
+    debug("timestamp: {}", .{ event.*.timestamp });
+    debug("value: {}", .{ @floatToInt(i32, event.*.proximity) });
+    debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_prox))) });
 }
 pub fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
