@@ -148,6 +148,8 @@ And the auto-translation from C to Zig: [translated/sensortest.zig](translated/s
 
 # Sensor App in Zig
 
+Based on the Auto-Translation, we created our Zig Sensor App: [sensortest.zig](sensortest.zig)
+
 We compile our Zig Sensor App...
 
 ```bash
