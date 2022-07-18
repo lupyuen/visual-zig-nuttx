@@ -4,9 +4,9 @@
 
 # Visual Programming for Zig with NuttX Sensors
 
-Can we use Scratch / Blockly to write Zig programs the drag-n-drop way?
+Can we use Scratch / [Blockly](https://github.com/google/blockly) to write Zig programs the drag-n-drop way?
 
-Let's create a Visual Programming Tool for Zig that will make IoT Sensor Apps with Apache NuttX RTOS.
+Let's create a Visual Programming Tool for Zig that will generate IoT Sensor Apps with Apache NuttX RTOS.
 
 _Why limit to IoT Sensor Apps?_
 
