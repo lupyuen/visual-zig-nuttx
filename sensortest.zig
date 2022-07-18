@@ -198,9 +198,11 @@ fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
     //     @floatCast(f64, event.*.pressure), 
     //     @floatCast(f64, event.*.temperature)
     // );
-    _ = printf("%s: timestamp:%llu value1:%d value2:%d\n", 
+    _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
+    );
+    _ = printf("value1:%d value2:%d\n", 
         @floatToInt(i32, event.*.pressure), 
         @floatToInt(i32, event.*.temperature)
     );
