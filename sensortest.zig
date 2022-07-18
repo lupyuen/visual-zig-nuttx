@@ -188,50 +188,30 @@ fn print_valf3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
     var event: [*c]c.struct_sensor_event_rgb = @intToPtr([*c]c.struct_sensor_event_rgb, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.r), @floatCast(f64, event.*.g), @floatCast(f64, event.*.b));
 }
-fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
-    var buffer = arg_buffer;
-    var name = arg_name;
+fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
     var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-    // _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.pressure), 
-    //     @floatCast(f64, event.*.temperature)
-    // );
+    _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
+        name, 
+        event.*.timestamp, 
+        @floatCast(f64, event.*.pressure), 
+        @floatCast(f64, event.*.temperature)
+    );
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
     );
-    _ = printf("value1:%d value2:%d\n", 
-        @floatToInt(i32, event.*.pressure), 
-        @floatToInt(i32, event.*.temperature)
+    _ = printf("value1:%.2f value2:%.2f\n", 
+        @floatCast(f64, event.*.pressure), 
+        @floatCast(f64, event.*.temperature)
     );
-    // _ = printf("name: %s\n", name);
-    // _ = event;
-    // debug("timestamp: {}", .{ event.*.timestamp });
-    // debug("value1: {}", .{ @floatToInt(i32, event.*.pressure) });
-    // debug("value2: {}", .{ @floatToInt(i32, event.*.temperature) });
-    // debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
 }
-fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
-    var buffer = arg_buffer;
-    var name = arg_name;
+fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
     var event: [*c]c.struct_sensor_event_prox = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
-    // _ = printf("%s: timestamp:%llu value:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.proximity)
-    // );
-    _ = printf("%s: timestamp:%llu value:%d\n", 
+    _ = printf("%s: timestamp:%llu value:%.2f\n", 
         name, 
         event.*.timestamp, 
-        @floatToInt(i32, event.*.proximity)
+        @floatCast(f64, event.*.proximity)
     );
-    // _ = printf("name: %s\n", name);
-    // _ = event;
-    // debug("timestamp: {}", .{ event.*.timestamp });
-    // debug("value: {}", .{ @floatToInt(i32, event.*.proximity) });
-    // debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_prox))) });
 }
 fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) void {
     var buffer = arg_buffer;
