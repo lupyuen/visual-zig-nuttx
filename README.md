@@ -4,21 +4,69 @@
 
 # Visual Programming for Zig with NuttX Sensors
 
-Can we use Scratch / [Blockly](https://github.com/google/blockly) to write Zig programs the drag-n-drop way?
+Can we use Scratch / [Blockly](https://github.com/google/blockly) to code Zig programs, the drag-n-drop way?
 
 Let's create a Visual Programming Tool for Zig that will generate IoT Sensor Apps with Apache NuttX RTOS.
 
 _Why limit to IoT Sensor Apps?_
 
--   Types are simpler: Only floating-point numbers supported, no strings needed
+-   Types are simpler: Only floating-point numbers will be supported, no strings needed
 
--   Blockly is Typeless. With Zig we can use Type Inference to fill in the missing Struct Types
+-   Blockly is Typeless. With Zig we can use Type Inference to deduce the missing Struct Types
 
 -   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
 
 # Sensor Test App in C
 
 We start with the Sensor Test App (in C) from Apache NuttX RTOS: [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
+
+Here are the steps for reading a NuttX Sensor...
+
+```c
+// From https://lupyuen.github.io/articles/bme280#sensor-test-app
+// Open the Sensor Device.
+// devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+fd = open(devname, O_RDONLY | O_NONBLOCK);
+
+// Set Standby Interval
+ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+
+// Set Batch Latency
+ioctl(fd, SNIOC_BATCH, &latency);
+
+// Enable Sensor and switch to Normal Power Mode
+ioctl(fd, SNIOC_ACTIVATE, 1);
+
+//  If Sensor Data is available...
+if (poll(&fds, 1, -1) > 0) {
+
+  //  Read the Sensor Data
+  if (read(fd, buffer, len) >= len) {
+
+    // Cast buffer as Barometer Sensor Data
+    struct sensor_event_baro *event = 
+      (struct sensor_event_baro *) buffer;
+
+    // Handle Pressure and Temperature
+    printf(
+      "%s: timestamp:%d value1:%.2f value2:%.2f\n",
+      name, 
+      event.timestamp, 
+      event.pressure, 
+      event.temperature
+    );
+  }
+}
+
+// Disable Sensor and switch to Low Power Mode
+ioctl(fd, SNIOC_ACTIVATE, 0);
+
+// Close the Sensor Device and free the buffer
+close(fd);
+free(buffer);
+```
+
+[(Source)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
 
 NuttX compiles the Sensor Test App [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c) with this GCC command...
 
@@ -250,18 +298,83 @@ We see that Humidity (`value`), Pressure (`value1`) and Temperature (`value2`) a
 
 Something got messed up in the Auto-Translation from C [(sensortest.c)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c) to Zig [(sensortest.zig)](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417). Let's find out why...
 
-# Fix Sensor App
+# Fix Sensor Values
 
-TODO
+Earlier we saw that our Zig Sensor App returned the incorrect Sensor Values for Pressure (`value1`) and Temperature (`value2`)...
+
+```bash
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+bme280_fetch: temperature=30.520000 °C, pressure=1029.177490 mbar, humidity=72.184570 %
+baro0: timestamp:78490000 value1:72.18 value2:72.18
+```
+
+Zig seems to have a problem passing the Pressure and Temperature values (both `f32`) to `printf`...
+
+```c
+fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
+    var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
+       name, 
+       event.*.timestamp, 
+       @floatCast(f64, event.*.pressure), 
+       @floatCast(f64, event.*.temperature)
+    );
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L187-L198)
+
+The workaround is to cast the values as Integer AND split into two calls to `printf`...
+
+```c
+fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
+    var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    _ = printf("%s: timestamp:%llu ", 
+        name, 
+        event.*.timestamp, 
+    );
+    _ = printf("value1:%d value2:%d\n", 
+        @floatToInt(i32, event.*.pressure), 
+        @floatToInt(i32, event.*.temperature)
+    );
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/74ac3c36f44911685503f4ba7161771907af2793/sensortest.zig#L191-L222)
+
+Now our Zig Sensor App prints the correct values, truncated as Integers...
+
+```text
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+baro0: timestamp:42610000 value1:1003 value2:31
+SensorTest: Received message: baro0, number:1/1
+
+nsh> sensortest -n 1 humi0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+humi0: timestamp:32420000 value:68
+SensorTest: Received message: humi0, number:1/1
+```
+
+_Instead of `printf`, why not call the Zig Debug Logger `debug`?_
+
+```zig
+debug("pressure: {}", .{ event.*.pressure });
+debug("temperature: {}", .{ event.*.temperature });
+```
+
+This causes a Linker Error, as explained below...
 
 # Floating-Point Link Error
-
-TODO
 
 This code that prints two 32-bit Floating-Point numbers...
 
 ```zig
-var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+var event: [*c]c.struct_sensor_event_baro = 
+  @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
 debug("pressure: {}", .{ event.*.pressure });
 debug("temperature: {}", .{ event.*.temperature });
 ```
@@ -291,7 +404,11 @@ debug("pressure: {}", .{ @floatToInt(i32, event.*.pressure) });
 debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
 ```
 
-# TODO
+But calling the `debug` logger somehow causes NuttX to crash with an Assertion Failure or RISC-V Exception...
+
+# Debug Logger Crashes
+
+TODO
 
 ```zig
 debug("timestamp: {}", .{ event.*.timestamp });
@@ -356,19 +473,4 @@ riscv_registerdump: S0: 4201b9a0 S1: 2307a000 S2: 00000a80 S3: 4201bdef
 riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
 riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
-```
-
-```text
-NuttShell (NSH) NuttX-10.3.0
-nsh> sensortest -n 1 humi0
-Zig Sensor Test
-SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
-humi0: timestamp:32420000 value:68
-SensorTest: Received message: humi0, number:1/1
-
-nsh> sensortest -n 1 baro0
-Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
-baro0: timestamp:42610000 value1:1003 value2:31
-SensorTest: Received message: baro0, number:1/1
 ```
