@@ -176,19 +176,19 @@ pub export fn sensortest_main(
     return ret;
 }
 
-pub fn print_vec3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_vec3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_accel = @intToPtr([*c]c.struct_sensor_event_accel, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu x:%.2f y:%.2f z:%.2f, temperature:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.x), @floatCast(f64, event.*.y), @floatCast(f64, event.*.z), @floatCast(f64, event.*.temperature));
 }
-pub fn print_valf3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_valf3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_rgb = @intToPtr([*c]c.struct_sensor_event_rgb, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.r), @floatCast(f64, event.*.g), @floatCast(f64, event.*.b));
 }
-pub fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
@@ -204,7 +204,7 @@ pub fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C
     debug("value2: {}", .{ @floatToInt(i32, event.*.temperature) });
     debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))) });
 }
-pub fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_prox = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
@@ -214,44 +214,44 @@ pub fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C)
     debug("value: {}", .{ @floatToInt(i32, event.*.proximity) });
     debug("size: {}", .{ @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_prox))) });
 }
-pub fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_hall = @intToPtr([*c]c.struct_sensor_event_hall, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value:%d\n", name, event.*.timestamp, @as(c_int, @boolToInt(event.*.hall)));
 }
-pub fn print_vali2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_vali2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_ots = @intToPtr([*c]c.struct_sensor_event_ots, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:% li value2:% li\n", name, event.*.timestamp, event.*.x, event.*.y);
 }
-pub fn print_ppgd(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_ppgd(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_ppgd = @intToPtr([*c]c.struct_sensor_event_ppgd, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu current:%lu gain1:%u gain2:%u\n", name, event.*.timestamp, event.*.ppg[@intCast(c_uint, @as(c_int, 0))], event.*.ppg[@intCast(c_uint, @as(c_int, 1))], event.*.current, @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])));
 }
-pub fn print_ppgq(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_ppgq(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_ppgq = @intToPtr([*c]c.struct_sensor_event_ppgq, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", name, event.*.timestamp, event.*.ppg[@intCast(c_uint, @as(c_int, 0))], event.*.ppg[@intCast(c_uint, @as(c_int, 1))], event.*.ppg[@intCast(c_uint, @as(c_int, 2))], event.*.ppg[@intCast(c_uint, @as(c_int, 3))], event.*.current, @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))])));
 }
-pub fn print_gps(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_gps(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_gps = @intToPtr([*c]c.struct_sensor_event_gps, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", name, event.*.timestamp, event.*.time_utc, @floatCast(f64, event.*.latitude), @floatCast(f64, event.*.longitude), @floatCast(f64, event.*.altitude), @floatCast(f64, event.*.altitude_ellipsoid), @floatCast(f64, event.*.eph), @floatCast(f64, event.*.epv), @floatCast(f64, event.*.hdop), @floatCast(f64, event.*.vdop), @floatCast(f64, event.*.ground_speed), @floatCast(f64, event.*.course), event.*.satellites_used);
 }
-pub fn print_gps_satellite(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
+fn print_gps_satellite(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
     var event: [*c]c.struct_sensor_event_gps_satellite = @intToPtr([*c]c.struct_sensor_event_gps_satellite, @ptrToInt(buffer));
     _ = printf("%s: timestamp: %llu count: %lu satellites: %lu\n", name, event.*.timestamp, event.*.count, event.*.satellites);
 }
 
-pub fn usage() callconv(.C) void {
+fn usage() callconv(.C) void {
     _ = printf("sensortest [arguments...] <command>\n");
     _ = printf("\t[-h      ]  sensortest commands help\n");
     _ = printf("\t[-i <val>]  The output data period of sensor in us\n");
@@ -264,13 +264,13 @@ pub fn usage() callconv(.C) void {
     _ = printf("\t<sensor_node_name> ex, accel0(/dev/sensor/accel0)\n");
 }
 
-pub fn exit_handler(arg_signo: c_int) callconv(.C) void {
-    var signo = arg_signo;
-    _ = signo;
-    g_should_exit = @as(c_int, 1) != 0;
-}
+// pub fn exit_handler(arg_signo: c_int) callconv(.C) void {
+//     var signo = arg_signo;
+//     _ = signo;
+//     g_should_exit = @as(c_int, 1) != 0;
+// }
 
-pub const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
+const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
     struct_sensor_info{
         .print = print_vec3,
         .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_accel))),
@@ -423,15 +423,15 @@ pub const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
     },
 };
 
-pub const struct_sensor_info = extern struct {
+const struct_sensor_info = extern struct {
     print: data_print,
     esize: u8,
     name: [*c]const u8,
 };
 
-pub var g_should_exit: bool = @as(c_int, 0) != 0;
+var g_should_exit: bool = @as(c_int, 0) != 0;
 
-pub const data_print = ?fn ([*c]const u8, [*c]const u8) callconv(.C) void;
+const data_print = ?fn ([*c]const u8, [*c]const u8) callconv(.C) void;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
