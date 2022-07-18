@@ -205,7 +205,15 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 bme280_fetch: temperature=30.520000 °C, pressure=1029.177490 mbar, humidity=72.184570 %
 baro0: timestamp:78490000 value1:72.18 value2:72.18
+```
 
+[(See the complete log)](https://gist.github.com/lupyuen/97358b560197d26304fc196ceb45565a)
+
+This shows that the BME280 Driver fetched the correct Temperature (30 °C), Pressure (1,029 mbar) and Humidity (72 %).
+
+But our Zig App returns both Pressure (`value1`) and Temperature (`value2`) as 72. Which is incorrect.
+
+```bash
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 bme280_fetch: temperature=30.520000 °C, pressure=1027.211548 mbar, humidity=72.229492 %
@@ -214,9 +222,9 @@ humi0: timestamp:109080000 value:72.23
 
 [(See the complete log)](https://gist.github.com/lupyuen/97358b560197d26304fc196ceb45565a)
 
-TODO: Zig Humidity correct but not temperature and air pressure
+Our Zig App returns the correct Humidity (`value`): 72 %.
 
-TODO: Sensor App in C...
+Compare the above output with the original C Version of the Sensor App...
 
 ```bash
 nsh> sensortest -n 1 baro0
@@ -229,3 +237,11 @@ humi0: timestamp:26000000 value:72.28
 ```
 
 [(See the complete log)](https://gist.github.com/lupyuen/f20fbfbf5d4f1103946a278b87b8bc3c)
+
+We see that Pressure (`value1`), Temperature (`value2`) and Humidity (`value`) are returned correctly by the C Version of the Sensor App.
+
+Something got messed up in the Auto-Translation from C to Zig. Let's find out why...
+
+# Fix Sensor App
+
+TODO
