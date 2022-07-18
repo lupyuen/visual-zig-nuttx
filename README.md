@@ -357,3 +357,18 @@ riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
 riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
 ```
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest -n 1 humi0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+humi0: timestamp:32420000 value:68
+SensorTest: Received message: humi0, number:1/1
+
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+baro0: timestamp:42610000 value1:1003 value2:31
+SensorTest: Received message: baro0, number:1/1
+```
