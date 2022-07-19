@@ -664,9 +664,105 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 Probably because `struct_sensor_event_baro` contains a `timestamp` field that's a 64-bit Integer.
 
-# Clean up
+# Clean Up
 
-TODO
+The Auto-Translation from C to Zig looks super verbose and strips away the Macro Constants...
+
+```zig
+// Parse the Command-Line Options
+g_should_exit = @as(c_int, 0) != 0;
+while ((blk: {
+    const tmp = c.getopt(argc, argv, "i:b:n:h");
+    ret = tmp;
+    break :blk tmp;
+}) != -@as(c_int, 1)) {
+    while (true) {
+        switch (ret) {
+            @as(c_int, 105) => {
+                interval = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
+                break;
+            },
+            @as(c_int, 98) => {
+                latency = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
+                break;
+            },
+            @as(c_int, 110) => {
+                count = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
+                break;
+            },
+            else => {
+                usage();
+                return ret;
+            },
+        }
+        break;
+    }
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/01d5cc053b2c980f16a406afc62a85911a18e18c/sensortest.zig#L62-L90)
+
+We clean up the Zig code like this...
+
+```zig
+// Parse the Command-Line Options
+g_should_exit = false;
+while ((blk: {
+    const tmp = c.getopt(argc, argv, "i:b:n:h");
+    ret = tmp;
+    break :blk tmp;
+}) != c.EOF) {
+    switch (ret) {
+        'i' => {
+            interval = c.strtoul(c.getoptargp().*, null, 0);
+        },
+        'b' => {
+            latency = c.strtoul(c.getoptargp().*, null, 0);
+        },
+        'n' => {
+            count = c.strtoul(c.getoptargp().*, null, 0);
+        },
+        else => {
+            usage();
+            return ret;
+        },
+    }
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/e72dbf00f9acd87ae19ac127fb50537706d7522e/sensortest.zig#L64-L86)
+
+So that it resembles the original C code...
+
+```c
+g_should_exit = false;
+while ((ret = getopt(argc, argv, "i:b:n:h")) != EOF)
+  {
+    switch (ret)
+      {
+        case 'i':
+          interval = strtoul(optarg, NULL, 0);
+          break;
+
+        case 'b':
+          latency = strtoul(optarg, NULL, 0);
+          break;
+
+        case 'n':
+          count = strtoul(optarg, NULL, 0);
+          break;
+
+        case 'h':
+        default:
+          usage();
+          goto name_err;
+      }
+  }
+```
+
+[(Source)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c#L268-L290)
+
+We test again to be sure that the Zig Sensor App is still working OK...
 
 ```text
 NuttShell (NSH) NuttX-10.3.0
