@@ -175,11 +175,19 @@ pub export fn sensortest_main(
         if (c.poll(&fds, 1, -1) > 0) {
 
             // Read the Sensor Data
-            if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len) {
+            if (c.read(
+                fd, 
+                &sensor_data, 
+                @bitCast(usize, len)
+            ) >= len) {
 
                 // Print the Sensor Data
-                received +%= 1;
-                g_sensor_info[@intCast(c_uint, idx)].print.?(&sensor_data, name);
+                received += 1;
+                g_sensor_info[@intCast(c_uint, idx)]
+                    .print.?(
+                        &sensor_data, 
+                        name
+                    );
             }
         }
     }
