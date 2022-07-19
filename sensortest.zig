@@ -118,9 +118,17 @@ pub export fn sensortest_main(
     }
 
     // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
-    _ = c.snprintf(@ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), @bitCast(usize, @as(c_int, 256)), "/dev/sensor/%s", name);
-    fd = c.open(@ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), (@as(c_int, 1) << @intCast(std.math.Log2Int(c_int), 0)) | (@as(c_int, 1) << @intCast(std.math.Log2Int(c_int), 6)));
-    if (fd < @as(c_int, 0)) {
+    _ = c.snprintf(
+        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
+        c.PATH_MAX, 
+        "/dev/sensor/%s", 
+        name
+    );
+    fd = c.open(
+        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
+        c.O_RDONLY | c.O_NONBLOCK
+    );
+    if (fd < 0) {
         ret = -c.__errno().*;
         _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
         return ret;
