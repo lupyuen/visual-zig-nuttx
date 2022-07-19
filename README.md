@@ -590,7 +590,7 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
 
-So that we no longer need to worry about deallocating the buffer...
+So that we no longer worry about deallocating the buffer...
 
 ```zig
 // Use static buffer
@@ -606,6 +606,48 @@ if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len
 ```
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L98-L153)
+
+We also moved the Device Name from the Stack...
+
+```zig
+/// Main Function that will be called by NuttX. We read the Sensor Data from a Sensor.
+pub export fn sensortest_main(...) {
+    var devname: [c.PATH_MAX]u8 = undefined;
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/b680cfa718661db34e15cb0b9861c68c1598ead2/sensortest.zig#L46)
+
+To a Static Buffer...
+
+```zig
+/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// (Aligned to 8 bytes because it's passed to C)
+var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/f0887918e5efb990ee81911d1f851c5ff6334875/sensortest.zig#L534-L536)
+
+And we removed the Alignment from Device Name...
+
+```zig
+fd = c.open(
+    @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
+    c.O_RDONLY | c.O_NONBLOCK
+);
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/b680cfa718661db34e15cb0b9861c68c1598ead2/sensortest.zig#L127-L130)
+
+So it looks like this...
+
+```zig
+fd = c.open(
+    @ptrCast([*c]u8, &devname), 
+    c.O_RDONLY | c.O_NONBLOCK
+);
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/f0887918e5efb990ee81911d1f851c5ff6334875/sensortest.zig#L126-L129)
 
 # Incorrect Alignment
 
