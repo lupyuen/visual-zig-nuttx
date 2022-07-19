@@ -118,18 +118,18 @@ pub export fn sensortest_main(
 
     // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
     _ = c.snprintf(
-        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
+        @ptrCast([*c]u8, &devname), 
         devname.len,
         "/dev/sensor/%s", 
         name
     );
     fd = c.open(
-        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
+        @ptrCast([*c]u8, &devname), 
         c.O_RDONLY | c.O_NONBLOCK
     );
     if (fd < 0) {
         ret = -c.__errno().*;
-        _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
+        _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
         return ret;
     }
 
@@ -139,7 +139,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
+            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
             return ret;
         }
     }
@@ -150,7 +150,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to batch for sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
+            _ = printf("Failed to batch for sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
             return ret;
         }
     }
@@ -161,13 +161,13 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to enable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
+            _ = printf("Failed to enable sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
             return ret;
         }
     }
 
     // Prepare to poll Sensor
-    _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), interval, latency);
+    _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, &devname), interval, latency);
     fds.fd = fd;
     fds.events = @bitCast(c.pollevent_t, @as(c_int, 1));
 
@@ -193,7 +193,7 @@ pub export fn sensortest_main(
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 0));
     if (ret < 0) {
         ret = -c.__errno().*;
-        _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
+        _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
         return ret;
     }
 
