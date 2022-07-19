@@ -455,7 +455,7 @@ But calling the `debug` logger somehow causes NuttX to crash with an Assertion F
 
 # Debug Logger Crashes
 
-TODO
+Calling the `debug` logger inside `print_valf2` seems to cause weird crashes...
 
 ```zig
 debug("timestamp: {}", .{ event.*.timestamp });
@@ -520,6 +520,51 @@ riscv_registerdump: S0: 4201b9a0 S1: 2307a000 S2: 00000a80 S3: 4201bdef
 riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
 riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
+```
+
+TODO: Why?
+
+# Change to Static Buffer
+
+TODO
+
+```zig
+// Allocate buffer from heap
+len = @bitCast(c_int, @as(c_uint, g_sensor_info[@intCast(c_uint, idx)].esize));
+buffer = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), 
+    c.calloc(@bitCast(usize, @as(c_int, 1)), @bitCast(usize, len))));
+...
+// Read into heap buffer
+if (c.read(fd, @ptrCast(?*anyopaque, buffer), @bitCast(usize, len)) >= len) {
+    received +%= 1;
+    g_sensor_info[@intCast(c_uint, idx)].print.?(buffer, name);
+}
+...
+// Deallocate heap buffer
+c.free(@ptrCast(?*anyopaque, buffer));
+```
+
+TODO
+
+```zig
+/// Sensor Data Buffer
+/// (Aligned to 8 bytes because it's passed to C)
+var sensor_data align(8) = std.mem.zeroes([256]u8);
+```
+
+TODO
+
+```zig
+// Use static buffer
+len = @bitCast(c_int, @as(c_uint, g_sensor_info[@intCast(c_uint, idx)].esize));
+assert(sensor_data.len >= len);
+...
+// Read into static buffer
+if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len) {
+    g_sensor_info[@intCast(c_uint, idx)].print.?(&sensor_data, name);
+}
+...
+// No need to deallocate buffer
 ```
 
 # Incorrect Alignment
