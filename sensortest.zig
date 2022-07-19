@@ -167,10 +167,12 @@ pub export fn sensortest_main(
         }
     }
 
-    // Repeat until all samples have been read
+    // Prepare to poll Sensor
     _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), interval, latency);
     fds.fd = fd;
     fds.events = @bitCast(c.pollevent_t, @as(c_int, 1));
+
+    // Repeat until all samples have been read
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
 
         // If Sensor Data is available...
