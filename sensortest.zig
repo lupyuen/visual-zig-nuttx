@@ -55,10 +55,7 @@ pub export fn sensortest_main(
     }
 
     // Register the Signal Handler for Ctrl-C
-    // TODO: cannot cast negative value -1 to unsigned integer type 'usize'
-    // if (c.signal(@as(c_int, 10), exit_handler) == @intToPtr(c._sa_handler_t, -@as(c_int, 1))) {
-    //     return -c.__errno().*;
-    // }
+    _ = c.signal(@as(c_int, 10), exit_handler);  // TODO: Check for error
 
     // Parse the Command-Line Options
     g_should_exit = false;
@@ -360,11 +357,11 @@ fn usage() void {
     _ = printf("\t<sensor_node_name> ex, accel0(/dev/sensor/accel0)\n");
 }
 
-// pub fn exit_handler(arg_signo: c_int) callconv(.C) void {
-//     var signo = arg_signo;
-//     _ = signo;
-//     g_should_exit = @as(c_int, 1) != 0;
-// }
+pub fn exit_handler(arg_signo: c_int) callconv(.C) void {
+    var signo = arg_signo;
+    _ = signo;
+    g_should_exit = @as(c_int, 1) != 0;
+}
 
 const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
     struct_sensor_info{
