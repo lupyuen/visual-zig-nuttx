@@ -491,8 +491,8 @@ const struct_sensor_info = struct {
 };
 
 /// Sensor Data Buffer
-/// (Aligned to 32 bits because it's passed to C)
-var sensor_data align(4) = std.mem.zeroes([256]u8);
+/// (Aligned to 8 bytes because it's passed to C)
+var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 var g_should_exit: bool = @as(c_int, 0) != 0;
 
