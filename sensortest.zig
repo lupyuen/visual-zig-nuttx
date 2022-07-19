@@ -352,6 +352,7 @@ fn print_float(f: f32) void {
     _ = printf("%d.%02d", f1, f2);
 }
 
+/// Print the Command-Line Options
 fn usage() void {
     _ = printf("sensortest [arguments...] <command>\n");
     _ = printf("\t[-h      ]  sensortest commands help\n");
@@ -365,171 +366,177 @@ fn usage() void {
     _ = printf("\t<sensor_node_name> ex, accel0(/dev/sensor/accel0)\n");
 }
 
-pub fn exit_handler(arg_signo: c_int) callconv(.C) void {
-    var signo = arg_signo;
+/// Signal Handler for Ctrl-C
+export fn exit_handler(signo: c_int) void {
     _ = signo;
-    g_should_exit = @as(c_int, 1) != 0;
+    g_should_exit = true;
 }
 
-const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
+/// All Sensor Types
+const g_sensor_info = [30]struct_sensor_info{
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_accel))),
+        .esize = @sizeOf(c.struct_sensor_event_accel),
         .name = "accel",
     },
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_mag))),
+        .esize = @sizeOf(c.struct_sensor_event_mag),
         .name = "mag",
     },
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_gyro))),
+        .esize = @sizeOf(c.struct_sensor_event_gyro),
         .name = "gyro",
     },
     struct_sensor_info{
         .print = print_valf2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_baro))),
+        .esize = @sizeOf(c.struct_sensor_event_baro),
         .name = "baro",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_light))),
+        .esize = @sizeOf(c.struct_sensor_event_light),
         .name = "light",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_prox))),
+        .esize = @sizeOf(c.struct_sensor_event_prox),
         .name = "prox",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_humi))),
+        .esize = @sizeOf(c.struct_sensor_event_humi),
         .name = "humi",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_temp))),
+        .esize = @sizeOf(c.struct_sensor_event_temp),
         .name = "temp",
     },
     struct_sensor_info{
         .print = print_valf3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_rgb))),
+        .esize = @sizeOf(c.struct_sensor_event_rgb),
         .name = "rgb",
     },
     struct_sensor_info{
         .print = print_valb,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_hall))),
+        .esize = @sizeOf(c.struct_sensor_event_hall),
         .name = "hall",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ir))),
+        .esize = @sizeOf(c.struct_sensor_event_ir),
         .name = "ir",
     },
     struct_sensor_info{
         .print = print_gps,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_gps))),
+        .esize = @sizeOf(c.struct_sensor_event_gps),
         .name = "gps",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_uv))),
+        .esize = @sizeOf(c.struct_sensor_event_uv),
         .name = "uv",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_noise))),
+        .esize = @sizeOf(c.struct_sensor_event_noise),
         .name = "noise",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_pm25))),
+        .esize = @sizeOf(c.struct_sensor_event_pm25),
         .name = "pm25",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_pm1p0))),
+        .esize = @sizeOf(c.struct_sensor_event_pm1p0),
         .name = "pm1p0",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_pm10))),
+        .esize = @sizeOf(c.struct_sensor_event_pm10),
         .name = "pm10",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_co2))),
+        .esize = @sizeOf(c.struct_sensor_event_co2),
         .name = "co2",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_hcho))),
+        .esize = @sizeOf(c.struct_sensor_event_hcho),
         .name = "hcho",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_tvoc))),
+        .esize = @sizeOf(c.struct_sensor_event_tvoc),
         .name = "tvoc",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ph))),
+        .esize = @sizeOf(c.struct_sensor_event_ph),
         .name = "ph",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_dust))),
+        .esize = @sizeOf(c.struct_sensor_event_dust),
         .name = "dust",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_hrate))),
+        .esize = @sizeOf(c.struct_sensor_event_hrate),
         .name = "hrate",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_hbeat))),
+        .esize = @sizeOf(c.struct_sensor_event_hbeat),
         .name = "hbeat",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ecg))),
+        .esize = @sizeOf(c.struct_sensor_event_ecg),
         .name = "ecg",
     },
     struct_sensor_info{
         .print = print_ppgd,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ppgd))),
+        .esize = @sizeOf(c.struct_sensor_event_ppgd),
         .name = "ppgd",
     },
     struct_sensor_info{
         .print = print_ppgq,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ppgq))),
+        .esize = @sizeOf(c.struct_sensor_event_ppgq),
         .name = "ppgq",
     },
     struct_sensor_info{
         .print = print_valf2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_impd))),
+        .esize = @sizeOf(c.struct_sensor_event_impd),
         .name = "impd",
     },
     struct_sensor_info{
         .print = print_vali2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_ots))),
+        .esize = @sizeOf(c.struct_sensor_event_ots),
         .name = "ots",
     },
     struct_sensor_info{
         .print = print_gps_satellite,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(c.struct_sensor_event_gps_satellite))),
+        .esize = @sizeOf(c.struct_sensor_event_gps_satellite),
         .name = "gps_satellite",
     },
 };
 
+/// Sensor Info
 const struct_sensor_info = struct {
+    /// Print function for Sensor Data
     print: data_print,
+    /// Size of Sensor Data
     esize: u8,
+    /// Name of Sensor Type
     name: [*c]const u8,
 };
 
+/// Sensor Data Printer
 const data_print = ?fn ([*c]const u8, [*c]const u8) void;
 
 /// Sensor Data Buffer
