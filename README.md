@@ -455,7 +455,7 @@ But calling the `debug` logger somehow causes NuttX to crash with an Assertion F
 
 # Debug Logger Crashes
 
-Calling the `debug` logger inside `print_valf2` seems to cause weird crashes...
+Calling the `debug` logger inside `print_valf2` causes weird crashes...
 
 ```zig
 debug("timestamp: {}", .{ event.*.timestamp });
@@ -526,7 +526,7 @@ TODO: Why?
 
 # Change to Static Buffer
 
-TODO
+Originally we allocated the Sensor Data Buffer from the Heap via `calloc`...
 
 ```zig
 // Allocate buffer from heap
@@ -536,7 +536,6 @@ buffer = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8),
 ...
 // Read into heap buffer
 if (c.read(fd, @ptrCast(?*anyopaque, buffer), @bitCast(usize, len)) >= len) {
-    received +%= 1;
     g_sensor_info[@intCast(c_uint, idx)].print.?(buffer, name);
 }
 ...
@@ -544,7 +543,7 @@ if (c.read(fd, @ptrCast(?*anyopaque, buffer), @bitCast(usize, len)) >= len) {
 c.free(@ptrCast(?*anyopaque, buffer));
 ```
 
-TODO
+To make this a little safer, we switched to a Static Buffer...
 
 ```zig
 /// Sensor Data Buffer
@@ -552,7 +551,9 @@ TODO
 var sensor_data align(8) = std.mem.zeroes([256]u8);
 ```
 
-TODO
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
+
+So that we no longer need to worry about deallocating the buffer...
 
 ```zig
 // Use static buffer
@@ -566,6 +567,8 @@ if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len
 ...
 // No need to deallocate buffer
 ```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L98-L153)
 
 # Incorrect Alignment
 
@@ -619,5 +622,7 @@ Which means that the buffer address must be aligned to 8 bytes...
 /// (Aligned to 8 bytes because it's passed to C)
 var sensor_data align(8) = std.mem.zeroes([256]u8);
 ```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
 
 Probably because `struct_sensor_event_baro` contains a `timestamp` field that's a 64-bit Integer.
