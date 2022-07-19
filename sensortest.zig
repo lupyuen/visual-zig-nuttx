@@ -45,7 +45,6 @@ pub export fn sensortest_main(
     var count: c_uint = 0;
     var devname: [256]u8 = undefined;
     var fds: c.struct_pollfd = undefined;
-    var buffer: [*c]u8 = undefined;
     var name: [*c]u8 = undefined;
     var len: c_int = 0;
     var fd: c_int = undefined;
@@ -97,7 +96,7 @@ pub export fn sensortest_main(
             while (@bitCast(c_uint, idx) < (@sizeOf([30]struct_sensor_info) / @sizeOf(struct_sensor_info))) : (idx += 1) {
                 if (!(c.strncmp(name, g_sensor_info[@intCast(c_uint, idx)].name, c.strlen(g_sensor_info[@intCast(c_uint, idx)].name)) != 0)) {
                     len = @bitCast(c_int, @as(c_uint, g_sensor_info[@intCast(c_uint, idx)].esize));
-                    buffer = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), c.calloc(@bitCast(usize, @as(c_int, 1)), @bitCast(usize, len))));
+                    assert(sensor_data.len >= len);
                     break;
                 }
             }
@@ -106,10 +105,6 @@ pub export fn sensortest_main(
             _ = printf("The sensor node name:%s is invalid\n", name);
             usage();
             ret = -@as(c_int, 22);
-            return ret;
-        }
-        if (!(buffer != null)) {
-            ret = -@as(c_int, 12);
             return ret;
         }
     } else {
@@ -153,9 +148,9 @@ pub export fn sensortest_main(
     fds.events = @bitCast(c.pollevent_t, @as(c_int, 1));
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
         if (c.poll(&fds, @bitCast(c.nfds_t, @as(c_int, 1)), -@as(c_int, 1)) > @as(c_int, 0)) {
-            if (c.read(fd, @ptrCast(?*anyopaque, buffer), @bitCast(usize, len)) >= len) {
+            if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len) {
                 received +%= 1;
-                g_sensor_info[@intCast(c_uint, idx)].print.?(buffer, name);
+                g_sensor_info[@intCast(c_uint, idx)].print.?(&sensor_data, name);
             }
         }
     }
@@ -168,8 +163,6 @@ pub export fn sensortest_main(
     }
     debug("close", .{});
     _ = c.close(fd);
-    debug("free", .{});
-    c.free(@ptrCast(?*anyopaque, buffer));
     debug("getoptindp", .{});
     c.getoptindp().* = 0;
     debug("return", .{});
@@ -496,6 +489,10 @@ const struct_sensor_info = struct {
     esize: u8,
     name: [*c]const u8,
 };
+
+/// Sensor Data Buffer
+/// (Aligned to 32 bits because it's passed to C)
+var sensor_data align(4) = std.mem.zeroes([256]u8);
 
 var g_should_exit: bool = @as(c_int, 0) != 0;
 

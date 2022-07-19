@@ -521,3 +521,34 @@ riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
 riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
 ```
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+
+!ZIG PANIC!
+incorrect alignment
+Stack Trace:
+0x23014f4c
+0x230161e2
+```
+
+```text
+/home/user/nuttx/visual-zig-nuttx/sensortest.zig:196
+    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+23014f2a:	85aa                	mv	a1,a0
+23014f2c:	fcb42e23          	sw	a1,-36(s0)
+23014f30:	891d                	andi	a0,a0,7
+23014f32:	4581                	li	a1,0
+23014f34:	00b50c63          	beq	a0,a1,23014f4c <print_valf2+0x32>
+23014f38:	a009                	j	23014f3a <print_valf2+0x20>
+23014f3a:	23068537          	lui	a0,0x23068
+23014f3e:	3c850513          	addi	a0,a0,968 # 230683c8 <__unnamed_6>
+23014f42:	4581                	li	a1,0
+23014f44:	00000097          	auipc	ra,0x0
+23014f48:	dd4080e7          	jalr	-556(ra) # 23014d18 <panic>
+23014f4c:	fdc42503          	lw	a0,-36(s0)
+23014f50:	fea42a23          	sw	a0,-12(s0)
+```
