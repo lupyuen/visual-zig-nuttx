@@ -532,7 +532,7 @@ riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
 
 This crashes inside `free` when deallocating the Sensor Data Buffer, might be due to a Heap Problem.
 
-(Or maybe due to a Corrupted Stack?)
+(Or maybe due to a Corrupted Stack? Caused by Floats?)
 
 For safety, let's convert the Heap Buffer to a Static Buffer...
 
