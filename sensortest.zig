@@ -58,6 +58,8 @@ pub export fn sensortest_main(
     // if (c.signal(@as(c_int, 10), exit_handler) == @intToPtr(c._sa_handler_t, -@as(c_int, 1))) {
     //     return -c.__errno().*;
     // }
+
+    // Parse the Command-Line Options
     g_should_exit = @as(c_int, 0) != 0;
     while ((blk: {
         const tmp = c.getopt(argc, argv, "i:b:n:h");
@@ -86,6 +88,8 @@ pub export fn sensortest_main(
             break;
         }
     }
+
+    // Get Sensor Type
     if (c.getoptindp().* < argc) {
         name = (blk: {
             const tmp = c.getoptindp().*;
@@ -112,6 +116,8 @@ pub export fn sensortest_main(
         ret = -@as(c_int, 22);
         return ret;
     }
+
+    // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
     _ = c.snprintf(@ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), @bitCast(usize, @as(c_int, 256)), "/dev/sensor/%s", name);
     fd = c.open(@ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), (@as(c_int, 1) << @intCast(std.math.Log2Int(c_int), 0)) | (@as(c_int, 1) << @intCast(std.math.Log2Int(c_int), 6)));
     if (fd < @as(c_int, 0)) {
@@ -119,6 +125,8 @@ pub export fn sensortest_main(
         _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
         return ret;
     }
+
+    // Set Standby Interval
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 129), &interval);
     if (ret < @as(c_int, 0)) {
         ret = -c.__errno().*;
@@ -127,6 +135,8 @@ pub export fn sensortest_main(
             return ret;
         }
     }
+
+    // Set Batch Latency
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 130), &latency);
     if (ret < @as(c_int, 0)) {
         ret = -c.__errno().*;
@@ -135,6 +145,8 @@ pub export fn sensortest_main(
             return ret;
         }
     }
+
+    // Enable Sensor and switch to Normal Power Mode
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 1));
     if (ret < @as(c_int, 0)) {
         ret = -c.__errno().*;
@@ -143,17 +155,27 @@ pub export fn sensortest_main(
             return ret;
         }
     }
+
+    // Repeat until all samples have been read
     _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), interval, latency);
     fds.fd = fd;
     fds.events = @bitCast(c.pollevent_t, @as(c_int, 1));
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
+
+        // If Sensor Data is available...
         if (c.poll(&fds, @bitCast(c.nfds_t, @as(c_int, 1)), -@as(c_int, 1)) > @as(c_int, 0)) {
+
+            // Read the Sensor Data
             if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len) {
+
+                // Print the Sensor Data
                 received +%= 1;
                 g_sensor_info[@intCast(c_uint, idx)].print.?(&sensor_data, name);
             }
         }
     }
+
+    // Disable Sensor and switch to Low Power Mode
     _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 0));
     if (ret < @as(c_int, 0)) {
@@ -161,11 +183,11 @@ pub export fn sensortest_main(
         _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
         return ret;
     }
+
+    // Close the Sensor Device
     debug("close", .{});
     _ = c.close(fd);
-    debug("getoptindp", .{});
     c.getoptindp().* = 0;
-    debug("return", .{});
     return ret;
 }
 
