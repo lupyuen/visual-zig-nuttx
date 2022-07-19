@@ -461,42 +461,7 @@ Calling the `debug` logger inside `print_valf2` causes weird crashes...
 debug("timestamp: {}", .{ event.*.timestamp });
 ```
 
-```text
-up_assert: Assertion failed at file:common/riscv_doirq.c line: 78 task: sensortest
-backtrace| 3: 0x2300bd9a
-riscv_registerdump: EPC: 2300bd9a
-riscv_registerdump: A0: 00000000 A1: 4201bc38 A2: 00000013 A3: 00000000
-riscv_registerdump: A4: 00000000 A5: 0000000b A6: a0000000 A7: 2306a1b2
-riscv_registerdump: T0: f0000000 T1: 80000000 T2: 00000000 T3: 00000000
-riscv_registerdump: T4: 00000008 T5: 00010000 T6: 6d0cb600
-riscv_registerdump: S0: 0000001b S1: 00000000 S2: 23079000 S3: 4201b8c8
-riscv_registerdump: S4: 4201bc38 S5: 00000006 S6: 00000000 S7: 00000000
-riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
-riscv_registerdump: SP: 4201bbf0 FP: 0000001b TP: 00000000 RA: 2300bd78
-```
-
-```text
-/home/user/nuttx/nuttx/fs/inode/fs_files.c:380
-  /* if f_inode is NULL, fd was closed */
-  if (!(*filep)->f_inode)
-2300bd98:	441c                	lw	a5,8(s0)
-2300bd9a:	c39d                	beqz	a5,2300bdc0 <fs_getfilep+0xaa>
-2300bd9c:	87a2                	mv	a5,s0
-2300bd9e:	00fa2023          	sw	a5,0(s4)
-```
-
-```text
-up_assert: Assertion failed at file:mm_heap/mm_free.c line: 154 task: sensortest
-riscv_registerdump: EPC: 230086b0
-riscv_registerdump: A0: 00000000 A1: 4201bc38 A2: 00000000 A3: 00000000
-riscv_registerdump: A4: 23078460 A5: 23078000 A6: 4201bdbc A7: 23078000
-riscv_registerdump: T0: 000001ff T1: 23078460 T2: 0000002d T3: 00000068
-riscv_registerdump: T4: 00000009 T5: 0000002a T6: 0000002e
-riscv_registerdump: S0: 4201c1f0 S1: 23078000 S2: 4201b800 S3: 4201bed0
-riscv_registerdump: S4: 42013000 S5: 23078000 S6: 00000000 S7: 00000000
-riscv_registerdump: S8: 00000081 S9: 00000025 S10: 23068e25 S11: 4201bec4
-riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
-```
+Here's a crash log...
 
 ```text
 bme280_fetch: temperature=31.570000 Â°C, pressure=1025.396118 mbar, humidity=64.624023 %
@@ -522,7 +487,52 @@ riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bef0 FP: 4201b9a0 TP: 00000000 RA: 2300c78e
 ```
 
-TODO: Why?
+Another crash...
+
+```text
+up_assert: Assertion failed at file:common/riscv_doirq.c line: 78 task: sensortest
+backtrace| 3: 0x2300bd9a
+riscv_registerdump: EPC: 2300bd9a
+riscv_registerdump: A0: 00000000 A1: 4201bc38 A2: 00000013 A3: 00000000
+riscv_registerdump: A4: 00000000 A5: 0000000b A6: a0000000 A7: 2306a1b2
+riscv_registerdump: T0: f0000000 T1: 80000000 T2: 00000000 T3: 00000000
+riscv_registerdump: T4: 00000008 T5: 00010000 T6: 6d0cb600
+riscv_registerdump: S0: 0000001b S1: 00000000 S2: 23079000 S3: 4201b8c8
+riscv_registerdump: S4: 4201bc38 S5: 00000006 S6: 00000000 S7: 00000000
+riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
+riscv_registerdump: SP: 4201bbf0 FP: 0000001b TP: 00000000 RA: 2300bd78
+```
+
+```text
+/home/user/nuttx/nuttx/fs/inode/fs_files.c:380
+  /* if f_inode is NULL, fd was closed */
+  if (!(*filep)->f_inode)
+2300bd98:	441c                	lw	a5,8(s0)
+2300bd9a:	c39d                	beqz	a5,2300bdc0 <fs_getfilep+0xaa>
+2300bd9c:	87a2                	mv	a5,s0
+2300bd9e:	00fa2023          	sw	a5,0(s4)
+```
+
+And another...
+
+```text
+up_assert: Assertion failed at file:mm_heap/mm_free.c line: 154 task: sensortest
+riscv_registerdump: EPC: 230086b0
+riscv_registerdump: A0: 00000000 A1: 4201bc38 A2: 00000000 A3: 00000000
+riscv_registerdump: A4: 23078460 A5: 23078000 A6: 4201bdbc A7: 23078000
+riscv_registerdump: T0: 000001ff T1: 23078460 T2: 0000002d T3: 00000068
+riscv_registerdump: T4: 00000009 T5: 0000002a T6: 0000002e
+riscv_registerdump: S0: 4201c1f0 S1: 23078000 S2: 4201b800 S3: 4201bed0
+riscv_registerdump: S4: 42013000 S5: 23078000 S6: 00000000 S7: 00000000
+riscv_registerdump: S8: 00000081 S9: 00000025 S10: 23068e25 S11: 4201bec4
+riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
+```
+
+This crashes inside `free` when deallocating the Sensor Data Buffer, might be due to a Heap Problem.
+
+Let's convert the Heap Buffer to a Static Buffer...
+
+TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`?
 
 # Change to Static Buffer
 
