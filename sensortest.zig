@@ -172,7 +172,7 @@ pub export fn sensortest_main(
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
 
         // If Sensor Data is available...
-        if (c.poll(&fds, @bitCast(c.nfds_t, @as(c_int, 1)), -@as(c_int, 1)) > @as(c_int, 0)) {
+        if (c.poll(&fds, 1, -1) > 0) {
 
             // Read the Sensor Data
             if (c.read(fd, @ptrCast(?*anyopaque, &sensor_data), @bitCast(usize, len)) >= len) {
