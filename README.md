@@ -298,9 +298,9 @@ We see that Humidity (`value`), Pressure (`value1`) and Temperature (`value2`) a
 
 Something got messed up in the Auto-Translation from C [(sensortest.c)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c) to Zig [(sensortest.zig)](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417). Let's find out why...
 
-# Fix Sensor Values
+# Fix Floating-Point Values
 
-Earlier we saw that our Zig Sensor App returned the incorrect Sensor Values for Pressure (`value1`) and Temperature (`value2`)...
+Earlier we saw that our Zig Sensor App printed the incorrect Sensor Values for Pressure (`value1`) and Temperature (`value2`)...
 
 ```bash
 nsh> sensortest -n 1 baro0
@@ -309,7 +309,7 @@ bme280_fetch: temperature=30.520000 °C, pressure=1029.177490 mbar, humidity=72.
 baro0: timestamp:78490000 value1:72.18 value2:72.18
 ```
 
-Zig seems to have a problem passing the Pressure and Temperature values (both `f32`) to `printf`...
+Zig seems to have a problem passing the Pressure and Temperature values (both `f32`) to `printf`, based on this Auto-Translated Zig Code...
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
