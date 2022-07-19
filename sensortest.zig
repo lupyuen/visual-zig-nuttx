@@ -185,11 +185,12 @@ pub export fn sensortest_main(
             }
         }
     }
+    _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
 
     // Disable Sensor and switch to Low Power Mode
-    _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
+    // ret = c.ioctl(fd, SNIOC_ACTIVATE, @as(c_int, 0));
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 0));
-    if (ret < @as(c_int, 0)) {
+    if (ret < 0) {
         ret = -c.__errno().*;
         _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
         return ret;
