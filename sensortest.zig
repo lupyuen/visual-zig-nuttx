@@ -43,7 +43,6 @@ pub export fn sensortest_main(
     var received: c_uint = 0;
     var latency: c_uint = 0;
     var count: c_uint = 0;
-    var devname: [c.PATH_MAX]u8 = undefined;
     var fds: c.struct_pollfd = undefined;
     var name: [*c]u8 = undefined;
     var len: c_int = 0;
@@ -120,7 +119,7 @@ pub export fn sensortest_main(
     // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
     _ = c.snprintf(
         @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), 
-        c.PATH_MAX, 
+        devname.len,
         "/dev/sensor/%s", 
         name
     );
@@ -526,13 +525,18 @@ const struct_sensor_info = struct {
     name: [*c]const u8,
 };
 
+const data_print = ?fn ([*c]const u8, [*c]const u8) void;
+
 /// Sensor Data Buffer
 /// (Aligned to 8 bytes because it's passed to C)
 var sensor_data align(8) = std.mem.zeroes([256]u8);
 
-var g_should_exit: bool = @as(c_int, 0) != 0;
+/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// (Aligned to 8 bytes because it's passed to C)
+var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 
-const data_print = ?fn ([*c]const u8, [*c]const u8) void;
+/// True if we should exit due to Ctrl-C
+var g_should_exit = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
