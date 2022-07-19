@@ -407,6 +407,29 @@ humi0: timestamp:28580000 value:77.44
 SensorTest: Received message: humi0, number:1/1
 ```
 
+_Have we tried other options for `@floatCast`?_
+
+Yes we tested these options for `@floatCast`...
+
+```zig
+_ = printf("value1 no floatCast: %f\n",  event.*.pressure);
+_ = printf("value1 floatCast f32: %f\n", @floatCast(f32, event.*.pressure));
+_ = printf("value1 floatCast f64: %f\n", @floatCast(f64, event.*.pressure));
+```
+
+But the result is incorrect...
+
+```text
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+baro0: timestamp:60280000 value1:1006.90 value2:30.79
+value1 no floatCast: 0.000000
+value1 floatCast f32: 0.000000
+value1 floatCast f64: 30.790001
+```
+
+Because `value1` (Pressure) is supposed to be 1006, not 30.
+
 _Instead of `printf`, why not call the Zig Debug Logger `debug`?_
 
 ```zig
