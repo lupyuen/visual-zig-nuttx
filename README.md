@@ -325,7 +325,7 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L187-L198)
 
-The workaround is to convert the values as Integer AND split into two calls to `printf`...
+The workaround is to convert the Float values to Integer AND split into two calls to `printf`...
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
@@ -343,7 +343,7 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/74ac3c36f44911685503f4ba7161771907af2793/sensortest.zig#L191-L222)
 
-Now our Zig Sensor App prints the correct values, truncated as Integers...
+Now our Zig Sensor App prints the correct values, but truncated as Integers...
 
 ```text
 nsh> sensortest -n 1 baro0
