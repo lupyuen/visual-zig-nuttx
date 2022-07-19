@@ -39,53 +39,49 @@ pub export fn sensortest_main(
 ) c_int {
     debug("Zig Sensor Test", .{});
 
-    var interval: c_uint = @bitCast(c_uint, @as(c_int, 1000000));
+    var interval: c_uint = 1_000_000;
     var received: c_uint = 0;
     var latency: c_uint = 0;
     var count: c_uint = 0;
-    var devname: [256]u8 = undefined;
+    var devname: [c.PATH_MAX]u8 = undefined;
     var fds: c.struct_pollfd = undefined;
     var name: [*c]u8 = undefined;
     var len: c_int = 0;
     var fd: c_int = undefined;
     var idx: c_int = undefined;
     var ret: c_int = undefined;
-    if (argc <= @as(c_int, 1)) {
+    if (argc <= 1) {
         usage();
-        return -@as(c_int, 22);
+        return -c.EINVAL;
     }
+
+    // Register the Signal Handler for Ctrl-C
     // TODO: cannot cast negative value -1 to unsigned integer type 'usize'
     // if (c.signal(@as(c_int, 10), exit_handler) == @intToPtr(c._sa_handler_t, -@as(c_int, 1))) {
     //     return -c.__errno().*;
     // }
 
     // Parse the Command-Line Options
-    g_should_exit = @as(c_int, 0) != 0;
+    g_should_exit = false;
     while ((blk: {
         const tmp = c.getopt(argc, argv, "i:b:n:h");
         ret = tmp;
         break :blk tmp;
-    }) != -@as(c_int, 1)) {
-        while (true) {
-            switch (ret) {
-                @as(c_int, 105) => {
-                    interval = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
-                    break;
-                },
-                @as(c_int, 98) => {
-                    latency = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
-                    break;
-                },
-                @as(c_int, 110) => {
-                    count = @bitCast(c_uint, @truncate(c_uint, c.strtoul(c.getoptargp().*, null, @as(c_int, 0))));
-                    break;
-                },
-                else => {
-                    usage();
-                    return ret;
-                },
-            }
-            break;
+    }) != c.EOF) {
+        switch (ret) {
+            'i' => {
+                interval = c.strtoul(c.getoptargp().*, null, 0);
+            },
+            'b' => {
+                latency = c.strtoul(c.getoptargp().*, null, 0);
+            },
+            'n' => {
+                count = c.strtoul(c.getoptargp().*, null, 0);
+            },
+            else => {
+                usage();
+                return ret;
+            },
         }
     }
 

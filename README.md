@@ -663,3 +663,25 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
 
 Probably because `struct_sensor_event_baro` contains a `timestamp` field that's a 64-bit Integer.
+
+# Clean up
+
+TODO
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+baro0: timestamp:132170000 value1:1005.53 value2:30.97
+SensorTest: Received message: baro0, number:1/1
+close
+
+nsh> sensortest -n 1 humi0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+humi0: timestamp:144650000 value:68.12
+SensorTest: Received message: humi0, number:1/1
+close
+nsh>
+```
