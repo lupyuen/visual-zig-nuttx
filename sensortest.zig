@@ -135,30 +135,33 @@ pub export fn sensortest_main(
     }
 
     // Set Standby Interval
+    // ret = c.ioctl(fd, c.SNIOC_SET_INTERVAL, &interval);
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 129), &interval);
-    if (ret < @as(c_int, 0)) {
+    if (ret < 0) {
         ret = -c.__errno().*;
-        if (ret != -@as(c_int, 134)) {
+        if (ret != -c.ENOTSUP) {
             _ = printf("Failed to set interval for sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
             return ret;
         }
     }
 
     // Set Batch Latency
+    // ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 130), &latency);
-    if (ret < @as(c_int, 0)) {
+    if (ret < 0) {
         ret = -c.__errno().*;
-        if (ret != -@as(c_int, 134)) {
+        if (ret != -c.ENOTSUP) {
             _ = printf("Failed to batch for sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
             return ret;
         }
     }
 
     // Enable Sensor and switch to Normal Power Mode
+    // ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
     ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 1));
-    if (ret < @as(c_int, 0)) {
+    if (ret < 0) {
         ret = -c.__errno().*;
-        if (ret != -@as(c_int, 134)) {
+        if (ret != -c.ENOTSUP) {
             _ = printf("Failed to enable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &devname)), c.strerror(c.__errno().*));
             return ret;
         }

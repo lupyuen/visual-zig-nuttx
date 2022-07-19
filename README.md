@@ -673,14 +673,14 @@ NuttShell (NSH) NuttX-10.3.0
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
 SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
-baro0: timestamp:16790000 value1:1005.27 value2:31.20
+baro0: timestamp:13510000 value1:1005.05 value2:31.39
 SensorTest: Received message: baro0, number:1/1
 close
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
-humi0: timestamp:23510000 value:69.17
+humi0: timestamp:21780000 value:68.75
 SensorTest: Received message: humi0, number:1/1
 close
 ```
