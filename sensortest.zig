@@ -93,23 +93,27 @@ pub export fn sensortest_main(
         }).*;
         {
             idx = 0;
-            while (@bitCast(c_uint, idx) < (@sizeOf([30]struct_sensor_info) / @sizeOf(struct_sensor_info))) : (idx += 1) {
-                if (!(c.strncmp(name, g_sensor_info[@intCast(c_uint, idx)].name, c.strlen(g_sensor_info[@intCast(c_uint, idx)].name)) != 0)) {
-                    len = @bitCast(c_int, @as(c_uint, g_sensor_info[@intCast(c_uint, idx)].esize));
+            while (idx < (@sizeOf([30]struct_sensor_info) / @sizeOf(struct_sensor_info))) : (idx += 1) {
+                if (c.strncmp(
+                    name, 
+                    g_sensor_info[@intCast(c_uint, idx)].name, 
+                    c.strlen(g_sensor_info[@intCast(c_uint, idx)].name)
+                ) == 0) {
+                    len = g_sensor_info[@intCast(c_uint, idx)].esize;
                     assert(sensor_data.len >= len);
                     break;
                 }
             }
         }
-        if (!(len != 0)) {
+        if (len == 0) {
             _ = printf("The sensor node name:%s is invalid\n", name);
             usage();
-            ret = -@as(c_int, 22);
+            ret = -c.EINVAL;
             return ret;
         }
     } else {
         usage();
-        ret = -@as(c_int, 22);
+        ret = -c.EINVAL;
         return ret;
     }
 
