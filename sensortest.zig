@@ -201,36 +201,34 @@ fn print_valf3(buffer: [*c]const u8, name: [*c]const u8) void {
 
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-    // _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
+    _ = printf("%s: timestamp:%llu ", 
+        name, 
+        event.*.timestamp, 
+    );
+    _ = printf("value1:");  print_float(event.*.pressure);
+    _ = printf(" value2:"); print_float(event.*.temperature);
+    _ = printf("\n");
+    // Previously: printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
     //     name, 
     //     event.*.timestamp, 
     //     @floatCast(f64, event.*.pressure), 
     //     @floatCast(f64, event.*.temperature)
     // );
-    _ = printf("%s: timestamp:%llu ", 
-        name, 
-        event.*.timestamp, 
-    );
-    _ = printf("value1:%d value2:%d\n", 
-        @floatToInt(i32, event.*.pressure), 
-        @floatToInt(i32, event.*.temperature)
-    );
 }
 
 fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
-    // _ = printf("%s: timestamp:%llu value:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.proximity)
-    // );
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
     );
-    _ = printf("value:%d\n", 
-        @floatToInt(i32, event.*.proximity)
-    );
+    _ = printf("value:");  print_float(event.*.proximity);
+    _ = printf("\n");
+    // Previously: printf("%s: timestamp:%llu value:%.2f\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     @floatCast(f64, event.*.proximity)
+    // );
 }
 
 fn print_valb(buffer: [*c]const u8, name: [*c]const u8) void {
@@ -310,6 +308,15 @@ fn print_gps_satellite(buffer: [*c]const u8, name: [*c]const u8) void {
         event.*.count, 
         event.*.satellites
     );
+}
+
+/// Print the float with 2 decimal places.
+/// We print as integers because `printf` has a problem with floats.
+fn print_float(f: f32) void {
+    const scaled = @floatToInt(i32, f * 100);
+    const f1 = @divTrunc(scaled, 100);
+    const f2 = @mod(scaled, 100);
+    _ = printf("%d.%02d", f1, f2);
 }
 
 fn usage() void {

@@ -359,6 +359,22 @@ humi0: timestamp:32420000 value:68
 SensorTest: Received message: humi0, number:1/1
 ```
 
+TODO
+
+```text
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+baro0: timestamp:17780000 value1:1006.12 value2:29.65
+SensorTest: Received message: baro0, number:1/1
+
+nsh> sensortest -n 1 humi0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+humi0: timestamp:28580000 value:77.44
+SensorTest: Received message: humi0, number:1/1
+```
+
 _Instead of `printf`, why not call the Zig Debug Logger `debug`?_
 
 ```zig
