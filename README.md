@@ -503,6 +503,8 @@ riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
 riscv_registerdump: SP: 4201bbf0 FP: 0000001b TP: 00000000 RA: 2300bd78
 ```
 
+Which happens when closing a file (console?)...
+
 ```text
 /home/user/nuttx/nuttx/fs/inode/fs_files.c:380
   /* if f_inode is NULL, fd was closed */
@@ -513,7 +515,7 @@ riscv_registerdump: SP: 4201bbf0 FP: 0000001b TP: 00000000 RA: 2300bd78
 2300bd9e:	00fa2023          	sw	a5,0(s4)
 ```
 
-And another...
+And another crash...
 
 ```text
 up_assert: Assertion failed at file:mm_heap/mm_free.c line: 154 task: sensortest
@@ -530,7 +532,9 @@ riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
 
 This crashes inside `free` when deallocating the Sensor Data Buffer, might be due to a Heap Problem.
 
-Let's convert the Heap Buffer to a Static Buffer...
+(Or maybe due to a Corrupted Stack?)
+
+For safety, let's convert the Heap Buffer to a Static Buffer...
 
 TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`?
 
