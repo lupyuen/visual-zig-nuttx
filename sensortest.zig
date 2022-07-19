@@ -166,7 +166,7 @@ pub export fn sensortest_main(
     // Prepare to poll Sensor
     _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, &devname), interval, latency);
     fds.fd = fd;
-    fds.events = @bitCast(c.pollevent_t, @as(c_int, 1));
+    fds.events = c.POLLIN;
 
     // Repeat until all samples have been read
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
