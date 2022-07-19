@@ -313,7 +313,7 @@ Zig seems to have a problem passing the Pressure and Temperature values (both `f
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
        name, 
        event.*.timestamp, 
@@ -325,11 +325,11 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L187-L198)
 
-The workaround is to cast the values as Integer AND split into two calls to `printf`...
+The workaround is to convert the values as Integer AND split into two calls to `printf`...
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    var event: [*c]c.struct_sensor_event_baro = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
@@ -359,7 +359,39 @@ humi0: timestamp:32420000 value:68
 SensorTest: Received message: humi0, number:1/1
 ```
 
-TODO
+Since `printf` works OK with Integers, let's print the Floats as Integers with 2 decimal places...
+
+```zig
+/// Print the float with 2 decimal places.
+/// We print as integers because `printf` has a problem with floats.
+fn print_float(f: f32) void {
+    const scaled = @floatToInt(i32, f * 100);
+    const f1 = @divTrunc(scaled, 100);
+    const f2 = @mod(scaled, 100);
+    _ = printf("%d.%02d", f1, f2);
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/54d6b0c0a55126435b5244cef8f78d6060182215/sensortest.zig#L313-L320)
+
+Then we pass the Floats to `print_float` for printing...
+
+```zig
+fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
+    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    _ = printf("%s: timestamp:%llu ", 
+        name, 
+        event.*.timestamp, 
+    );
+    _ = printf("value1:");  print_float(event.*.pressure);
+    _ = printf(" value2:"); print_float(event.*.temperature);
+    _ = printf("\n");
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/54d6b0c0a55126435b5244cef8f78d6060182215/sensortest.zig#L202-L217)
+
+Finally we see the Pressure (`value1`), Temperature (`value2`) and Humidity (`value`) printed correctly with 2 decimal places!
 
 ```text
 nsh> sensortest -n 1 baro0
@@ -389,9 +421,8 @@ This causes a Linker Error, as explained below...
 This code that prints two 32-bit Floating-Point numbers...
 
 ```zig
-var event: [*c]c.struct_sensor_event_baro = 
-  @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-debug("pressure: {}", .{ event.*.pressure });
+var event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+debug("pressure: {}",    .{ event.*.pressure });
 debug("temperature: {}", .{ event.*.temperature });
 ```
 
