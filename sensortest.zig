@@ -143,8 +143,7 @@ pub export fn sensortest_main(
     }
 
     // Set Batch Latency
-    // ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
-    ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 130), &latency);
+    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
@@ -154,8 +153,7 @@ pub export fn sensortest_main(
     }
 
     // Enable Sensor and switch to Normal Power Mode
-    // ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
-    ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 1));
+    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
@@ -195,8 +193,7 @@ pub export fn sensortest_main(
     _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
 
     // Disable Sensor and switch to Low Power Mode
-    // ret = c.ioctl(fd, SNIOC_ACTIVATE, @as(c_int, 0));
-    ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 0));
+    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
     if (ret < 0) {
         ret = -c.__errno().*;
         _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
