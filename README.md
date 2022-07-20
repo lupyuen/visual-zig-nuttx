@@ -804,6 +804,14 @@ while ((ret = getopt(argc, argv, "i:b:n:h")) != EOF)
 
 [(Source)](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c#L268-L290)
 
+Our Zig Sensor App was originally this...
+
+https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L35-L170
+
+Now after cleanup becomes this...
+
+https://github.com/lupyuen/visual-zig-nuttx/blob/2effc999c3eb4d38e53ba0cb044aececc87314ff/sensortest.zig#L35-L210
+
 We test again to be sure that the Zig Sensor App is still working OK...
 
 ```text
