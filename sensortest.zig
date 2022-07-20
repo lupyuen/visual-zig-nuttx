@@ -348,20 +348,29 @@ fn print_ppgq(buffer: [*c]const u8, name: [*c]const u8) void {
         name, 
         event.*.timestamp, 
     );
-
-    _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", 
-        name, 
-        event.*.timestamp, 
-        event.*.ppg[@intCast(c_uint, @as(c_int, 0))], 
-        event.*.ppg[@intCast(c_uint, @as(c_int, 1))], 
-        event.*.ppg[@intCast(c_uint, @as(c_int, 2))], 
-        event.*.ppg[@intCast(c_uint, @as(c_int, 3))], 
-        event.*.current, 
-        @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), 
-        @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])), 
-        @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])), 
-        @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))]))
-    );
+    _ = printf(" ppg1:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 0))]);
+    _ = printf(" ppg2:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 1))]);
+    _ = printf(" ppg3:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 2))]);
+    _ = printf(" ppg4:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 3))]);
+    _ = printf(" current:%lu", event.*.current);
+    _ = printf(" gain1:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])));
+    _ = printf(" gain2:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])));
+    _ = printf(" gain3:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])));
+    _ = printf(" gain4:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))])));
+    _ = printf("\n");
+    // Previously: printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     event.*.ppg[@intCast(c_uint, @as(c_int, 0))], 
+    //     event.*.ppg[@intCast(c_uint, @as(c_int, 1))], 
+    //     event.*.ppg[@intCast(c_uint, @as(c_int, 2))], 
+    //     event.*.ppg[@intCast(c_uint, @as(c_int, 3))], 
+    //     event.*.current, 
+    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), 
+    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])), 
+    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])), 
+    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))]))
+    // );
 }
 
 /// Print GPS
@@ -371,23 +380,35 @@ fn print_gps(buffer: [*c]const u8, name: [*c]const u8) void {
         name, 
         event.*.timestamp, 
     );
-
-    _ = printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", 
-        name, 
-        event.*.timestamp, 
-        event.*.time_utc, 
-        @floatCast(f64, event.*.latitude), 
-        @floatCast(f64, event.*.longitude), 
-        @floatCast(f64, event.*.altitude), 
-        @floatCast(f64, event.*.altitude_ellipsoid), 
-        @floatCast(f64, event.*.eph), 
-        @floatCast(f64, event.*.epv), 
-        @floatCast(f64, event.*.hdop), 
-        @floatCast(f64, event.*.vdop), 
-        @floatCast(f64, event.*.ground_speed), 
-        @floatCast(f64, event.*.course), 
-        event.*.satellites_used
-    );
+    _ = printf(" time_utc: %llu", event.*.time_utc);
+    _ = printf(" latitude:");   print_float(event.*.latitude);
+    _ = printf(" longitude:");  print_float(event.*.longitude);
+    _ = printf(" altitude:");   print_float(event.*.altitude);
+    _ = printf(" altitude_ellipsoid:");  print_float(event.*.altitude_ellipsoid);
+    _ = printf(" eph:");   print_float(event.*.eph);
+    _ = printf(" epv:");   print_float(event.*.epv);
+    _ = printf(" hdop:");  print_float(event.*.hdop);
+    _ = printf(" vdop:");  print_float(event.*.vdop); 
+    _ = printf(" ground_speed:");  print_float(event.*.ground_speed);
+    _ = printf(" course:");  print_float(event.*.course);
+    _ = printf(" satellites_used: %lu", event.*.satellites_used);
+    _ = printf("\n");
+    // Previously: printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     event.*.time_utc, 
+    //     @floatCast(f64, event.*.latitude), 
+    //     @floatCast(f64, event.*.longitude), 
+    //     @floatCast(f64, event.*.altitude), 
+    //     @floatCast(f64, event.*.altitude_ellipsoid), 
+    //     @floatCast(f64, event.*.eph), 
+    //     @floatCast(f64, event.*.epv), 
+    //     @floatCast(f64, event.*.hdop), 
+    //     @floatCast(f64, event.*.vdop), 
+    //     @floatCast(f64, event.*.ground_speed), 
+    //     @floatCast(f64, event.*.course), 
+    //     event.*.satellites_used
+    // );
 }
 
 /// Print GPS with Satellites
@@ -397,13 +418,15 @@ fn print_gps_satellite(buffer: [*c]const u8, name: [*c]const u8) void {
         name, 
         event.*.timestamp, 
     );
-
-    _ = printf("%s: timestamp: %llu count: %lu satellites: %lu\n", 
-        name, 
-        event.*.timestamp, 
-        event.*.count, 
-        event.*.satellites
-    );
+    _ = printf(" count: %lu", event.*.count);
+    _ = printf(" satellites: %lu", event.*.satellites);
+    _ = printf("\n");
+    // Previously: printf("%s: timestamp: %llu count: %lu satellites: %lu\n", 
+    //     name, 
+    //     event.*.timestamp, 
+    //     event.*.count, 
+    //     event.*.satellites
+    // );
 }
 
 /// Print the float with 2 decimal places.
