@@ -107,18 +107,18 @@ pub export fn sensortest_main(
 
     // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
     _ = c.snprintf(
-        @ptrCast([*c]u8, &devname), 
+        &devname[0], 
         devname.len,
         "/dev/sensor/%s", 
         &name[0]
     );
     var fd = c.open(
-        @ptrCast([*c]u8, &devname), 
+        &devname[0], 
         c.O_RDONLY | c.O_NONBLOCK
     );
     if (fd < 0) {
         ret = -c.__errno().*;
-        _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
+        _ = printf("Failed to open device:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
         return ret;
     }
 
@@ -129,7 +129,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
+            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
             return ret;
         }
     }
@@ -139,7 +139,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to batch for sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
+            _ = printf("Failed to batch for sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
             return ret;
         }
     }
@@ -149,13 +149,13 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to enable sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
+            _ = printf("Failed to enable sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
             return ret;
         }
     }
 
     // Prepare to poll Sensor
-    _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, &devname), interval, latency);
+    _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", &devname[0], interval, latency);
     var fds: c.struct_pollfd = undefined;
     fds.fd = fd;
     fds.events = c.POLLIN;
@@ -190,7 +190,7 @@ pub export fn sensortest_main(
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
     if (ret < 0) {
         ret = -c.__errno().*;
-        _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, &devname), c.strerror(c.__errno().*));
+        _ = printf("Failed to disable sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
         return ret;
     }
 
