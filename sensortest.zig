@@ -89,7 +89,7 @@ pub export fn sensortest_main(
         }).*;
         {
             idx = 0;
-            while (idx < (@sizeOf([30]struct_sensor_info) / @sizeOf(struct_sensor_info))) : (idx += 1) {
+            while (idx < (@sizeOf([30]sensor_info) / @sizeOf(sensor_info))) : (idx += 1) {
                 if (c.strncmp(
                     name, 
                     g_sensor_info[@intCast(c_uint, idx)].name, 
@@ -373,153 +373,153 @@ export fn exit_handler(signo: c_int) void {
 }
 
 /// All Sensor Types
-const g_sensor_info = [30]struct_sensor_info{
-    struct_sensor_info{
+const g_sensor_info = [30]sensor_info{
+    sensor_info{
         .print = print_vec3,
         .esize = @sizeOf(c.struct_sensor_event_accel),
         .name = "accel",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_vec3,
         .esize = @sizeOf(c.struct_sensor_event_mag),
         .name = "mag",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_vec3,
         .esize = @sizeOf(c.struct_sensor_event_gyro),
         .name = "gyro",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf2,
         .esize = @sizeOf(c.struct_sensor_event_baro),
         .name = "baro",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_light),
         .name = "light",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_prox),
         .name = "prox",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_humi),
         .name = "humi",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_temp),
         .name = "temp",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf3,
         .esize = @sizeOf(c.struct_sensor_event_rgb),
         .name = "rgb",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valb,
         .esize = @sizeOf(c.struct_sensor_event_hall),
         .name = "hall",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_ir),
         .name = "ir",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_gps,
         .esize = @sizeOf(c.struct_sensor_event_gps),
         .name = "gps",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_uv),
         .name = "uv",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_noise),
         .name = "noise",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_pm25),
         .name = "pm25",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_pm1p0),
         .name = "pm1p0",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_pm10),
         .name = "pm10",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_co2),
         .name = "co2",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_hcho),
         .name = "hcho",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_tvoc),
         .name = "tvoc",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_ph),
         .name = "ph",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_dust),
         .name = "dust",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_hrate),
         .name = "hrate",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_hbeat),
         .name = "hbeat",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf,
         .esize = @sizeOf(c.struct_sensor_event_ecg),
         .name = "ecg",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_ppgd,
         .esize = @sizeOf(c.struct_sensor_event_ppgd),
         .name = "ppgd",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_ppgq,
         .esize = @sizeOf(c.struct_sensor_event_ppgq),
         .name = "ppgq",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_valf2,
         .esize = @sizeOf(c.struct_sensor_event_impd),
         .name = "impd",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_vali2,
         .esize = @sizeOf(c.struct_sensor_event_ots),
         .name = "ots",
     },
-    struct_sensor_info{
+    sensor_info{
         .print = print_gps_satellite,
         .esize = @sizeOf(c.struct_sensor_event_gps_satellite),
         .name = "gps_satellite",
@@ -527,7 +527,7 @@ const g_sensor_info = [30]struct_sensor_info{
 };
 
 /// Sensor Info
-const struct_sensor_info = struct {
+const sensor_info = struct {
     /// Print function for Sensor Data
     print: data_print,
     /// Size of Sensor Data
