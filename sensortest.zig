@@ -77,7 +77,7 @@ pub export fn sensortest_main(
     // Get Sensor Type
     var name: [*c]u8 = undefined;
     var len: c_int = 0;
-    var idx: c_int = undefined;
+    var idx: c_uint = undefined;
     if (c.getoptindp().* < argc) {
         name = (blk: {
             const tmp = c.getoptindp().*;
@@ -85,13 +85,13 @@ pub export fn sensortest_main(
         }).*;
         {
             idx = 0;
-            while (idx < (@sizeOf([30]sensor_info) / @sizeOf(sensor_info))) : (idx += 1) {
+            while (idx < g_sensor_info.len) : (idx += 1) {
                 if (c.strncmp(
                     name, 
-                    g_sensor_info[@intCast(c_uint, idx)].name, 
-                    c.strlen(g_sensor_info[@intCast(c_uint, idx)].name)
+                    g_sensor_info[idx].name, 
+                    c.strlen(g_sensor_info[idx].name)
                 ) == 0) {
-                    len = g_sensor_info[@intCast(c_uint, idx)].esize;
+                    len = g_sensor_info[idx].esize;
                     assert(sensor_data.len >= len);
                     break;
                 }
@@ -180,7 +180,7 @@ pub export fn sensortest_main(
 
                 // Print the Sensor Data
                 received += 1;
-                g_sensor_info[@intCast(c_uint, idx)]
+                g_sensor_info[idx]
                     .print.?(
                         &sensor_data, 
                         name
