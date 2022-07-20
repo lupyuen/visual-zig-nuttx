@@ -210,8 +210,8 @@ pub export fn sensortest_main(
 //  Print Sensor Data
 
 /// Print X, Y, Z, Temperature
-fn print_vec3(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_accel, @ptrToInt(buffer));
+fn print_vec3(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_accel, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -232,8 +232,8 @@ fn print_vec3(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print 3 floats
-fn print_valf3(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_rgb, @ptrToInt(buffer));
+fn print_valf3(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_rgb, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -252,8 +252,8 @@ fn print_valf3(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print 2 floats
-fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+fn print_valf2(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_baro, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -270,8 +270,8 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print a float
-fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
+fn print_valf(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_prox, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -286,8 +286,8 @@ fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print a boolean
-fn print_valb(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_hall, @ptrToInt(buffer));
+fn print_valb(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_hall, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -301,8 +301,8 @@ fn print_valb(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print 2 integers
-fn print_vali2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_ots, @ptrToInt(buffer));
+fn print_vali2(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_ots, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -319,8 +319,8 @@ fn print_vali2(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print PPGD
-fn print_ppgd(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_ppgd, @ptrToInt(buffer));
+fn print_ppgd(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_ppgd, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -343,8 +343,8 @@ fn print_ppgd(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print PPGQ
-fn print_ppgq(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_ppgq, @ptrToInt(buffer));
+fn print_ppgq(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_ppgq, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -375,8 +375,8 @@ fn print_ppgq(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print GPS
-fn print_gps(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_gps, @ptrToInt(buffer));
+fn print_gps(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_gps, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -413,8 +413,8 @@ fn print_gps(buffer: [*c]const u8, name: [*c]const u8) void {
 }
 
 /// Print GPS with Satellites
-fn print_gps_satellite(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_gps_satellite, @ptrToInt(buffer));
+fn print_gps_satellite(buffer: []const u8, name: [*c]const u8) void {
+    const event = @intToPtr(*c.struct_sensor_event_gps_satellite, @ptrToInt(&buffer[0]));
     _ = printf("%s: timestamp:%llu", 
         name, 
         event.*.timestamp, 
@@ -641,7 +641,7 @@ const sensor_info = struct {
 };
 
 /// Sensor Data Print Function
-const data_print = ?fn ([*c]const u8, [*c]const u8) void;
+const data_print = ?fn ([]const u8, [*c]const u8) void;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
