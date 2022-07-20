@@ -131,8 +131,9 @@ pub export fn sensortest_main(
     }
 
     // Set Standby Interval
-    // ret = c.ioctl(fd, c.SNIOC_SET_INTERVAL, &interval);
-    ret = c.ioctl(fd, @as(c_int, 2560) | @as(c_int, 129), &interval);
+    // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
+    const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
+    ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
     if (ret < 0) {
         ret = -c.__errno().*;
         if (ret != -c.ENOTSUP) {
