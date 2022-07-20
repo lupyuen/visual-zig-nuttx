@@ -688,19 +688,19 @@ RISC-V Disassembly shows that it's checking `andi a0,a0,7`...
 ```text
 nuttx/visual-zig-nuttx/sensortest.zig:196
     const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
-23014f2a:	85aa                mv      a1,a0
-23014f2c:	fcb42e23            sw      a1,-36(s0)
-23014f30:	891d                andi    a0,a0,7
-23014f32:	4581                li      a1,0
-23014f34:	00b50c63            beq     a0,a1,23014f4c <print_valf2+0x32>
-23014f38:	a009                j       23014f3a <print_valf2+0x20>
-23014f3a:	23068537            lui     a0,0x23068
-23014f3e:	3c850513            addi    a0,a0,968 # 230683c8 <__unnamed_6>
-23014f42:	4581                li      a1,0
-23014f44:	00000097            auipc   ra,0x0
-23014f48:	dd4080e7            jalr    -556(ra) # 23014d18 <panic>
-23014f4c:	fdc42503            lw      a0,-36(s0)
-23014f50:	fea42a23            sw      a0,-12(s0)
+23014f2a: 85aa     mv      a1,a0
+23014f2c: fcb42e23 sw      a1,-36(s0)
+23014f30: 891d     andi    a0,a0,7
+23014f32: 4581     li      a1,0
+23014f34: 00b50c63 beq     a0,a1,23014f4c <print_valf2+0x32>
+23014f38: a009     j       23014f3a <print_valf2+0x20>
+23014f3a: 23068537 lui     a0,0x23068
+23014f3e: 3c850513 addi    a0,a0,968 # 230683c8 <__unnamed_6>
+23014f42: 4581     li      a1,0
+23014f44: 00000097 auipc   ra,0x0
+23014f48: dd4080e7 jalr    -556(ra) # 23014d18 <panic>
+23014f4c: fdc42503 lw      a0,-36(s0)
+23014f50: fea42a23 sw      a0,-12(s0)
 ```
 (Last 3 bits of address must be 0)
 
@@ -820,7 +820,7 @@ https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f1
 
 After cleanup becomes this...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/0c9935b7a2f094ef059578a632f7a79fdc338176/sensortest.zig#L35-L210
+https://github.com/lupyuen/visual-zig-nuttx/blob/1c71939d4be8cbd823b94d704800bcec7c537cb5/sensortest.zig#L35-L206
 
 We test again to be sure that the Zig Sensor App is still working OK...
 
