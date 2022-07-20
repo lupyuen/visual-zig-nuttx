@@ -75,31 +75,26 @@ pub export fn sensortest_main(
     }
 
     // Get Sensor Type
-    var name: [*c]u8 = undefined;
+    var name: []const u8 = undefined;
     var len: c_int = 0;
     var idx: c_uint = undefined;
     if (c.getoptindp().* < argc) {
-        name = (blk: {
+        var arg = (blk: {
             const tmp = c.getoptindp().*;
             if (tmp >= 0) break :blk argv + @intCast(usize, tmp) else break :blk argv - ~@bitCast(usize, @intCast(isize, tmp) +% -1);
         }).*;
-        {
-            idx = 0;
-            while (idx < g_sensor_info.len) : (idx += 1) {
-                // TODO: Change to std.mem.eql(u8, name, g_sensor_info[idx].name)
-                if (c.strncmp(
-                    name, 
-                    g_sensor_info[idx].name, 
-                    c.strlen(g_sensor_info[idx].name)
-                ) == 0) {
-                    len = g_sensor_info[idx].esize;
-                    assert(sensor_data.len >= len);
-                    break;
-                }
+        name = arg[0..c.strlen(arg)];
+        idx = 0;
+        while (idx < g_sensor_info.len) : (idx += 1) {
+            const sensor = g_sensor_info[idx];
+            if (std.mem.eql(u8, sensor.name, name[0..sensor.name.len])) {
+                len = sensor.esize;
+                assert(sensor_data.len >= len);
+                break;
             }
         }
         if (len == 0) {
-            _ = printf("The sensor node name:%s is invalid\n", name);
+            _ = printf("The sensor node name:%s is invalid\n", &name[0]);
             usage();
             ret = -c.EINVAL;
             return ret;
@@ -115,7 +110,7 @@ pub export fn sensortest_main(
         @ptrCast([*c]u8, &devname), 
         devname.len,
         "/dev/sensor/%s", 
-        name
+        &name[0]
     );
     var fd = c.open(
         @ptrCast([*c]u8, &devname), 
@@ -189,7 +184,7 @@ pub export fn sensortest_main(
             }
         }
     }
-    _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
+    _ = printf("SensorTest: Received message: %s, number:%d/%d\n", &name[0], received, count);
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
@@ -200,7 +195,6 @@ pub export fn sensortest_main(
     }
 
     // Close the Sensor Device
-    debug("close", .{});
     _ = c.close(fd);
     c.getoptindp().* = 0;
     return ret;
@@ -210,10 +204,10 @@ pub export fn sensortest_main(
 //  Print Sensor Data
 
 /// Print X, Y, Z, Temperature
-fn print_vec3(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_accel, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" x:");  print_float(event.*.x); 
@@ -232,10 +226,10 @@ fn print_vec3(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print 3 floats
-fn print_valf3(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_rgb, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" value1:");  print_float(event.*.r);
@@ -252,10 +246,10 @@ fn print_valf3(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print 2 floats
-fn print_valf2(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" value1:");  print_float(event.*.pressure);
@@ -270,10 +264,10 @@ fn print_valf2(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print a float
-fn print_valf(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" value:");  print_float(event.*.proximity);
@@ -286,10 +280,10 @@ fn print_valf(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print a boolean
-fn print_valb(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_valb(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_hall, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" value:%d\n", @as(c_int, @boolToInt(event.*.hall)));
@@ -301,10 +295,10 @@ fn print_valb(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print 2 integers
-fn print_vali2(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_ots, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" value1:%li", event.*.x);
@@ -319,10 +313,10 @@ fn print_vali2(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print PPGD
-fn print_ppgd(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_ppgd, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" ppg1:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 0))]);
@@ -343,10 +337,10 @@ fn print_ppgd(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print PPGQ
-fn print_ppgq(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_ppgq, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" ppg1:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 0))]);
@@ -375,10 +369,10 @@ fn print_ppgq(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print GPS
-fn print_gps(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_gps, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" time_utc: %llu", event.*.time_utc);
@@ -413,10 +407,10 @@ fn print_gps(buffer: []const align(8) u8, name: [*c]const u8) void {
 }
 
 /// Print GPS with Satellites
-fn print_gps_satellite(buffer: []const align(8) u8, name: [*c]const u8) void {
+fn print_gps_satellite(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_gps_satellite, &buffer[0]);
     _ = printf("%s: timestamp:%llu", 
-        name, 
+        &name[0], 
         event.*.timestamp, 
     );
     _ = printf(" count: %lu", event.*.count);
@@ -637,11 +631,11 @@ const sensor_info = struct {
     /// Size of Sensor Data
     esize: u8,
     /// Name of Sensor Type
-    name: [*c]const u8,
+    name: []const u8,
 };
 
 /// Sensor Data Print Function
-const data_print = ?fn ([]const align(8) u8, [*c]const u8) void;
+const data_print = ?fn ([]const align(8) u8, []const u8) void;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
