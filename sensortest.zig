@@ -86,6 +86,7 @@ pub export fn sensortest_main(
         {
             idx = 0;
             while (idx < g_sensor_info.len) : (idx += 1) {
+                // TODO: Change to std.mem.eql(u8, name, g_sensor_info[idx].name)
                 if (c.strncmp(
                     name, 
                     g_sensor_info[idx].name, 
