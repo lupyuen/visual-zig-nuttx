@@ -430,6 +430,16 @@ value1 floatCast f64: 30.790001
 
 Because `value1` (Pressure) is supposed to be 1006, not 30.
 
+Robert Lipe suggests that we might have a problem with the RISC-V Calling Conventions for Floats and Doubles...
+
+> The calling conventions for RISC-V on small computers for floats/doubles is weird and the software/emulators/ libs are confusing. Verify that floats get promoted to doubles in the call and that they go to F0, F2, F4, etc. in the frame, properly aligned. Double check complr flags
+
+[(Source)](https://twitter.com/robertlipe/status/1549640832818487297?t=3lcvm6oYFgEH_YMX7GfaUw&s=19)
+
+> See, e.g., https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/master/riscv-cc.adoc and related. This is _totally_ the kind of thing that small parts (enable FP on BL602; disable s/w libs) and x-language can get wrong.
+
+[(Source)](https://twitter.com/robertlipe/status/1549641888931651591?t=z5VGGX0MyiIGsHHp4FyAzw&s=19)
+
 _Instead of `printf`, why not call the Zig Debug Logger `debug`?_
 
 ```zig
