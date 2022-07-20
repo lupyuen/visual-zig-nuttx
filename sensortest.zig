@@ -208,6 +208,7 @@ pub export fn sensortest_main(
 ///////////////////////////////////////////////////////////////////////////////
 //  Print Sensor Data
 
+/// Print X, Y, Z, Temperature
 fn print_vec3(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_accel, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu x:%.2f y:%.2f z:%.2f, temperature:%.2f\n", 
@@ -220,6 +221,7 @@ fn print_vec3(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print 3 floats
 fn print_valf3(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_rgb, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", 
@@ -231,6 +233,7 @@ fn print_valf3(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print 2 floats
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
@@ -248,6 +251,7 @@ fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
     // );
 }
 
+/// Print a float
 fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_prox, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
@@ -263,6 +267,7 @@ fn print_valf(buffer: [*c]const u8, name: [*c]const u8) void {
     // );
 }
 
+/// Print a boolean
 fn print_valb(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_hall, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value:%d\n", 
@@ -272,6 +277,7 @@ fn print_valb(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print 2 integers
 fn print_vali2(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_ots, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:% li value2:% li\n", 
@@ -282,6 +288,7 @@ fn print_vali2(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print PPGD
 fn print_ppgd(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_ppgd, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu current:%lu gain1:%u gain2:%u\n", 
@@ -295,6 +302,7 @@ fn print_ppgd(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print PPGQ
 fn print_ppgq(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_ppgq, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", 
@@ -312,6 +320,7 @@ fn print_ppgq(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print GPS
 fn print_gps(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_gps, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", 
@@ -332,6 +341,7 @@ fn print_gps(buffer: [*c]const u8, name: [*c]const u8) void {
     );
 }
 
+/// Print GPS with Satellites
 fn print_gps_satellite(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_gps_satellite, @ptrToInt(buffer));
     _ = printf("%s: timestamp: %llu count: %lu satellites: %lu\n", 
@@ -552,7 +562,7 @@ const sensor_info = struct {
     name: [*c]const u8,
 };
 
-/// Sensor Data Printer
+/// Sensor Data Print Function
 const data_print = ?fn ([*c]const u8, [*c]const u8) void;
 
 ///////////////////////////////////////////////////////////////////////////////
