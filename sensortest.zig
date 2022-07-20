@@ -38,17 +38,6 @@ pub export fn sensortest_main(
     argv: [*c]const [*c]u8
 ) c_int {
     debug("Zig Sensor Test", .{});
-
-    var interval: c_uint = 1_000_000;
-    var received: c_uint = 0;
-    var latency: c_uint = 0;
-    var count: c_uint = 0;
-    var fds: c.struct_pollfd = undefined;
-    var name: [*c]u8 = undefined;
-    var len: c_int = 0;
-    var fd: c_int = undefined;
-    var idx: c_int = undefined;
-    var ret: c_int = undefined;
     if (argc <= 1) {
         usage();
         return -c.EINVAL;
@@ -59,6 +48,10 @@ pub export fn sensortest_main(
 
     // Parse the Command-Line Options
     g_should_exit = false;
+    var interval: c_uint = 1_000_000;
+    var latency: c_uint = 0;
+    var count: c_uint = 0;
+    var ret: c_int = undefined;
     while ((blk: {
         const tmp = c.getopt(argc, argv, "i:b:n:h");
         ret = tmp;
@@ -82,6 +75,9 @@ pub export fn sensortest_main(
     }
 
     // Get Sensor Type
+    var name: [*c]u8 = undefined;
+    var len: c_int = 0;
+    var idx: c_int = undefined;
     if (c.getoptindp().* < argc) {
         name = (blk: {
             const tmp = c.getoptindp().*;
@@ -120,7 +116,7 @@ pub export fn sensortest_main(
         "/dev/sensor/%s", 
         name
     );
-    fd = c.open(
+    var fd = c.open(
         @ptrCast([*c]u8, &devname), 
         c.O_RDONLY | c.O_NONBLOCK
     );
@@ -164,10 +160,12 @@ pub export fn sensortest_main(
 
     // Prepare to poll Sensor
     _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", @ptrCast([*c]u8, &devname), interval, latency);
+    var fds: c.struct_pollfd = undefined;
     fds.fd = fd;
     fds.events = c.POLLIN;
 
     // Repeat until all samples have been read
+    var received: c_uint = 0;
     while ((!(count != 0) or (received < count)) and !g_should_exit) {
 
         // If Sensor Data is available...
@@ -206,6 +204,9 @@ pub export fn sensortest_main(
     c.getoptindp().* = 0;
     return ret;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//  Print Sensor Data
 
 fn print_vec3(buffer: [*c]const u8, name: [*c]const u8) void {
     const event = @intToPtr([*c]c.struct_sensor_event_accel, @ptrToInt(buffer));
@@ -370,6 +371,9 @@ export fn exit_handler(signo: c_int) void {
     g_should_exit = true;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  Variables
+
 /// All Sensor Types
 const g_sensor_info = [30]sensor_info{
     sensor_info{
@@ -524,6 +528,20 @@ const g_sensor_info = [30]sensor_info{
     },
 };
 
+/// Sensor Data Buffer
+/// (Aligned to 8 bytes because it's passed to C)
+var sensor_data align(8) = std.mem.zeroes([256]u8);
+
+/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// (Aligned to 8 bytes because it's passed to C)
+var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
+
+/// True if we should exit due to Ctrl-C
+var g_should_exit = false;
+
+///////////////////////////////////////////////////////////////////////////////
+//  Types
+
 /// Sensor Info
 const sensor_info = struct {
     /// Print function for Sensor Data
@@ -536,17 +554,6 @@ const sensor_info = struct {
 
 /// Sensor Data Printer
 const data_print = ?fn ([*c]const u8, [*c]const u8) void;
-
-/// Sensor Data Buffer
-/// (Aligned to 8 bytes because it's passed to C)
-var sensor_data align(8) = std.mem.zeroes([256]u8);
-
-/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
-/// (Aligned to 8 bytes because it's passed to C)
-var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
-
-/// True if we should exit due to Ctrl-C
-var g_should_exit = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
