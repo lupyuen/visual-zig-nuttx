@@ -652,12 +652,12 @@ So it looks like this...
 
 ```zig
 fd = c.open(
-    @ptrCast([*c]u8, &devname), 
+    &devname[0], 
     c.O_RDONLY | c.O_NONBLOCK
 );
 ```
 
-[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/f0887918e5efb990ee81911d1f851c5ff6334875/sensortest.zig#L126-L129)
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/a975ae54f601c9176ed7c8d2f89650a7f3644c5b/sensortest.zig#L117-L120)
 
 # Incorrect Alignment
 
@@ -820,7 +820,7 @@ https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f1
 
 After cleanup becomes this...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/1c71939d4be8cbd823b94d704800bcec7c537cb5/sensortest.zig#L35-L206
+https://github.com/lupyuen/visual-zig-nuttx/blob/a975ae54f601c9176ed7c8d2f89650a7f3644c5b/sensortest.zig#L35-L203
 
 We test again to be sure that the Zig Sensor App is still working OK...
 
