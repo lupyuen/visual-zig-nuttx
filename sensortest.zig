@@ -84,22 +84,24 @@ pub export fn sensortest_main(
             if (tmp >= 0) break :blk argv + @intCast(usize, tmp) else break :blk argv - ~@bitCast(usize, @intCast(isize, tmp) +% -1);
         }).*;
         name = arg[0..c.strlen(arg)];
-        idx = 0;
-        while (idx < g_sensor_info.len) : (idx += 1) {
-            const sensor = g_sensor_info[idx];
-            if (std.mem.eql(u8, sensor.name, name[0..sensor.name.len])) {
-                len = sensor.esize;
-                assert(sensor_data.len >= len);
-                break;
-            }
-        }
-        if (len == 0) {
-            _ = printf("The sensor node name:%s is invalid\n", &name[0]);
-            usage();
-            ret = -c.EINVAL;
-            return ret;
-        }
     } else {
+        usage();
+        ret = -c.EINVAL;
+        return ret;
+    }
+
+    // Lookup Sensor Info
+    idx = 0;
+    while (idx < g_sensor_info.len) : (idx += 1) {
+        const sensor = g_sensor_info[idx];
+        if (std.mem.eql(u8, sensor.name, name[0..sensor.name.len])) {
+            len = sensor.esize;
+            assert(sensor_data.len >= len);
+            break;
+        }
+    }
+    if (len == 0) {
+        _ = printf("The sensor node name:%s is invalid\n", &name[0]);
         usage();
         ret = -c.EINVAL;
         return ret;
