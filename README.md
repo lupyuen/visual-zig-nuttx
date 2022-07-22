@@ -830,3 +830,20 @@ SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
 humi0: timestamp:30080000 value:76.71
 SensorTest: Received message: humi0, number:1/1
 ```
+
+# TODO
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest -n 1 baro0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
+value1:1007.62 value2:31.29
+SensorTest: Received message: ▒▒B▒, number:1/1
+
+nsh> sensortest -n 1 humi0
+Zig Sensor Test
+SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
+value:69.13
+SensorTest: Received message: humi0, number:1/1
+```

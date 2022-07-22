@@ -176,7 +176,7 @@ pub export fn sensortest_main(
             }
         }
     }
-    debug("SensorTest: Received message: {s}, number:{}/{}\n", .{ name, received, count });
+    debug("SensorTest: Received message: {s}, number:{}/{}", .{ name, received, count });
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
@@ -247,10 +247,6 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
         pressure.int, pressure.frac,
         temperature.int, temperature.frac
     });
-    // TODO
-    _ = printf(" value1:");  print_float(event.*.pressure);
-    _ = printf(" value2:");  print_float(event.*.temperature);
-    _ = printf("\n");
 }
 
 /// Print a float
@@ -261,9 +257,6 @@ fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     debug("value:{}.{:0>2}", .{
         proximity.int, proximity.frac
     });
-    // TODO
-    _ = printf(" value:");  print_float(event.*.proximity);
-    _ = printf("\n");
 }
 
 /// Print a boolean
