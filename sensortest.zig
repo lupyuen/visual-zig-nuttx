@@ -80,10 +80,8 @@ pub export fn sensortest_main(
     var len: c_int = 0;
     var idx: c_uint = undefined;
     if (c.getoptindp().* < argc) {
-        var arg = (blk: {
-            const tmp = c.getoptindp().*;
-            if (tmp >= 0) break :blk argv + @intCast(usize, tmp) else break :blk argv - ~@bitCast(usize, @intCast(isize, tmp) +% -1);
-        }).*;
+        const i = @intCast(usize, c.getoptindp().*);
+        const arg = argv[i];
         name = arg[0..c.strlen(arg)];
     } else {
         usage();
