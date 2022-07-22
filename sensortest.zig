@@ -679,22 +679,16 @@ pub fn log(
     var buf: [100]u8 = undefined;  // Limit to 100 chars
     var slice = std.fmt.bufPrint(&buf, format, args)
         catch { _ = puts("*** log error: buf too small"); return; };
-    
-    // Terminate the formatted message with a null
+
+    // Replace all nulls by spaces and terminate with a null
     var buf2: [buf.len + 1 : 0]u8 = undefined;
-    // TODO: var buf2: [slice.len + 1 : 0]u8 = undefined;
-    std.mem.copy(
-        u8, 
-        buf2[0..slice.len], 
-        slice[0..slice.len]
+    _ = std.mem.replace(
+        u8,
+        slice[0..slice.len],
+        "\x00",
+        " ",
+        buf2[0..slice.len]
     );
-    // TODO: _ = std.mem.replace(
-    //     u8,
-    //     slice[0..slice.len],
-    //     "\x00",
-    //     " ",
-    //     buf2[0..slice.len]
-    // );
     buf2[slice.len] = 0;
 
     // Print the formatted message
