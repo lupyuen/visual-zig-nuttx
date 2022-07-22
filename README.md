@@ -759,30 +759,19 @@ We clean up the Zig code like this...
 ```zig
 // Parse the Command-Line Options
 g_should_exit = false;
-while ((blk: {
-    const tmp = c.getopt(argc, argv, "i:b:n:h");
-    ret = tmp;
-    break :blk tmp;
-}) != c.EOF) {
+while (true) {
+    ret = c.getopt(argc, argv, "i:b:n:h");
+    if (ret == c.EOF) { break; }
     switch (ret) {
-        'i' => {
-            interval = c.strtoul(c.getoptargp().*, null, 0);
-        },
-        'b' => {
-            latency = c.strtoul(c.getoptargp().*, null, 0);
-        },
-        'n' => {
-            count = c.strtoul(c.getoptargp().*, null, 0);
-        },
-        else => {
-            usage();
-            return ret;
-        },
+        'i' => { interval = c.strtoul(c.getoptargp().*, null, 0); },
+        'b' => { latency  = c.strtoul(c.getoptargp().*, null, 0); },
+        'n' => { count    = c.strtoul(c.getoptargp().*, null, 0); },
+        else => { usage(); return ret; },
     }
 }
 ```
 
-[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/e72dbf00f9acd87ae19ac127fb50537706d7522e/sensortest.zig#L64-L86)
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/8c870893b91db0eae22b0beff808ba9b5f3b2e11/sensortest.zig#L52-L67)
 
 So that it resembles the original C code...
 
@@ -820,7 +809,7 @@ https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f1
 
 After cleanup becomes this...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/a975ae54f601c9176ed7c8d2f89650a7f3644c5b/sensortest.zig#L35-L203
+https://github.com/lupyuen/visual-zig-nuttx/blob/8c870893b91db0eae22b0beff808ba9b5f3b2e11/sensortest.zig#L35-L194
 
 We test again to be sure that the Zig Sensor App is still working OK...
 
