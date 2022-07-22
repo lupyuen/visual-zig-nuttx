@@ -153,6 +153,7 @@ pub export fn sensortest_main(
     }
 
     // Prepare to poll Sensor
+    // debug("SensorTest: Test {s} with interval({}), latency({})", .{ devname, interval, latency });
     _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", &devname[0], interval, latency);
     var fds: c.struct_pollfd = undefined;
     fds.fd = fd;
@@ -175,6 +176,7 @@ pub export fn sensortest_main(
             }
         }
     }
+    // debug("SensorTest: Received message: {s}, number:{}/{}\n", .{ name, received, count });
     _ = printf("SensorTest: Received message: %s, number:%d/%d\n", &name[0], received, count);
 
     // Disable Sensor and switch to Low Power Mode
@@ -680,11 +682,19 @@ pub fn log(
     
     // Terminate the formatted message with a null
     var buf2: [buf.len + 1 : 0]u8 = undefined;
+    //// var buf2: [slice.len + 1 : 0]u8 = undefined;
     std.mem.copy(
         u8, 
         buf2[0..slice.len], 
         slice[0..slice.len]
     );
+    // _ = std.mem.replace(
+    //     u8,
+    //     slice[0..slice.len],
+    //     "\x00",
+    //     " ",
+    //     buf2[0..slice.len]
+    // );
     buf2[slice.len] = 0;
 
     // Print the formatted message
