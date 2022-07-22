@@ -169,13 +169,11 @@ name0 = name; ////
 
             // Read the Sensor Data
             if (c.read(fd, &sensor_data, len) >= len) {
-_ = printf("d: %d\n", name[0]);////
 
                 // Print the Sensor Data
                 received += 1;
                 const sensor = g_sensor_info[idx];
                 sensor.print(&sensor_data, name);
-_ = printf("e: %d\n", name[0]);////
             }
         }
     }
@@ -246,18 +244,15 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-_ = printf("l: %d\n", name[0]);////
+    // Previously: printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", 
+    //     name, 
+    //     event.*.timestamp, 
     debug("value1:{}.{:0>2}", .{
         pressure.int, pressure.frac,
     });
     debug("value2:{}.{:0>2}", .{
         temperature.int, temperature.frac
     });
-    // debug("value1:{}.{:0>2} value2:{}.{:0>2}", .{
-    //     pressure.int, pressure.frac,
-    //     temperature.int, temperature.frac
-    // });
-_ = printf("m: %d\n", name[0]);////
 }
 
 /// Print a float

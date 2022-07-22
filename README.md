@@ -836,14 +836,42 @@ SensorTest: Received message: humi0, number:1/1
 ```text
 NuttShell (NSH) NuttX-10.3.0
 nsh> sensortest -n 1 baro0
+n: 97
+o: 97
+slice.len: 15
 Zig Sensor Test
+n: 98
+o: 98
+slice.len: 70
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1007.62 value2:31.29
-SensorTest: Received message: ▒▒B▒, number:1/1
+n: 98
+o: 98
+slice.len: 14
+value1:1008.24
+n: 98
+o: 98
+slice.len: 12
+value2:30.76
+n: 98
+o: 98
+slice.len: 47
+SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
+n: 104
+o: 104
+slice.len: 15
 Zig Sensor Test
+n: 104
+o: 104
+slice.len: 70
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:69.13
+n: 104
+o: 104
+slice.len: 11
+value:69.83
+n: 104
+o: 104
+slice.len: 47
 SensorTest: Received message: humi0, number:1/1
 ```
