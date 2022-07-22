@@ -103,8 +103,8 @@ pub export fn sensortest_main(
     }
 
     // Compose the Device Name. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
-    _ = std.fmt.bufPrint(
-        &devname,
+    const devname = std.fmt.bufPrint(
+        &devname_buffer,
         "/dev/sensor/{s}\x00",
         .{ name }
     ) catch { std.log.err("Path overflow", .{}); return -c.EINVAL; };
@@ -614,7 +614,7 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 /// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
 /// (Aligned to 8 bytes because it's passed to C)
-var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
+var devname_buffer align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 
 /// True if we should exit due to Ctrl-C
 var g_should_exit = false;
