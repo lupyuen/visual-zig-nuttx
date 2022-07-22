@@ -239,36 +239,63 @@ fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
 
 /// Print 2 floats
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
+    const pressure = float_to_fixed(event.*.pressure);
+    const temperature = float_to_fixed(event.*.temperature);
+
+    debug("{}.{:0>2}", .{
+        pressure.int, pressure.frac,
+    });
+    debug("{}.{:0>2}", .{
+        temperature.int, temperature.frac
+    });
+    // debug("{s}", .{
+    //     name, 
+    // });
+    // debug("{}", .{
+    //     event.*.timestamp, 
+    // });
+    // debug("{s}: timestamp:{}", .{
+    //     name, 
+    //     event.*.timestamp, 
+    // });
+    debug("value1:{}.{:0>2} value2:{}.{:0>2}", .{
+        pressure.int, pressure.frac,
+        temperature.int, temperature.frac
+    });
+
+    // debug("{s}: timestamp:{} value1:{}.{:0>2} value2:{}.{:0>2}", .{
+    //     name, 
+    //     event.*.timestamp, 
+    //     pressure.int, pressure.frac,
+    //     temperature.int, temperature.frac
+    // });
+
+    // _ = printf("%s: timestamp:%llu", 
+    //     &name[0], 
+    //     event.*.timestamp, 
+    // );
     _ = printf(" value1:");  print_float(event.*.pressure);
     _ = printf(" value2:");  print_float(event.*.temperature);
     _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.pressure), 
-    //     @floatCast(f64, event.*.temperature)
-    // );
 }
 
 /// Print a float
 fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
+    const proximity = float_to_fixed(event.*.proximity);
+    debug("value:{}.{:0>2}", .{
+        proximity.int, proximity.frac
+    });
+
+    // _ = printf("%s: timestamp:%llu", 
+    //     &name[0], 
+    //     event.*.timestamp, 
+    // );
     _ = printf(" value:");  print_float(event.*.proximity);
     _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu value:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.proximity)
-    // );
 }
 
 /// Print a boolean
@@ -448,6 +475,16 @@ export fn exit_handler(signo: c_int) void {
 /// Return the NuttX Error Number
 fn errno() c_int {
     return c.__errno().*;
+}
+
+/// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
+/// We do this because `debug` has a problem with floats.
+fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+    const scaled = @floatToInt(i32, f * 100);
+    return .{
+        .int  = @divTrunc(scaled, 100),
+        .frac = @intCast(u8, @mod(scaled, 100)),
+    };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -694,7 +731,7 @@ pub fn log(
 }
 
 /// Common Static Buffer for Logging
-var log_buf: [100]u8 = undefined;  // Limit to 100 chars
+var log_buf: [256]u8 = undefined;  // Limit to 256 chars
 var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
 
 ///////////////////////////////////////////////////////////////////////////////
