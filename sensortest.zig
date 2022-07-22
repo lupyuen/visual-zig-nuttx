@@ -92,9 +92,14 @@ pub export fn sensortest_main(
 
     // Lookup Sensor Info
     idx = 0;
-    while (idx < g_sensor_info.len) : (idx += 1) {
-        const sensor = g_sensor_info[idx];
-        if (std.mem.eql(u8, sensor.name, name[0..sensor.name.len])) {
+    for (g_sensor_info) |sensor, i| {
+        const name_prefix = name[0..sensor.name.len];
+        if (std.mem.eql(
+            u8, 
+            sensor.name, 
+            name_prefix
+        )) {
+            idx = i;
             len = sensor.esize;
             assert(sensor_data.len >= len);
             break;
