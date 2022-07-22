@@ -55,11 +55,9 @@ pub export fn sensortest_main(
     var latency: c_uint = 0;
     var count: c_uint = 0;
     var ret: c_int = undefined;
-    while ((blk: {
-        const tmp = c.getopt(argc, argv, "i:b:n:h");
-        ret = tmp;
-        break :blk tmp;
-    }) != c.EOF) {
+    while (true) {
+        ret = c.getopt(argc, argv, "i:b:n:h");
+        if (ret == c.EOF) { break; }
         switch (ret) {
             'i' => {
                 interval = c.strtoul(c.getoptargp().*, null, 0);
