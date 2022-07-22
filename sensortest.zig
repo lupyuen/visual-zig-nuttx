@@ -75,6 +75,7 @@ pub export fn sensortest_main(
         const i = @intCast(usize, c.getoptindp().*);
         const arg = argv[i];
         name = arg[0..c.strlen(arg)];
+name0 = name; ////
     } else {
         usage();
         ret = -c.EINVAL;
@@ -168,11 +169,13 @@ pub export fn sensortest_main(
 
             // Read the Sensor Data
             if (c.read(fd, &sensor_data, len) >= len) {
+_ = printf("d: %d\n", name[0]);////
 
                 // Print the Sensor Data
                 received += 1;
                 const sensor = g_sensor_info[idx];
                 sensor.print(&sensor_data, name);
+_ = printf("e: %d\n", name[0]);////
             }
         }
     }
@@ -243,10 +246,18 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-    debug("value1:{}.{:0>2} value2:{}.{:0>2}", .{
+_ = printf("l: %d\n", name[0]);////
+    debug("value1:{}.{:0>2}", .{
         pressure.int, pressure.frac,
+    });
+    debug("value2:{}.{:0>2}", .{
         temperature.int, temperature.frac
     });
+    // debug("value1:{}.{:0>2} value2:{}.{:0>2}", .{
+    //     pressure.int, pressure.frac,
+    //     temperature.int, temperature.frac
+    // });
+_ = printf("m: %d\n", name[0]);////
 }
 
 /// Print a float
@@ -672,10 +683,13 @@ pub fn log(
 ) void {
     _ = _message_level;
     _ = _scope;
+_ = printf("n: %d\n", name0[0]);////
 
     // Format the message
     var slice = std.fmt.bufPrint(&log_buf, format, args)
         catch { _ = puts("*** Error: log_buf too small"); return; };
+_ = printf("o: %d\n", name0[0]);////
+_ = printf("slice.len: %d\n", slice.len);////
 
     // Replace all nulls by spaces and terminate with a null
     _ = std.mem.replace(
@@ -694,6 +708,8 @@ pub fn log(
 /// Common Static Buffer for Logging
 var log_buf: [256]u8 = undefined;  // Limit to 256 chars
 var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
+
+var name0: []const u8 = "aaaa"; ////
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions and Variables
