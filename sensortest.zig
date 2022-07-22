@@ -153,8 +153,7 @@ pub export fn sensortest_main(
     }
 
     // Prepare to poll Sensor
-    // TODO: debug("SensorTest: Test {s} with interval({}), latency({})", .{ devname, interval, latency });
-    _ = printf("SensorTest: Test %s with interval(%uus), latency(%uus)\n", &devname[0], interval, latency);
+    debug("SensorTest: Test {s} with interval({}), latency({})", .{ devname, interval, latency });
     var fds: c.struct_pollfd = undefined;
     fds.fd = fd;
     fds.events = c.POLLIN;
@@ -176,8 +175,7 @@ pub export fn sensortest_main(
             }
         }
     }
-    // TODO: debug("SensorTest: Received message: {s}, number:{}/{}\n", .{ name, received, count });
-    _ = printf("SensorTest: Received message: %s, number:%d/%d\n", &name[0], received, count);
+    debug("SensorTest: Received message: {s}, number:{}/{}\n", .{ name, received, count });
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
@@ -665,6 +663,7 @@ pub fn panic(
 //  Logging
 
 /// Called by Zig for `std.log.debug`, `std.log.info`, `std.log.err`, ...
+/// TODO: Support multiple threads
 /// https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
 pub fn log(
     comptime _message_level: std.log.Level,
@@ -676,24 +675,26 @@ pub fn log(
     _ = _scope;
 
     // Format the message
-    var buf: [100]u8 = undefined;  // Limit to 100 chars
-    var slice = std.fmt.bufPrint(&buf, format, args)
-        catch { _ = puts("*** log error: buf too small"); return; };
+    var slice = std.fmt.bufPrint(&log_buf, format, args)
+        catch { _ = puts("*** Error: log_buf too small"); return; };
 
     // Replace all nulls by spaces and terminate with a null
-    var buf2: [buf.len + 1 : 0]u8 = undefined;
     _ = std.mem.replace(
         u8,
         slice[0..slice.len],
         "\x00",
         " ",
-        buf2[0..slice.len]
+        log_buf2[0..slice.len]
     );
-    buf2[slice.len] = 0;
+    log_buf2[slice.len] = 0;
 
     // Print the formatted message
-    _ = puts(&buf2);
+    _ = puts(&log_buf2);
 }
+
+/// Common Static Buffer for Logging
+var log_buf: [100]u8 = undefined;  // Limit to 100 chars
+var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions and Variables
