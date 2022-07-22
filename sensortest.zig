@@ -59,19 +59,10 @@ pub export fn sensortest_main(
         ret = c.getopt(argc, argv, "i:b:n:h");
         if (ret == c.EOF) { break; }
         switch (ret) {
-            'i' => {
-                interval = c.strtoul(c.getoptargp().*, null, 0);
-            },
-            'b' => {
-                latency = c.strtoul(c.getoptargp().*, null, 0);
-            },
-            'n' => {
-                count = c.strtoul(c.getoptargp().*, null, 0);
-            },
-            else => {
-                usage();
-                return ret;
-            },
+            'i' => { interval = c.strtoul(c.getoptargp().*, null, 0); },
+            'b' => { latency  = c.strtoul(c.getoptargp().*, null, 0); },
+            'n' => { count    = c.strtoul(c.getoptargp().*, null, 0); },
+            else => { usage(); return ret; },
         }
     }
 
@@ -173,19 +164,12 @@ pub export fn sensortest_main(
         if (c.poll(&fds, 1, -1) > 0) {
 
             // Read the Sensor Data
-            if (c.read(
-                fd, 
-                &sensor_data, 
-                len
-            ) >= len) {
+            if (c.read(fd, &sensor_data, len) >= len) {
 
                 // Print the Sensor Data
                 received += 1;
-                g_sensor_info[idx]
-                    .print(
-                        &sensor_data, 
-                        name
-                    );
+                const sensor = g_sensor_info[idx];
+                sensor.print(&sensor_data, name);
             }
         }
     }
