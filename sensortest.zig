@@ -243,39 +243,11 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-
-    debug("{}.{:0>2}", .{
-        pressure.int, pressure.frac,
-    });
-    debug("{}.{:0>2}", .{
-        temperature.int, temperature.frac
-    });
-    // debug("{s}", .{
-    //     name, 
-    // });
-    // debug("{}", .{
-    //     event.*.timestamp, 
-    // });
-    // debug("{s}: timestamp:{}", .{
-    //     name, 
-    //     event.*.timestamp, 
-    // });
     debug("value1:{}.{:0>2} value2:{}.{:0>2}", .{
         pressure.int, pressure.frac,
         temperature.int, temperature.frac
     });
-
-    // debug("{s}: timestamp:{} value1:{}.{:0>2} value2:{}.{:0>2}", .{
-    //     name, 
-    //     event.*.timestamp, 
-    //     pressure.int, pressure.frac,
-    //     temperature.int, temperature.frac
-    // });
-
-    // _ = printf("%s: timestamp:%llu", 
-    //     &name[0], 
-    //     event.*.timestamp, 
-    // );
+    // TODO
     _ = printf(" value1:");  print_float(event.*.pressure);
     _ = printf(" value2:");  print_float(event.*.temperature);
     _ = printf("\n");
@@ -289,11 +261,7 @@ fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     debug("value:{}.{:0>2}", .{
         proximity.int, proximity.frac
     });
-
-    // _ = printf("%s: timestamp:%llu", 
-    //     &name[0], 
-    //     event.*.timestamp, 
-    // );
+    // TODO
     _ = printf(" value:");  print_float(event.*.proximity);
     _ = printf("\n");
 }
