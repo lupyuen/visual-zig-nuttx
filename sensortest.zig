@@ -44,7 +44,10 @@ pub export fn sensortest_main(
     }
 
     // Register the Signal Handler for Ctrl-C
-    _ = c.signal(@as(c_int, 10), exit_handler);  // TODO: Check for error
+    const handler = c.signal(c.SIGINT, exit_handler);
+    if (@ptrToInt(handler) == @ptrToInt(c.SIG_ERR)) {
+        return -c.__errno().*;
+    }
 
     // Parse the Command-Line Options
     g_should_exit = false;
