@@ -46,7 +46,7 @@ pub export fn sensortest_main(
     // Register the Signal Handler for Ctrl-C
     const handler = c.signal(c.SIGINT, exit_handler);
     if (@ptrToInt(handler) == @ptrToInt(c.SIG_ERR)) {
-        return -c.__errno().*;
+        return -errno();
     }
 
     // Parse the Command-Line Options
@@ -122,8 +122,8 @@ pub export fn sensortest_main(
         c.O_RDONLY | c.O_NONBLOCK
     );
     if (fd < 0) {
-        ret = -c.__errno().*;
-        _ = printf("Failed to open device:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
+        ret = -errno();
+        _ = printf("Failed to open device:%s, ret:%s\n", &devname[0], c.strerror(errno()));
         return ret;
     }
 
@@ -132,9 +132,9 @@ pub export fn sensortest_main(
     const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
     ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
     if (ret < 0) {
-        ret = -c.__errno().*;
+        ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
+            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
             return ret;
         }
     }
@@ -142,9 +142,9 @@ pub export fn sensortest_main(
     // Set Batch Latency
     ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
     if (ret < 0) {
-        ret = -c.__errno().*;
+        ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to batch for sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
+            _ = printf("Failed to batch for sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
             return ret;
         }
     }
@@ -152,9 +152,9 @@ pub export fn sensortest_main(
     // Enable Sensor and switch to Normal Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
     if (ret < 0) {
-        ret = -c.__errno().*;
+        ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to enable sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
+            _ = printf("Failed to enable sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
             return ret;
         }
     }
@@ -182,7 +182,7 @@ pub export fn sensortest_main(
                 // Print the Sensor Data
                 received += 1;
                 g_sensor_info[idx]
-                    .print.?(
+                    .print(
                         &sensor_data, 
                         name
                     );
@@ -194,8 +194,8 @@ pub export fn sensortest_main(
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
     if (ret < 0) {
-        ret = -c.__errno().*;
-        _ = printf("Failed to disable sensor:%s, ret:%s\n", &devname[0], c.strerror(c.__errno().*));
+        ret = -errno();
+        _ = printf("Failed to disable sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
         return ret;
     }
 
@@ -458,6 +458,11 @@ export fn exit_handler(signo: c_int) void {
     g_should_exit = true;
 }
 
+/// Return the NuttX Error Number
+fn errno() c_int {
+    return -c.__errno().*;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Variables
 
@@ -640,7 +645,7 @@ const sensor_info = struct {
 };
 
 /// Sensor Data Print Function
-const data_print = ?fn ([]const align(8) u8, []const u8) void;
+const data_print = fn ([]const align(8) u8, []const u8) void;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
