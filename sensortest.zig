@@ -110,7 +110,7 @@ pub export fn sensortest_main(
     ) catch { std.log.err("Path overflow", .{}); return -c.EINVAL; };
 
     // Open the Sensor Device
-    var fd = c.open(
+    const fd = c.open(
         &devname[0], 
         c.O_RDONLY | c.O_NONBLOCK
     );
