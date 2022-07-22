@@ -77,8 +77,8 @@ pub export fn sensortest_main(
 
     // Get Sensor Type
     var name: []const u8 = undefined;
-    var len: c_int = 0;
-    var idx: c_uint = undefined;
+    var len: usize = 0;
+    var idx: usize = undefined;
     if (c.getoptindp().* < argc) {
         const i = @intCast(usize, c.getoptindp().*);
         const arg = argv[i];
@@ -176,7 +176,7 @@ pub export fn sensortest_main(
             if (c.read(
                 fd, 
                 &sensor_data, 
-                @bitCast(usize, len)
+                len
             ) >= len) {
 
                 // Print the Sensor Data
