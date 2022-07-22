@@ -46,6 +46,7 @@ pub export fn sensortest_main(
     // Register the Signal Handler for Ctrl-C
     const handler = c.signal(c.SIGINT, exit_handler);
     if (@ptrToInt(handler) == @ptrToInt(c.SIG_ERR)) {
+        std.log.err("Failed to register signal handler", .{});
         return -errno();
     }
 
@@ -96,7 +97,7 @@ pub export fn sensortest_main(
         }
     }
     if (len == 0) {
-        _ = printf("The sensor node name:%s is invalid\n", &name[0]);
+        std.log.err("The sensor node name:{s} is invalid", .{ name });
         usage();
         ret = -c.EINVAL;
         return ret;
@@ -116,7 +117,7 @@ pub export fn sensortest_main(
     );
     if (fd < 0) {
         ret = -errno();
-        _ = printf("Failed to open device:%s, ret:%s\n", &devname[0], c.strerror(errno()));
+        std.log.err("Failed to open device:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return ret;
     }
 
@@ -127,7 +128,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to set interval for sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
+            std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
             return ret;
         }
     }
@@ -137,7 +138,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to batch for sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
+            std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
             return ret;
         }
     }
@@ -147,7 +148,7 @@ pub export fn sensortest_main(
     if (ret < 0) {
         ret = -errno();
         if (ret != -c.ENOTSUP) {
-            _ = printf("Failed to enable sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
+            std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
             return ret;
         }
     }
@@ -181,7 +182,7 @@ pub export fn sensortest_main(
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
     if (ret < 0) {
         ret = -errno();
-        _ = printf("Failed to disable sensor:%s, ret:%s\n", &devname[0], c.strerror(errno()));
+        std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return ret;
     }
 
