@@ -113,12 +113,11 @@ pub export fn sensortest_main(
     }
 
     // Open the Sensor Device. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
-    _ = c.snprintf(
-        &devname[0], 
-        devname.len,
-        "/dev/sensor/%s", 
-        &name[0]
-    );
+    _ = std.fmt.bufPrint(
+        &devname,
+        "/dev/sensor/{s}\x00",
+        .{ name }
+    ) catch { std.log.err("Path overflow", .{}); return -c.EINVAL; };
     var fd = c.open(
         &devname[0], 
         c.O_RDONLY | c.O_NONBLOCK
