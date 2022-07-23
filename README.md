@@ -451,7 +451,7 @@ This causes a Linker Error, as explained below...
 
 # Floating-Point Link Error
 
-This code that prints two 32-bit Floating-Point numbers...
+When we call the Zig Debug Logger `debug` to print Floating-Point Numbers (32-bit)...
 
 ```zig
 var event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
@@ -459,7 +459,7 @@ debug("pressure: {}",    .{ event.*.pressure });
 debug("temperature: {}", .{ event.*.temperature });
 ```
 
-Fails to link...
+It fails to link...
 
 ```text
 riscv64-unknown-elf-ld: nuttx/nuttx/staging/libapps.a(sensortest.c.home.user.nuttx.apps.testing.sensortest.o): in function `std.fmt.errol.errolInt':
@@ -477,18 +477,54 @@ riscv64-unknown-elf-ld: nuttx/nuttx/staging/libapps.a(sensortest.c.home.user.nut
 zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/fmt/errol.zig:677: undefined reference to `__ashlti3'
 ```
 
-So we print as Integers instead...
+But printing as Integers works OK...
 
 ```zig
 debug("pressure: {}", .{ @floatToInt(i32, event.*.pressure) });
 debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
 ```
 
-But calling the `debug` logger somehow causes NuttX to crash with an Assertion Failure or RISC-V Exception...
+So we print Floats as Integers with the Debug Logger...
+
+# Debug Logger
+
+Earlier we saw that Zig Debug Logger `debug` won't print Floating-Point Numbers (due to a Linker Error).
+
+Let's convert Floating-Point Numbers to Fixed-Point Numbers (2 decimal points) and print as Integers instead...
+
+```zig
+/// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
+/// We do this because `debug` has a problem with floats.
+fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+    const scaled = @floatToInt(i32, f * 100);
+    return .{
+        .int  = @divTrunc(scaled, 100),
+        .frac = @intCast(u8, @mod(scaled, 100)),
+    };
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/3cc8c12d38932ab4f3c5e2cd0dd8f5b33ad47750/sensortest.zig#L344-L352)
+
+This is how we print Floating-Point Numbers as Fixed-Point Numbers...
+
+```zig
+/// Print 2 floats
+fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
+    const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
+    const pressure = float_to_fixed(event.*.pressure);
+    const temperature = float_to_fixed(event.*.temperature);
+    debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
+    debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/3cc8c12d38932ab4f3c5e2cd0dd8f5b33ad47750/sensortest.zig#L224-L232)
 
 # Debug Logger Crashes
 
-Calling the `debug` logger inside `print_valf2` causes weird crashes...
+TODO: Calling the `debug` logger inside `print_valf2` causes weird crashes...
 
 ```zig
 debug("timestamp: {}", .{ event.*.timestamp });
