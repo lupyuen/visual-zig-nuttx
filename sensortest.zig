@@ -198,44 +198,28 @@ name0 = name; ////
 
 /// Print X, Y, Z, Temperature
 fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_accel, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" x:");  print_float(event.*.x); 
-    _ = printf(" y:");  print_float(event.*.y); 
-    _ = printf(" z:");  print_float(event.*.z); 
-    _ = printf(" temperature:");  print_float(event.*.temperature);
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu x:%.2f y:%.2f z:%.2f, temperature:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.x), 
-    //     @floatCast(f64, event.*.y), 
-    //     @floatCast(f64, event.*.z), 
-    //     @floatCast(f64, event.*.temperature)
-    // );
+    const x = float_to_fixed(event.*.x);
+    const y = float_to_fixed(event.*.y);
+    const z = float_to_fixed(event.*.z);
+    const temperature = float_to_fixed(event.*.temperature);
+    debug("x:{}.{:0>2}", .{ x.int, x.frac });
+    debug("y:{}.{:0>2}", .{ y.int, y.frac });
+    debug("z:{}.{:0>2}", .{ z.int, z.frac });
+    debug("temperature:{}.{:0>2}", .{ temperature.int, temperature.frac });
 }
 
 /// Print 3 floats
 fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_rgb, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" value1:");  print_float(event.*.r);
-    _ = printf(" value2:");  print_float(event.*.g); 
-    _ = printf(" value3:");  print_float(event.*.b);
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @floatCast(f64, event.*.r), 
-    //     @floatCast(f64, event.*.g), 
-    //     @floatCast(f64, event.*.b)
-    // );
+    const r = float_to_fixed(event.*.r);
+    const g = float_to_fixed(event.*.g);
+    const b = float_to_fixed(event.*.b);
+    debug("value1:{}.{:0>2}", .{ r.int, r.frac });
+    debug("value2:{}.{:0>2}", .{ g.int, g.frac }); 
+    debug("value3:{}.{:0>2}", .{ b.int, b.frac });
 }
 
 /// Print 2 floats
@@ -244,12 +228,8 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-    debug("value1:{}.{:0>2}", .{
-        pressure.int, pressure.frac,
-    });
-    debug("value2:{}.{:0>2}", .{
-        temperature.int, temperature.frac
-    });
+    debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
+    debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
 }
 
 /// Print a float
@@ -257,163 +237,84 @@ fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
     const proximity = float_to_fixed(event.*.proximity);
-    debug("value:{}.{:0>2}", .{
-        proximity.int, proximity.frac
-    });
+    debug("value:{}.{:0>2}", .{ proximity.int, proximity.frac });
 }
 
 /// Print a boolean
 fn print_valb(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_hall, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" value:%d\n", @as(c_int, @boolToInt(event.*.hall)));
-    // Previously: printf("%s: timestamp:%llu value:%d\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     @as(c_int, @boolToInt(event.*.hall))
-    // );
+    debug("value:{}", .{ @as(c_int, @boolToInt(event.*.hall)) });
 }
 
 /// Print 2 integers
 fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_ots, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" value1:%li", event.*.x);
-    _ = printf(" value2:%li", event.*.y);
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu value1:% li value2:% li\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     event.*.x, 
-    //     event.*.y
-    // );
+    debug("value1:{}", .{ event.*.x });
+    debug("value2:{}", .{ event.*.y });
 }
 
 /// Print PPGD
 fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_ppgd, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" ppg1:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 0))]);
-    _ = printf(" ppg2:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 1))]);
-    _ = printf(" current:%lu", event.*.current);
-    _ = printf(" gain1:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])));
-    _ = printf(" gain2:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])));
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu current:%lu gain1:%u gain2:%u\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 0))], 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 1))], 
-    //     event.*.current, 
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])),
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))]))
-    // );
+    debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
+    debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
+    debug("current:{}", .{ event.*.current });
+    debug("gain1:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])) });
+    debug("gain2:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])) });
 }
 
 /// Print PPGQ
 fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_ppgq, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" ppg1:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 0))]);
-    _ = printf(" ppg2:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 1))]);
-    _ = printf(" ppg3:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 2))]);
-    _ = printf(" ppg4:%lu", event.*.ppg[@intCast(c_uint, @as(c_int, 3))]);
-    _ = printf(" current:%lu", event.*.current);
-    _ = printf(" gain1:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])));
-    _ = printf(" gain2:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])));
-    _ = printf(" gain3:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])));
-    _ = printf(" gain4:%u", @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))])));
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 0))], 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 1))], 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 2))], 
-    //     event.*.ppg[@intCast(c_uint, @as(c_int, 3))], 
-    //     event.*.current, 
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), 
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])), 
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])), 
-    //     @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))]))
-    // );
+    debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
+    debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
+    debug("ppg3:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 2))] });
+    debug("ppg4:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 3))] });
+    debug("current:{}", .{ event.*.current });
+    debug("gain1:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])) });
+    debug("gain2:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])) });
+    debug("gain3:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])) });
+    debug("gain4:{}", .{ @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))])) });
 }
 
 /// Print GPS
 fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_gps, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" time_utc: %llu", event.*.time_utc);
-    _ = printf(" latitude:");   print_float(event.*.latitude);
-    _ = printf(" longitude:");  print_float(event.*.longitude);
-    _ = printf(" altitude:");   print_float(event.*.altitude);
-    _ = printf(" altitude_ellipsoid:");  print_float(event.*.altitude_ellipsoid);
-    _ = printf(" eph:");   print_float(event.*.eph);
-    _ = printf(" epv:");   print_float(event.*.epv);
-    _ = printf(" hdop:");  print_float(event.*.hdop);
-    _ = printf(" vdop:");  print_float(event.*.vdop); 
-    _ = printf(" ground_speed:");  print_float(event.*.ground_speed);
-    _ = printf(" course:");  print_float(event.*.course);
-    _ = printf(" satellites_used: %lu", event.*.satellites_used);
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     event.*.time_utc, 
-    //     @floatCast(f64, event.*.latitude), 
-    //     @floatCast(f64, event.*.longitude), 
-    //     @floatCast(f64, event.*.altitude), 
-    //     @floatCast(f64, event.*.altitude_ellipsoid), 
-    //     @floatCast(f64, event.*.eph), 
-    //     @floatCast(f64, event.*.epv), 
-    //     @floatCast(f64, event.*.hdop), 
-    //     @floatCast(f64, event.*.vdop), 
-    //     @floatCast(f64, event.*.ground_speed), 
-    //     @floatCast(f64, event.*.course), 
-    //     event.*.satellites_used
-    // );
+    const latitude = float_to_fixed(event.*.latitude);
+    const longitude = float_to_fixed(event.*.longitude);
+    const altitude = float_to_fixed(event.*.altitude);
+    const altitude_ellipsoid = float_to_fixed(event.*.altitude_ellipsoid);
+    const eph = float_to_fixed(event.*.eph);
+    const epv = float_to_fixed(event.*.epv);
+    const hdop = float_to_fixed(event.*.hdop);
+    const vdop = float_to_fixed(event.*.vdop);
+    const ground_speed = float_to_fixed(event.*.ground_speed);
+    const course = float_to_fixed(event.*.course);
+    debug("time_utc:{}", .{ event.*.time_utc });
+    debug("latitude:{}.{:0>2}", .{ latitude.int, latitude.frac });
+    debug("longitude:{}.{:0>2}", .{ longitude.int, longitude.frac });
+    debug("altitude:{}.{:0>2}", .{ altitude.int, altitude.frac });
+    debug("altitude_ellipsoid:{}.{:0>2}", .{ altitude_ellipsoid.int, altitude_ellipsoid.frac });
+    debug("eph:{}.{:0>2}", .{ eph.int, eph.frac });
+    debug("epv:{}.{:0>2}", .{ epv.int, epv.frac });
+    debug("hdop:{}.{:0>2}", .{ hdop.int, hdop.frac });
+    debug("vdop:{}.{:0>2}", .{ vdop.int, vdop.frac }); 
+    debug("ground_speed:{}.{:0>2}", .{ ground_speed.int, ground_speed.frac });
+    debug("course:{}.{:0>2}", .{ course.int, course.frac });
+    debug("satellites_used:{}", .{ event.*.satellites_used });
 }
 
-/// Print GPS with Satellites
+/// Print GPS Count
 fn print_gps_satellite(buffer: []const align(8) u8, name: []const u8) void {
+    _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_gps_satellite, &buffer[0]);
-    _ = printf("%s: timestamp:%llu", 
-        &name[0], 
-        event.*.timestamp, 
-    );
-    _ = printf(" count: %lu", event.*.count);
-    _ = printf(" satellites: %lu", event.*.satellites);
-    _ = printf("\n");
-    // Previously: printf("%s: timestamp: %llu count: %lu satellites: %lu\n", 
-    //     name, 
-    //     event.*.timestamp, 
-    //     event.*.count, 
-    //     event.*.satellites
-    // );
-}
-
-/// Print the float with 2 decimal places.
-/// We print as integers because `printf` has a problem with floats.
-fn print_float(f: f32) void {
-    const scaled = @floatToInt(i32, f * 100);
-    const f1 = @divTrunc(scaled, 100);
-    const f2 = @mod(scaled, 100);
-    _ = printf("%d.%02d", f1, f2);
+    debug("count:{}", .{ event.*.count });
+    debug("satellites:{}", .{ event.*.satellites });
 }
 
 /// Print the Command-Line Options
