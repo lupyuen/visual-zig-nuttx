@@ -244,9 +244,6 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-    // Previously: printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", 
-    //     name, 
-    //     event.*.timestamp, 
     debug("value1:{}.{:0>2}", .{
         pressure.int, pressure.frac,
     });
