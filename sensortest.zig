@@ -75,7 +75,6 @@ pub export fn sensortest_main(
         const i = @intCast(usize, c.getoptindp().*);
         const arg = argv[i];
         name = arg[0..c.strlen(arg)];
-name0 = name; ////
     } else {
         usage();
         ret = -c.EINVAL;
@@ -576,13 +575,10 @@ pub fn log(
 ) void {
     _ = _message_level;
     _ = _scope;
-_ = printf("n: %d\n", name0[0]);////
 
     // Format the message
     var slice = std.fmt.bufPrint(&log_buf, format, args)
         catch { _ = puts("*** Error: log_buf too small"); return; };
-_ = printf("o: %d\n", name0[0]);////
-_ = printf("slice.len: %d\n", slice.len);////
 
     // Replace all nulls by spaces and terminate with a null
     _ = std.mem.replace(
@@ -601,8 +597,6 @@ _ = printf("slice.len: %d\n", slice.len);////
 /// Common Static Buffer for Logging
 var log_buf: [256]u8 = undefined;  // Limit to 256 chars
 var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
-
-var name0: []const u8 = "aaaa"; ////
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions and Variables
