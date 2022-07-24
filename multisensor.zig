@@ -25,7 +25,7 @@ fn TODO_usage() void {
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
-/// Read the Sensor Data from a Sensor specified by the Command-Line Args
+/// Read the Sensor Data from a Sensor specified by the Command-Line Options
 pub export fn test_multisensor(
     argc: c_int, 
     argv: [*c]const [*c]u8

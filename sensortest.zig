@@ -19,7 +19,7 @@ pub export fn sensortest_main(
     // Quit if no args specified
     if (argc <= 1) { usage(); return -1; }
 
-    // Read the Sensor specified by the Command-Line Args
+    // Read the Sensor specified by the Command-Line Options
     return multi.test_multisensor(argc, argv);
 }
 
