@@ -535,6 +535,17 @@ const sensor_info = struct {
 /// Sensor Data Print Function
 const data_print = fn ([]const align(8) u8, []const u8) void;
 
+/// Sensor Errors
+const SensorError = error{
+    NameError,      // Invalid name
+    OptionError,    // Invalid option
+    OpenError,      // Failed to open device
+    IntervalError,  // Failed to set sensor interval
+    BatchError,     // Failed to set sensor batch
+    EnableError,    // Failed to activate sensor
+    DisableError,   // Failed to disable sensor
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
 
