@@ -867,3 +867,11 @@ SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
 value:73.82
 SensorTest: Received messge: humi0, number:1/1
 ```
+
+We also check that errors are handled correctly...
+
+```text
+nsh> sensortest -n 1 baro
+Zig Sensor Test
+Failed to open device:/dev/sensor/baro , ret:No such file or directory
+```
