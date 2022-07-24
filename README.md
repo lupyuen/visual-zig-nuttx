@@ -856,16 +856,18 @@ NuttX 10.3.0 32c8fdf272 Jul 18 2022 16:38:47 risc-v bl602evb
 
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
+test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1006.41
-value2:28.72
+value1:1005.59
+value2:28.65
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
+test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:73.82
-SensorTest: Received messge: humi0, number:1/1
+value:75.93
+SensorTest: Received message: humi0, number:1/1
 ```
 
 We also check that errors are handled correctly...
@@ -874,4 +876,17 @@ We also check that errors are handled correctly...
 nsh> sensortest -n 1 baro
 Zig Sensor Test
 Failed to open device:/dev/sensor/baro , ret:No such file or directory
+
+nsh> sensortest
+Zig Sensor Test
+sensortest [arguments...] <command>
+        [-h      ]  sensortest commands help
+        [-i <val>]  The output data period of sensor in us
+                    default: 1000000
+        [-b <val>]  The maximum report latency of sensor in us
+                    default: 0
+        [-n <val>]  The number of output data
+                    default: 0
+ Commands:
+        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
 ```
