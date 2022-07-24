@@ -84,11 +84,10 @@ pub export fn sensortest_main(
     // Lookup Sensor Info
     idx = 0;
     for (g_sensor_info) |sensor, i| {
-        const name_prefix = name[0..sensor.name.len];
-        if (std.mem.eql(
-            u8, 
-            sensor.name, 
-            name_prefix
+        if (std.mem.startsWith(
+            u8,
+            name,
+            sensor.name
         )) {
             idx = i;
             len = sensor.esize;

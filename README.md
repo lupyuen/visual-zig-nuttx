@@ -857,13 +857,13 @@ NuttX 10.3.0 32c8fdf272 Jul 18 2022 16:38:47 risc-v bl602evb
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1007.52
-value2:29.85
+value1:1006.41
+value2:28.72
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:74.75
-SensorTest: Received message: humi0, number:1/1
+value:73.82
+SensorTest: Received messge: humi0, number:1/1
 ```
