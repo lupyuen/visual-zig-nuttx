@@ -95,32 +95,23 @@ pub fn test_multisensor(
     // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
     const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
     ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
-    if (ret < 0) {
-        ret = -errno();
-        if (ret != -c.ENOTSUP) {
-            std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return error.IntervalError;
-        }
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
+        return error.IntervalError;
     }
 
     // Set Batch Latency
     ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
-    if (ret < 0) {
-        ret = -errno();
-        if (ret != -c.ENOTSUP) {
-            std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return error.BatchError;
-        }
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
+        return error.BatchError;
     }
 
     // Enable Sensor and switch to Normal Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
-    if (ret < 0) {
-        ret = -errno();
-        if (ret != -c.ENOTSUP) {
-            std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return error.EnableError;
-        }
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
+        return error.EnableError;
     }
 
     // Prepare to poll Sensor
