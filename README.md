@@ -785,16 +785,18 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1006.59
-value2:29.60
+value1:1006.87
+value2:29.24
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:73.72
+value:75.16
 SensorTest: Received message: humi0, number:1/1
+nsh> sensortest test
+Zig Sensor Test
 ```
 
 We also check that errors are handled correctly...

@@ -19,6 +19,16 @@ pub export fn sensortest_main(
     // Quit if no args specified
     if (argc <= 1) { usage(); return -1; }
 
+    // Run a command like "test"
+    if (argc == 2) {
+        const cmd = std.mem.span(argv[1]);
+        if (std.mem.eql(u8, cmd, "test")) {
+            test_sensor()
+                catch { return -1; };
+            return 0;
+        }
+    }
+
     // Read the Sensor specified by the Command-Line Options
     multi.test_multisensor(argc, argv)
         catch |err| {
@@ -27,6 +37,10 @@ pub export fn sensortest_main(
         };
 
     return 0;
+}
+
+/// Read Pressure and Temperature from "/dev/sensor/baro0"
+fn test_sensor() !void {
 }
 
 /// Print the Command-Line Options

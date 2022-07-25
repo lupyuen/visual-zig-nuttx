@@ -49,8 +49,7 @@ pub fn test_multisensor(
     var idx: usize = undefined;
     if (c.getoptindp().* < argc) {
         const i = @intCast(usize, c.getoptindp().*);
-        const arg = argv[i];
-        name = arg[0..c.strlen(arg)];
+        name = std.mem.span(argv[i]);
     } else {
         return error.OptionError;
     }
