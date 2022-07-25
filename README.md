@@ -772,7 +772,7 @@ https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f1
 
 After cleanup becomes this...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/db3aa75f5f4d2959ac8edee3fa1f11366b8d1789/sensortest.zig#L35-L192
+https://github.com/lupyuen/visual-zig-nuttx/blob/692b5e5f6b67d04815f975dff77380a164c98247/multisensor.zig#L15-L150
 
 We test again to be sure that the Zig Sensor App is still working OK...
 
