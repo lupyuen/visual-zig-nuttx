@@ -5,6 +5,8 @@ const std = @import("std");
 
 /// Import the Sensor Definitions
 const sen = @import("./sensor.zig");
+
+/// Import the Sensor Library from C
 const c = sen.c;
 
 /// TODO: Remove this
