@@ -89,6 +89,12 @@ pub fn test_multisensor(
         return error.OpenError;
     }
 
+    // Close the Sensor Device when this function returns
+    defer {
+        _ = c.close(fd);
+        c.getoptindp().* = 0;
+    }
+
     // Set Standby Interval
     // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
     const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
@@ -143,10 +149,6 @@ pub fn test_multisensor(
         std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.DisableError;
     }
-
-    // Close the Sensor Device
-    _ = c.close(fd);
-    c.getoptindp().* = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

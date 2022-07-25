@@ -785,15 +785,15 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1006.44
-value2:29.44
+value1:1005.45
+value2:30.37
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:73.72
+value:71.23
 SensorTest: Received message: humi0, number:1/1
 ```
 
@@ -809,6 +809,10 @@ nsh> sensortest -n 1 invalid
 Zig Sensor Test
 test_multisensor
 The sensor node name:invalid is invalid
+sensortest test
+ Test barometer sensor (/dev/sensor/baro0)
+sensortest test2
+ Test humidity sensor (/dev/sensor/humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -822,6 +826,10 @@ sensortest [arguments...] <command>
 
 nsh> sensortest
 Zig Sensor Test
+sensortest test
+ Test barometer sensor (/dev/sensor/baro0)
+sensortest test2
+ Test humidity sensor (/dev/sensor/humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -869,12 +877,11 @@ if (c.read(fd, &sensor_data, len) >= len) {
 Here's the Air Pressure and Temperature read from the BME280 Barometer Sensor...
 
 ```text
-NuttShell (NSH) NuttX-10.3.0
 nsh> sensortest test
 Zig Sensor Test
 test_sensor
-pressure:1005.20
-temperature:29.24
+pressure:1005.45
+temperature:30.39
 ```
 
 # Read Humidity Sensor
@@ -908,7 +915,7 @@ Here's the Humidity read from the BME280 Humidity Sensor...
 nsh> sensortest test2
 Zig Sensor Test
 test_sensor2
-humidity:75.37
+humidity:71.13
 ```
 
 # Debug Logger Crashes
