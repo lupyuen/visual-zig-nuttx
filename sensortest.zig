@@ -51,9 +51,11 @@ fn test_sensor() !void {
 
     // Open the Sensor Device
     const fd = c.open(
-        "/dev/sensor/baro0", 
-        c.O_RDONLY | c.O_NONBLOCK
+        "/dev/sensor/baro0",       // Path of Sensor Device
+        c.O_RDONLY | c.O_NONBLOCK  // Open for read-only
     );
+
+    // Check for error
     if (fd < 0) {
         std.log.err("Failed to open device:{s}", .{ c.strerror(errno()) });
         return error.OpenError;
@@ -64,6 +66,8 @@ fn test_sensor() !void {
     const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
     var interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
     var ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+
+    // Check for error
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to set interval:{s}", .{ c.strerror(errno()) });
         return error.IntervalError;
@@ -72,6 +76,8 @@ fn test_sensor() !void {
     // Set Batch Latency
     var latency: c_uint = 0;  // No latency
     ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+
+    // Check for error
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to batch:{s}", .{ c.strerror(errno()) });
         return error.BatchError;
@@ -79,6 +85,8 @@ fn test_sensor() !void {
 
     // Enable Sensor and switch to Normal Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
+
+    // Check for error
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to enable sensor:{s}", .{ c.strerror(errno()) });
         return error.EnableError;
@@ -117,6 +125,8 @@ fn test_sensor() !void {
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
+
+    // Check for error
     if (ret < 0) {
         std.log.err("Failed to disable sensor:{s}", .{ c.strerror(errno()) });
         return error.DisableError;
