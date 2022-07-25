@@ -866,14 +866,47 @@ if (c.read(fd, &sensor_data, len) >= len) {
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/6707ec5c597fddc971d14cd078527e6926177edb/sensortest.zig#L103-L123)
 
-Here's the Sensor Data read from the BME280 Barometer Sensor...
+Here's the Air Pressure and Temperature read from the BME280 Barometer Sensor...
 
 ```text
+NuttShell (NSH) NuttX-10.3.0
 nsh> sensortest test
 Zig Sensor Test
 test_sensor
-pressure:1006.44
-temperature:29.43
+pressure:1005.20
+temperature:29.24
+```
+
+# Read Humidity Sensor
+
+To read a Humidity Sensor (like BME280), the code looks highly similar...
+
+```zig
+// Define the Sensor Data Type
+var sensor_data = std.mem.zeroes(c.struct_sensor_event_humi);
+const len = @sizeOf(@TypeOf(sensor_data));
+
+// Read the Sensor Data
+if (c.read(fd, &sensor_data, len) >= len) {
+
+    // Convert the Sensor Data to Fixed-Point Numbers
+    const humidity = float_to_fixed(sensor_data.humidity);
+
+    // Print the Sensor Data
+    debug("humidity:{}.{:0>2}", .{
+        humidity.int, 
+        humidity.frac 
+    });
+}
+```
+
+Here's the Humidity read from the BME280 Humidity Sensor...
+
+```text
+nsh> sensortest test2
+Zig Sensor Test
+test_sensor2
+humidity:75.37
 ```
 
 # Debug Logger Crashes
