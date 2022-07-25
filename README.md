@@ -486,7 +486,7 @@ debug("temperature: {}", .{ @floatToInt(i32, event.*.temperature) });
 
 So we print Floats as Integers with the Debug Logger...
 
-# Debug Logger
+# Fixed-Point Printing
 
 Earlier we saw that Zig Debug Logger `debug` won't print Floating-Point Numbers (due to a Linker Error).
 
