@@ -129,6 +129,8 @@ fn test_sensor() !void {
 /// Print the Command-Line Options
 fn usage() void {
     const err = std.log.err;
+    err("sensortest test", .{});
+    err(" Test barometer sensor (/dev/sensor/baro0)", .{});
     err("sensortest [arguments...] <command>", .{});
     err("\t[-h      ]  sensortest commands help", .{});
     err("\t[-i <val>]  The output data period of sensor in us", .{});
