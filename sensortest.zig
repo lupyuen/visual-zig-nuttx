@@ -125,8 +125,9 @@ fn test_sensor() !void {
                 temperature.int,
                 temperature.frac 
             });
-        }
-    } else { debug("Sensor data not available", .{}); }
+            
+        } else { std.log.err("Sensor data incorrect size", .{}); }
+    } else { std.log.err("Sensor data not available", .{}); }
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
@@ -211,8 +212,9 @@ fn test_sensor2() !void {
                 humidity.int, 
                 humidity.frac 
             });
-        }
-    } else { debug("Sensor data not available", .{}); }
+
+        } else { std.log.err("Sensor data incorrect size", .{}); }
+    } else { std.log.err("Sensor data not available", .{}); }
 
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));

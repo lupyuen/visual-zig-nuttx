@@ -900,6 +900,8 @@ if (c.read(fd, &sensor_data, len) >= len) {
 }
 ```
 
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/8d9a98afc5864af8d087bc566841863a68ee4b1e/sensortest.zig#L108-L128)
+
 Here's the Humidity read from the BME280 Humidity Sensor...
 
 ```text
