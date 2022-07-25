@@ -9,21 +9,6 @@ const sen = @import("./sensor.zig");
 /// Import the Sensor Library from C
 const c = sen.c;
 
-/// TODO: Remove this
-fn TODO_usage() void {
-    const err = std.log.err;
-    err("sensortest [arguments...] <command>", .{});
-    err("\t[-h      ]  sensortest commands help", .{});
-    err("\t[-i <val>]  The output data period of sensor in us", .{});
-    err("\t            default: 1000000", .{});
-    err("\t[-b <val>]  The maximum report latency of sensor in us", .{});
-    err("\t            default: 0", .{});
-    err("\t[-n <val>]  The number of output data", .{});
-    err("\t            default: 0", .{});
-    err(" Commands:", .{});
-    err("\t<sensor_node_name> ex, accel0(/dev/sensor/accel0)", .{});
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
@@ -67,8 +52,6 @@ pub fn test_multisensor(
         const arg = argv[i];
         name = arg[0..c.strlen(arg)];
     } else {
-        TODO_usage();
-        ret = -c.EINVAL;
         return error.OptionError;
     }
 
@@ -88,8 +71,6 @@ pub fn test_multisensor(
     }
     if (len == 0) {
         std.log.err("The sensor node name:{s} is invalid", .{ name });
-        TODO_usage();
-        ret = -c.EINVAL;
         return error.NameError;
     }
 
@@ -106,7 +87,6 @@ pub fn test_multisensor(
         c.O_RDONLY | c.O_NONBLOCK
     );
     if (fd < 0) {
-        ret = -errno();
         std.log.err("Failed to open device:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.OpenError;
     }
@@ -171,7 +151,6 @@ pub fn test_multisensor(
     // Disable Sensor and switch to Low Power Mode
     ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
     if (ret < 0) {
-        ret = -errno();
         std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.DisableError;
     }

@@ -858,15 +858,15 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1006.38
-value2:29.12
+value1:1006.42
+value2:29.25
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:74.98
+value:74.55
 SensorTest: Received message: humi0, number:1/1
 ```
 
@@ -877,6 +877,21 @@ nsh> sensortest -n 1 baro
 Zig Sensor Test
 test_multisensor
 Failed to open device:/dev/sensor/baro , ret:No such file or directory
+
+nsh> sensortest -n 1 invalid
+Zig Sensor Test
+test_multisensor
+The sensor node name:invalid is invalid
+sensortest [arguments...] <command>
+        [-h      ]  sensortest commands help
+        [-i <val>]  The output data period of sensor in us
+                    default: 1000000
+        [-b <val>]  The maximum report latency of sensor in us
+                    default: 0
+        [-n <val>]  The number of output data
+                    default: 0
+ Commands:
+        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
 
 nsh> sensortest
 Zig Sensor Test

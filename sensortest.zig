@@ -21,7 +21,10 @@ pub export fn sensortest_main(
 
     // Read the Sensor specified by the Command-Line Options
     multi.test_multisensor(argc, argv)
-        catch { return -1; };
+        catch |err| {
+            if (err == error.OptionError or err == error.NameError) { usage(); }
+            return -1;
+        };
 
     return 0;
 }
