@@ -836,7 +836,37 @@ sensortest [arguments...] <command>
 
 # Read Barometer Sensor
 
-TODO
+Reading Sensor Data from a single sensor looks a lot simpler (because we don't need to cast the Sensor Data)...
+
+```zig
+// Omitted: Open the Sensor Device, enable the Sensor and poll for Sensor Data
+...
+// Define the Sensor Data Type
+var sensor_data = std.mem.zeroes(c.struct_sensor_event_baro);
+const len = @sizeOf(@TypeOf(sensor_data));
+
+// Read the Sensor Data
+if (c.read(fd, &sensor_data, len) >= len) {
+
+    // Convert the Sensor Data to Fixed-Point Numbers
+    const pressure    = float_to_fixed(sensor_data.pressure);
+    const temperature = float_to_fixed(sensor_data.temperature);
+
+    // Print the Sensor Data
+    debug("pressure:{}.{:0>2}", .{
+        pressure.int, 
+        pressure.frac 
+    });
+    debug("temperature:{}.{:0>2}", .{
+        temperature.int,
+        temperature.frac 
+    });
+}
+```
+
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/6707ec5c597fddc971d14cd078527e6926177edb/sensortest.zig#L103-L123)
+
+Here's the Sensor Data read from the BME280 Barometer Sensor...
 
 ```text
 nsh> sensortest test
