@@ -785,18 +785,16 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1006.87
-value2:29.24
+value1:1006.44
+value2:29.44
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:75.16
+value:73.72
 SensorTest: Received message: humi0, number:1/1
-nsh> sensortest test
-Zig Sensor Test
 ```
 
 We also check that errors are handled correctly...
@@ -836,6 +834,17 @@ sensortest [arguments...] <command>
         <sensor_node_name> ex, accel0(/dev/sensor/accel0)
 ```
 
+# Read Barometer Sensor
+
+TODO
+
+```text
+nsh> sensortest test
+Zig Sensor Test
+test_sensor
+pressure:1006.44
+temperature:29.43
+```
 
 # Debug Logger Crashes
 

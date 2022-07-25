@@ -46,7 +46,6 @@ pub fn test_multisensor(
     // Get Sensor Type
     var name: []const u8 = undefined;
     var len: usize = 0;
-    var idx: usize = undefined;
     if (c.getoptindp().* < argc) {
         const i = @intCast(usize, c.getoptindp().*);
         name = std.mem.span(argv[i]);
@@ -55,7 +54,7 @@ pub fn test_multisensor(
     }
 
     // Lookup Sensor Info
-    idx = 0;
+    var idx: usize = 0;
     for (g_sensor_info) |sensor, i| {
         if (std.mem.startsWith(
             u8,
@@ -115,7 +114,7 @@ pub fn test_multisensor(
 
     // Prepare to poll Sensor
     debug("SensorTest: Test {s} with interval({}), latency({})", .{ devname, interval, latency });
-    var fds: c.struct_pollfd = undefined;
+    var fds = std.mem.zeroes(c.struct_pollfd);
     fds.fd = fd;
     fds.events = c.POLLIN;
 

@@ -6,6 +6,12 @@ const std = @import("std");
 /// Import the Multisensor Module
 const multi = @import("./multisensor.zig");
 
+/// Import the Sensor Definitions
+const sen = @import("./sensor.zig");
+
+/// Import the Sensor Library from C
+const c = sen.c;
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
@@ -39,9 +45,85 @@ pub export fn sensortest_main(
     return 0;
 }
 
-/// Read Pressure and Temperature from "/dev/sensor/baro0"
+/// Read Pressure and Temperature from Barometer Sensor "/dev/sensor/baro0"
 fn test_sensor() !void {
     debug("test_sensor", .{});
+
+    // Open the Sensor Device
+    const fd = c.open(
+        "/dev/sensor/baro0", 
+        c.O_RDONLY | c.O_NONBLOCK
+    );
+    if (fd < 0) {
+        std.log.err("Failed to open device:{s}", .{ c.strerror(errno()) });
+        return error.OpenError;
+    }
+
+    // Set Standby Interval
+    // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
+    const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
+    var interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
+    var ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to set interval:{s}", .{ c.strerror(errno()) });
+        return error.IntervalError;
+    }
+
+    // Set Batch Latency
+    var latency: c_uint = 0;  // No latency
+    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to batch:{s}", .{ c.strerror(errno()) });
+        return error.BatchError;
+    }
+
+    // Enable Sensor and switch to Normal Power Mode
+    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
+    if (ret < 0 and errno() != c.ENOTSUP) {
+        std.log.err("Failed to enable sensor:{s}", .{ c.strerror(errno()) });
+        return error.EnableError;
+    }
+
+    // Prepare to poll Sensor
+    var fds = std.mem.zeroes(c.struct_pollfd);
+    fds.fd = fd;
+    fds.events = c.POLLIN;
+
+    // If Sensor Data is available...
+    if (c.poll(&fds, 1, -1) > 0) {
+
+        // Define the Sensor Data Type
+        var sensor_data = std.mem.zeroes(c.struct_sensor_event_baro);
+        const len = @sizeOf(@TypeOf(sensor_data));
+
+        // Read the Sensor Data
+        if (c.read(fd, &sensor_data, len) >= len) {
+
+            // Convert the Sensor Data to Fixed-Point Numbers
+            const pressure    = float_to_fixed(sensor_data.pressure);
+            const temperature = float_to_fixed(sensor_data.temperature);
+
+            // Print the Sensor Data
+            debug("pressure:{}.{:0>2}", .{
+                pressure.int, 
+                pressure.frac 
+            });
+            debug("temperature:{}.{:0>2}", .{
+                temperature.int,
+                temperature.frac 
+            });
+        }
+    } else { debug("Sensor data not available", .{}); }
+
+    // Disable Sensor and switch to Low Power Mode
+    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
+    if (ret < 0) {
+        std.log.err("Failed to disable sensor:{s}", .{ c.strerror(errno()) });
+        return error.DisableError;
+    }
+
+    // Close the Sensor Device
+    _ = c.close(fd);
 }
 
 /// Print the Command-Line Options
@@ -124,6 +206,10 @@ var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions and Variables
+
+/// Aliases for Sensor Definitions
+const errno = sen.errno;
+const float_to_fixed = sen.float_to_fixed;
 
 /// For safety, we import these functions ourselves to enforce Null-Terminated Strings.
 /// We changed `[*c]const u8` to `[*:0]const u8`
