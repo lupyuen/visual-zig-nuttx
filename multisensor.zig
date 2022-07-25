@@ -28,17 +28,17 @@ fn TODO_usage() void {
 //  Main Function
 
 /// Read the Sensor Data from a Sensor specified by the Command-Line Options
-pub export fn test_multisensor(
+pub fn test_multisensor(
     argc: c_int, 
     argv: [*c]const [*c]u8
-) c_int {
+) !void {
     debug("test_multisensor", .{});
 
     // Register the Signal Handler for Ctrl-C
     const handler = c.signal(c.SIGINT, exit_handler);
     if (@ptrToInt(handler) == @ptrToInt(c.SIG_ERR)) {
         std.log.err("Failed to register signal handler", .{});
-        return -errno();
+        return SensorError.SignalError;
     }
 
     // Parse the Command-Line Options
@@ -54,7 +54,7 @@ pub export fn test_multisensor(
             'i' => { interval = c.strtoul(c.getoptargp().*, null, 0); },
             'b' => { latency  = c.strtoul(c.getoptargp().*, null, 0); },
             'n' => { count    = c.strtoul(c.getoptargp().*, null, 0); },
-            else => { TODO_usage(); return ret; },
+            else => { return SensorError.OptionError; },
         }
     }
 
@@ -69,7 +69,7 @@ pub export fn test_multisensor(
     } else {
         TODO_usage();
         ret = -c.EINVAL;
-        return ret;
+        return SensorError.OptionError;
     }
 
     // Lookup Sensor Info
@@ -90,7 +90,7 @@ pub export fn test_multisensor(
         std.log.err("The sensor node name:{s} is invalid", .{ name });
         TODO_usage();
         ret = -c.EINVAL;
-        return ret;
+        return SensorError.NameError;
     }
 
     // Compose the Device Name. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
@@ -98,7 +98,7 @@ pub export fn test_multisensor(
         &devname_buffer,
         "/dev/sensor/{s}\x00",
         .{ name }
-    ) catch { std.log.err("Path overflow", .{}); return -c.EINVAL; };
+    ) catch { std.log.err("Path overflow", .{}); return SensorError.OpenError; };
 
     // Open the Sensor Device
     const fd = c.open(
@@ -108,7 +108,7 @@ pub export fn test_multisensor(
     if (fd < 0) {
         ret = -errno();
         std.log.err("Failed to open device:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return ret;
+        return SensorError.OpenError;
     }
 
     // Set Standby Interval
@@ -119,7 +119,7 @@ pub export fn test_multisensor(
         ret = -errno();
         if (ret != -c.ENOTSUP) {
             std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return ret;
+            return SensorError.IntervalError;
         }
     }
 
@@ -129,7 +129,7 @@ pub export fn test_multisensor(
         ret = -errno();
         if (ret != -c.ENOTSUP) {
             std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return ret;
+            return SensorError.BatchError;
         }
     }
 
@@ -139,7 +139,7 @@ pub export fn test_multisensor(
         ret = -errno();
         if (ret != -c.ENOTSUP) {
             std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-            return ret;
+            return SensorError.EnableError;
         }
     }
 
@@ -173,13 +173,12 @@ pub export fn test_multisensor(
     if (ret < 0) {
         ret = -errno();
         std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return ret;
+        return SensorError.DisableError;
     }
 
     // Close the Sensor Device
     _ = c.close(fd);
     c.getoptindp().* = 0;
-    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -305,9 +304,6 @@ fn print_gps_satellite(buffer: []const align(8) u8, name: []const u8) void {
     debug("count:{}", .{ event.*.count });
     debug("satellites:{}", .{ event.*.satellites });
 }
-
-///////////////////////////////////////////////////////////////////////////////
-//  Other Functions
 
 /// Signal Handler for Ctrl-C
 export fn exit_handler(signo: c_int) void {
@@ -500,11 +496,12 @@ const sensor_info = struct {
 const data_print = fn ([]const align(8) u8, []const u8) void;
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Imported Functions
+//  Imported Functions and Types
 
 /// Aliases for Sensor Definitions
 const errno = sen.errno;
 const float_to_fixed = sen.float_to_fixed;
+const SensorError = sen.SensorError;
 
 /// Aliases for Zig Standard Library
 const assert = std.debug.assert;

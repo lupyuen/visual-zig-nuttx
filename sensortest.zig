@@ -20,7 +20,10 @@ pub export fn sensortest_main(
     if (argc <= 1) { usage(); return -1; }
 
     // Read the Sensor specified by the Command-Line Options
-    return multi.test_multisensor(argc, argv);
+    multi.test_multisensor(argc, argv)
+        catch { return -1; };
+
+    return 0;
 }
 
 /// Print the Command-Line Options

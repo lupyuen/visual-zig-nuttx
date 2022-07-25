@@ -54,6 +54,7 @@ pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
 pub const SensorError = error{
     NameError,      // Invalid name
     OptionError,    // Invalid option
+    SignalError,    // Failed to register signal handler
     OpenError,      // Failed to open device
     IntervalError,  // Failed to set sensor interval
     BatchError,     // Failed to set sensor batch
