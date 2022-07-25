@@ -41,6 +41,7 @@ pub export fn sensortest_main(
 
 /// Read Pressure and Temperature from "/dev/sensor/baro0"
 fn test_sensor() !void {
+    debug("test_sensor", .{});
 }
 
 /// Print the Command-Line Options
