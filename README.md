@@ -510,7 +510,7 @@ Let's convert Floating-Point Numbers to Fixed-Point Numbers (2 decimal points) a
 fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
     const scaled = @floatToInt(i32, f * 100);
     return .{
-        .int  = @divTrunc(scaled, 100),
+        .int  = @divFloor(scaled, 100),
         .frac = @intCast(u8, @mod(scaled, 100)),
     };
 }
