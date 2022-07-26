@@ -507,16 +507,16 @@ Let's convert Floating-Point Numbers to Fixed-Point Numbers (2 decimal places) a
 ```zig
 /// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
 /// We do this because `debug` has a problem with floats.
-fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
-    const scaled = @floatToInt(i32, f * 100);
+pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+    const scaled = @floatToInt(i32, f * 100.0);
+    const rem = @rem(scaled, 100);
+    const rem_abs = if (rem < 0) -rem else rem;
     return .{
-        .int  = @divFloor(scaled, 100),
-        .frac = @intCast(u8, @mod(scaled, 100)),
+        .int  = @divTrunc(scaled, 100),
+        .frac = @intCast(u8, rem_abs),
     };
 }
 ```
-
-[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/3b9d394ad8849898cadc17255f657c9ec9371ccd/sensor.zig#L40-L48)
 
 This is how we print Floating-Point Numbers as Fixed-Point Numbers...
 
@@ -785,15 +785,15 @@ nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
-value1:1005.45
-value2:30.37
+value1:1007.65
+value2:27.68
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
 SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
-value:71.23
+value:78.91
 SensorTest: Received message: humi0, number:1/1
 ```
 
@@ -880,8 +880,8 @@ Here's the Air Pressure and Temperature read from the BME280 Barometer Sensor...
 nsh> sensortest test
 Zig Sensor Test
 test_sensor
-pressure:1005.45
-temperature:30.39
+pressure:1007.66
+temperature:27.70
 ```
 
 # Read Humidity Sensor
@@ -915,7 +915,7 @@ Here's the Humidity read from the BME280 Humidity Sensor...
 nsh> sensortest test2
 Zig Sensor Test
 test_sensor2
-humidity:71.13
+humidity:78.81
 ```
 
 # Debug Logger Crashes
