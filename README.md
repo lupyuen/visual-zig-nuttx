@@ -518,6 +518,8 @@ pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
 }
 ```
 
+[(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/b4a0ce4ae0e518e705d0de1437a32e201a7b0c50/sensor.zig#L40-L50)
+
 This is how we print Floating-Point Numbers as Fixed-Point Numbers...
 
 ```zig
