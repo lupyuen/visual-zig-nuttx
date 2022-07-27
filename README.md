@@ -18,10 +18,6 @@ _Why limit to IoT Sensor Apps?_
 
 -   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
 
-> ![TODO: Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/2022-07-18%2012.30.20~2.JPG)
-
-> (TODO)
-
 # Sensor Test App in C
 
 We start with the Sensor Test App (in C) from Apache NuttX RTOS: [sensortest.c](https://github.com/lupyuen/incubator-nuttx-apps/blob/pinedio/testing/sensortest/sensortest.c)
@@ -1024,3 +1020,11 @@ This crashes inside `free` when deallocating the Sensor Data Buffer, might be du
 For safety, we converted the Heap Buffer to a Static Buffer.
 
 TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`?
+
+# TODO
+
+TODO: Customise [Blockly](https://github.com/google/blockly) to generate the Zig Sensor App
+
+> ![TODO: Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/2022-07-18%2012.30.20~2.JPG)
+
+> (TODO)
