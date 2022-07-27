@@ -1,6 +1,4 @@
-> ![TODO: Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/2022-07-18%2012.30.20~2.JPG)
-
-> (TODO)
+![Pine64 PineCone BL602 RISC-V Board connected to Bosch BME280 Sensor](https://lupyuen.github.io/images/sensor-title.jpg)
 
 # Visual Programming for Zig with NuttX Sensors
 
@@ -19,6 +17,10 @@ _Why limit to IoT Sensor Apps?_
 -   Blockly is Typeless. With Zig we can use Type Inference to deduce the missing Struct Types
 
 -   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
+
+> ![TODO: Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/2022-07-18%2012.30.20~2.JPG)
+
+> (TODO)
 
 # Sensor Test App in C
 
