@@ -9,7 +9,6 @@ pub const c = @cImport({
     @cDefine("__NuttX__",  "");
     @cDefine("NDEBUG",     "");
     @cDefine("ARCH_RISCV", "");
-    @cDefine("LV_LVGL_H_INCLUDE_SIMPLE", "");
 
     // Workaround for "Unable to translate macro: undefined identifier `LL`"
     @cDefine("LL", "");
