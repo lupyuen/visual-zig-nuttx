@@ -251,6 +251,8 @@ For testing the Zig Sensor App, we connect the BME280 Sensor (Temperature / Humi
 | __`3V3`__ | `3.3V` | Red
 | __`GND`__ | `GND` | Black
 
+![Pine64 PineCone BL602 RISC-V Board connected to Bosch BME280 Sensor](https://lupyuen.github.io/images/sensor-connect.jpg)
+
 # Run Zig Sensor App
 
 To read the BME280 Sensor, let's run the Zig Sensor App: [sensortest.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/0d3617dbcae5ae9836b5a70ba2026c75e12a00ce/sensortest.zig#L32-L417)
