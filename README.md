@@ -18,7 +18,7 @@ _Why limit to IoT Sensor Apps?_
 
 -   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
 
-![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-slice2.jpg)
+![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
 
 # Sensor Test App in C
 
@@ -1029,8 +1029,8 @@ For safety, we converted the Heap Buffer to a Static Buffer.
 
 TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`?
 
-# TODO
+# Customise Blockly
 
 TODO: Customise [Blockly](https://github.com/google/blockly) to generate the Zig Sensor App
 
-![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-slice2.jpg)
+![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
