@@ -455,6 +455,8 @@ This causes a Linker Error, as explained below...
 
 # Floating-Point Link Error
 
+_(Note: We observed this issue with Zig Compiler version 0.10.0, it might have been fixed in later versions of the compiler)_
+
 When we call the Zig Debug Logger `debug` to print Floating-Point Numbers (32-bit)...
 
 ```zig
@@ -925,6 +927,8 @@ humidity:78.81
 ```
 
 # Debug Logger Crashes
+
+_(Note: We observed this issue with Zig Compiler version 0.10.0, it might have been fixed in later versions of the compiler)_
 
 TODO: Calling the `debug` logger inside `print_valf2` causes weird crashes...
 
