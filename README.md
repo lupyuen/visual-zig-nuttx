@@ -304,6 +304,8 @@ Something got messed up in the Auto-Translation from C [(sensortest.c)](https://
 
 # Fix Floating-Point Values
 
+_(Note: We observed this issue with Zig Compiler version 0.10.0, it might have been fixed in later versions of the compiler)_
+
 Earlier we saw that our Zig Sensor App printed the incorrect Sensor Values for Pressure (`value1`) and Temperature (`value2`)...
 
 ```bash
