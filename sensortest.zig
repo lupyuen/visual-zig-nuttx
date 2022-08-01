@@ -6,6 +6,9 @@ const std = @import("std");
 /// Import the Multisensor Module
 const multi = @import("./multisensor.zig");
 
+/// Import the Visual Program
+const visual = @import("./visual.zig");
+
 /// Import the Sensor Definitions
 const sen = @import("./sensor.zig");
 
@@ -35,6 +38,11 @@ pub export fn sensortest_main(
         }
         else if (std.mem.eql(u8, cmd, "test2")) {
             test_sensor2()
+                catch { return -1; };
+            return 0;
+        }
+        else if (std.mem.eql(u8, cmd, "visual")) {
+            visual.visual_main(argc, argv)
                 catch { return -1; };
             return 0;
         }
