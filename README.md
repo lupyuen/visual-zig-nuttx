@@ -18,7 +18,7 @@ _Why limit to IoT Sensor Apps?_
 
 -   Make it easier to experiment with various IoT Sensors: Temperature, Humidity, Air Pressure, ...
 
-[Blockly Source Code: blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
+[Blockly Source Code: lupyuen3/blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
 
 ![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
 
@@ -1035,6 +1035,6 @@ TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`
 
 TODO: Customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App
 
-[Blockly Source Code: blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
+[Blockly Source Code: lupyuen3/blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
 
 ![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
