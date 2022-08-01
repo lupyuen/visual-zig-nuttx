@@ -248,6 +248,8 @@ fn usage() void {
     err(" Test barometer sensor (/dev/sensor/baro0)", .{});
     err("sensortest test2", .{});
     err(" Test humidity sensor (/dev/sensor/humi0)", .{});
+    err("sensortest visual", .{});
+    err(" Run visual program", .{});
     err("sensortest [arguments...] <command>", .{});
     err("\t[-h      ]  sensortest commands help", .{});
     err("\t[-i <val>]  The output data period of sensor in us", .{});
