@@ -38,7 +38,7 @@ pub fn errno() c_int {
 
 /// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
 /// We do this because `debug` has a problem with floats.
-pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+pub fn float_to_fixed(f: f32) FixedPoint {
     const scaled = @floatToInt(i32, f * 100.0);
     const rem = @rem(scaled, 100);
     const rem_abs = if (rem < 0) -rem else rem;
@@ -50,6 +50,14 @@ pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
+
+/// Fixed Point Number (2 decimal places)
+pub const FixedPoint = struct {
+    /// Integer Component
+    int: i32,
+    /// Fraction Component (scaled by 100)
+    frac: u8
+};
 
 /// Sensor Errors
 pub const SensorError = error{
