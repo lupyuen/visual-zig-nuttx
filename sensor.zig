@@ -56,7 +56,22 @@ pub const FixedPoint = struct {
     /// Integer Component
     int: i32,
     /// Fraction Component (scaled by 100)
-    frac: u8
+    frac: u8,
+
+    /// Format the output for Fixed Point Number (like 123.45)
+    pub fn format(
+        self: FixedPoint,
+        comptime fmt: []const u8,
+        options: std.fmt.FormatOptions,
+        writer: anytype,
+    ) !void {
+        _ = fmt;
+        _ = options;
+        try writer.print("{}.{:0>2}", .{
+            self.int, 
+            self.frac 
+        });
+    }
 };
 
 /// Sensor Errors

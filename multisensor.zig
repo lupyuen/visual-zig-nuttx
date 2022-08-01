@@ -162,10 +162,10 @@ fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
     const y = float_to_fixed(event.*.y);
     const z = float_to_fixed(event.*.z);
     const temperature = float_to_fixed(event.*.temperature);
-    debug("x:{}.{:0>2}", .{ x.int, x.frac });
-    debug("y:{}.{:0>2}", .{ y.int, y.frac });
-    debug("z:{}.{:0>2}", .{ z.int, z.frac });
-    debug("temperature:{}.{:0>2}", .{ temperature.int, temperature.frac });
+    debug("x:{}", .{ x });
+    debug("y:{}", .{ y });
+    debug("z:{}", .{ z });
+    debug("temperature:{}", .{ temperature });
 }
 
 /// Print 3 floats
@@ -175,9 +175,9 @@ fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
     const r = float_to_fixed(event.*.r);
     const g = float_to_fixed(event.*.g);
     const b = float_to_fixed(event.*.b);
-    debug("value1:{}.{:0>2}", .{ r.int, r.frac });
-    debug("value2:{}.{:0>2}", .{ g.int, g.frac }); 
-    debug("value3:{}.{:0>2}", .{ b.int, b.frac });
+    debug("value1:{}", .{ r });
+    debug("value2:{}", .{ g }); 
+    debug("value3:{}", .{ b });
 }
 
 /// Print 2 floats
@@ -186,8 +186,8 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
     const pressure = float_to_fixed(event.*.pressure);
     const temperature = float_to_fixed(event.*.temperature);
-    debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
-    debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
+    debug("value1:{}", .{ pressure });
+    debug("value2:{}", .{ temperature });
 }
 
 /// Print a float
@@ -195,7 +195,7 @@ fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
     const proximity = float_to_fixed(event.*.proximity);
-    debug("value:{}.{:0>2}", .{ proximity.int, proximity.frac });
+    debug("value:{}", .{ proximity });
 }
 
 /// Print a boolean
@@ -254,16 +254,16 @@ fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
     const ground_speed = float_to_fixed(event.*.ground_speed);
     const course = float_to_fixed(event.*.course);
     debug("time_utc:{}", .{ event.*.time_utc });
-    debug("latitude:{}.{:0>2}", .{ latitude.int, latitude.frac });
-    debug("longitude:{}.{:0>2}", .{ longitude.int, longitude.frac });
-    debug("altitude:{}.{:0>2}", .{ altitude.int, altitude.frac });
-    debug("altitude_ellipsoid:{}.{:0>2}", .{ altitude_ellipsoid.int, altitude_ellipsoid.frac });
-    debug("eph:{}.{:0>2}", .{ eph.int, eph.frac });
-    debug("epv:{}.{:0>2}", .{ epv.int, epv.frac });
-    debug("hdop:{}.{:0>2}", .{ hdop.int, hdop.frac });
-    debug("vdop:{}.{:0>2}", .{ vdop.int, vdop.frac }); 
-    debug("ground_speed:{}.{:0>2}", .{ ground_speed.int, ground_speed.frac });
-    debug("course:{}.{:0>2}", .{ course.int, course.frac });
+    debug("latitude:{}", .{ latitude });
+    debug("longitude:{}", .{ longitude });
+    debug("altitude:{}", .{ altitude });
+    debug("altitude_ellipsoid:{}", .{ altitude_ellipsoid });
+    debug("eph:{}", .{ eph });
+    debug("epv:{}", .{ epv });
+    debug("hdop:{}", .{ hdop });
+    debug("vdop:{}", .{ vdop }); 
+    debug("ground_speed:{}", .{ ground_speed });
+    debug("course:{}", .{ course });
     debug("satellites_used:{}", .{ event.*.satellites_used });
 }
 

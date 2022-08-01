@@ -22,7 +22,7 @@ pub fn visual_main(
     _ = argv;
 
     // Read the Temperature
-    const temperature = temperature_blk: {
+    const temperature = blk: {
         // Open the Sensor Device
         const fd = c.open(
             "/dev/sensor/baro0",       // Path of Sensor Device
@@ -92,13 +92,11 @@ pub fn visual_main(
                 const temperature = float_to_fixed(sensor_data.temperature);
 
                 // Print the Sensor Data
-                debug("pressure:{}.{:0>2}", .{
-                    pressure.int, 
-                    pressure.frac 
+                debug("pressure:{}", .{
+                    pressure
                 });
-                debug("temperature:{}.{:0>2}", .{
-                    temperature.int,
-                    temperature.frac 
+                debug("temperature:{}", .{
+                    temperature
                 });
 
                 // Remember the Sensor Value
@@ -117,13 +115,12 @@ pub fn visual_main(
         }
         
         // Return the Sensor Value
-        break :temperature_blk sensor_value;
+        break :blk sensor_value;
     };
 
     // Print the Temperature
-    debug("temperature:{}.{:0>2}", .{
-        float_to_fixed(temperature).int,
-        float_to_fixed(temperature).frac 
+    debug("temperature:{}", .{
+        float_to_fixed(temperature)
     });
 }
 

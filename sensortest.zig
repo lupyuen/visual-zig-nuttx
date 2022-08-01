@@ -130,13 +130,11 @@ fn test_sensor() !void {
             const temperature = float_to_fixed(sensor_data.temperature);
 
             // Print the Sensor Data
-            debug("pressure:{}.{:0>2}", .{
-                pressure.int, 
-                pressure.frac 
+            debug("pressure:{}", .{
+                pressure
             });
-            debug("temperature:{}.{:0>2}", .{
-                temperature.int,
-                temperature.frac 
+            debug("temperature:{}", .{
+                temperature
             });
             
         } else { std.log.err("Sensor data incorrect size", .{}); }
@@ -223,9 +221,8 @@ fn test_sensor2() !void {
             const humidity = float_to_fixed(sensor_data.humidity);
 
             // Print the Sensor Data
-            debug("humidity:{}.{:0>2}", .{
-                humidity.int, 
-                humidity.frac 
+            debug("humidity:{}", .{
+                humidity
             });
 
         } else { std.log.err("Sensor data incorrect size", .{}); }
