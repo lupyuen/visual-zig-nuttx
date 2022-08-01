@@ -75,7 +75,7 @@ pub fn visual_main(
         var fds = std.mem.zeroes(c.struct_pollfd);
         fds.fd = fd;
         fds.events = c.POLLIN;
-        var sensor_value: FixedPoint = undefined;
+        var sensor_value: f32 = undefined;
 
         // If Sensor Data is available...
         if (c.poll(&fds, 1, -1) > 0) {
@@ -102,7 +102,7 @@ pub fn visual_main(
                 });
 
                 // Remember the Sensor Value
-                sensor_value = temperature;
+                sensor_value = sensor_data.temperature;
                 
             } else { std.log.err("Sensor data incorrect size", .{}); }
         } else { std.log.err("Sensor data not available", .{}); }
@@ -122,8 +122,8 @@ pub fn visual_main(
 
     // Print the Temperature
     debug("temperature:{}.{:0>2}", .{
-        temperature.int,
-        temperature.frac 
+        float_to_fixed(temperature).int,
+        float_to_fixed(temperature).frac 
     });
 }
 
