@@ -158,10 +158,10 @@ pub fn test_multisensor(
 fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_accel, &buffer[0]);
-    const x = float_to_fixed(event.*.x);
-    const y = float_to_fixed(event.*.y);
-    const z = float_to_fixed(event.*.z);
-    const temperature = float_to_fixed(event.*.temperature);
+    const x = floatToFixed(event.*.x);
+    const y = floatToFixed(event.*.y);
+    const z = floatToFixed(event.*.z);
+    const temperature = floatToFixed(event.*.temperature);
     debug("x:{}", .{ x });
     debug("y:{}", .{ y });
     debug("z:{}", .{ z });
@@ -172,9 +172,9 @@ fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
 fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_rgb, &buffer[0]);
-    const r = float_to_fixed(event.*.r);
-    const g = float_to_fixed(event.*.g);
-    const b = float_to_fixed(event.*.b);
+    const r = floatToFixed(event.*.r);
+    const g = floatToFixed(event.*.g);
+    const b = floatToFixed(event.*.b);
     debug("value1:{}", .{ r });
     debug("value2:{}", .{ g }); 
     debug("value3:{}", .{ b });
@@ -184,8 +184,8 @@ fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
-    const pressure = float_to_fixed(event.*.pressure);
-    const temperature = float_to_fixed(event.*.temperature);
+    const pressure = floatToFixed(event.*.pressure);
+    const temperature = floatToFixed(event.*.temperature);
     debug("value1:{}", .{ pressure });
     debug("value2:{}", .{ temperature });
 }
@@ -194,7 +194,7 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
 fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
-    const proximity = float_to_fixed(event.*.proximity);
+    const proximity = floatToFixed(event.*.proximity);
     debug("value:{}", .{ proximity });
 }
 
@@ -243,16 +243,16 @@ fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
 fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_gps, &buffer[0]);
-    const latitude = float_to_fixed(event.*.latitude);
-    const longitude = float_to_fixed(event.*.longitude);
-    const altitude = float_to_fixed(event.*.altitude);
-    const altitude_ellipsoid = float_to_fixed(event.*.altitude_ellipsoid);
-    const eph = float_to_fixed(event.*.eph);
-    const epv = float_to_fixed(event.*.epv);
-    const hdop = float_to_fixed(event.*.hdop);
-    const vdop = float_to_fixed(event.*.vdop);
-    const ground_speed = float_to_fixed(event.*.ground_speed);
-    const course = float_to_fixed(event.*.course);
+    const latitude = floatToFixed(event.*.latitude);
+    const longitude = floatToFixed(event.*.longitude);
+    const altitude = floatToFixed(event.*.altitude);
+    const altitude_ellipsoid = floatToFixed(event.*.altitude_ellipsoid);
+    const eph = floatToFixed(event.*.eph);
+    const epv = floatToFixed(event.*.epv);
+    const hdop = floatToFixed(event.*.hdop);
+    const vdop = floatToFixed(event.*.vdop);
+    const ground_speed = floatToFixed(event.*.ground_speed);
+    const course = floatToFixed(event.*.course);
     debug("time_utc:{}", .{ event.*.time_utc });
     debug("latitude:{}", .{ latitude });
     debug("longitude:{}", .{ longitude });
@@ -470,7 +470,7 @@ const data_print = fn ([]const align(8) u8, []const u8) void;
 
 /// Aliases for Sensor Definitions
 const errno = sen.errno;
-const float_to_fixed = sen.float_to_fixed;
+const floatToFixed = sen.floatToFixed;
 
 /// Aliases for Zig Standard Library
 const assert = std.debug.assert;

@@ -12,14 +12,15 @@ const c = sen.c;
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
-/// Read the Sensor Data from a Sensor specified by the Command-Line Options
-pub fn visual_main(
+/// Run the Visual Program that reads Sensor Data
+pub fn main(
     argc: c_int, 
     argv: [*c]const [*c]u8
 ) !void {
-    debug("visual_main", .{});
     _ = argc;
     _ = argv;
+    debug("Start main", .{});
+    defer { debug("End main", .{}); }
 
     // Read the Temperature
     const temperature = blk: {
@@ -87,18 +88,6 @@ pub fn visual_main(
             // Read the Sensor Data
             if (c.read(fd, &sensor_data, len) >= len) {
 
-                // Convert the Sensor Data to Fixed-Point Numbers
-                const pressure    = float_to_fixed(sensor_data.pressure);
-                const temperature = float_to_fixed(sensor_data.temperature);
-
-                // Print the Sensor Data
-                debug("pressure:{}", .{
-                    pressure
-                });
-                debug("temperature:{}", .{
-                    temperature
-                });
-
                 // Remember the Sensor Value
                 sensor_value = sensor_data.temperature;
                 
@@ -120,7 +109,7 @@ pub fn visual_main(
 
     // Print the Temperature
     debug("temperature:{}", .{
-        float_to_fixed(temperature)
+        floatToFixed(temperature)
     });
 }
 
@@ -146,7 +135,7 @@ const data_print = fn ([]const align(8) u8, []const u8) void;
 /// Aliases for Sensor Definitions
 const FixedPoint = sen.FixedPoint;
 const errno = sen.errno;
-const float_to_fixed = sen.float_to_fixed;
+const floatToFixed = sen.floatToFixed;
 
 /// Aliases for Zig Standard Library
 const assert = std.debug.assert;

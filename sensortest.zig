@@ -42,7 +42,7 @@ pub export fn sensortest_main(
             return 0;
         }
         else if (std.mem.eql(u8, cmd, "visual")) {
-            visual.visual_main(argc, argv)
+            visual.main(argc, argv)
                 catch { return -1; };
             return 0;
         }
@@ -126,8 +126,8 @@ fn test_sensor() !void {
         if (c.read(fd, &sensor_data, len) >= len) {
 
             // Convert the Sensor Data to Fixed-Point Numbers
-            const pressure    = float_to_fixed(sensor_data.pressure);
-            const temperature = float_to_fixed(sensor_data.temperature);
+            const pressure    = floatToFixed(sensor_data.pressure);
+            const temperature = floatToFixed(sensor_data.temperature);
 
             // Print the Sensor Data
             debug("pressure:{}", .{
@@ -218,7 +218,7 @@ fn test_sensor2() !void {
         if (c.read(fd, &sensor_data, len) >= len) {
 
             // Convert the Sensor Data to Fixed-Point Numbers
-            const humidity = float_to_fixed(sensor_data.humidity);
+            const humidity = floatToFixed(sensor_data.humidity);
 
             // Print the Sensor Data
             debug("humidity:{}", .{
@@ -327,7 +327,7 @@ var log_buf2: [log_buf.len + 1 : 0]u8 = undefined;
 
 /// Aliases for Sensor Definitions
 const errno = sen.errno;
-const float_to_fixed = sen.float_to_fixed;
+const floatToFixed = sen.floatToFixed;
 
 /// For safety, we import these functions ourselves to enforce Null-Terminated Strings.
 /// We changed `[*c]const u8` to `[*:0]const u8`

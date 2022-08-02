@@ -519,7 +519,7 @@ Let's convert Floating-Point Numbers to Fixed-Point Numbers (2 decimal places) a
 ```zig
 /// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
 /// We do this because `debug` has a problem with floats.
-pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+pub fn floatToFixed(f: f32) struct { int: i32, frac: u8 } {
     const scaled = @floatToInt(i32, f * 100.0);
     const rem = @rem(scaled, 100);
     const rem_abs = if (rem < 0) -rem else rem;
@@ -539,8 +539,8 @@ This is how we print Floating-Point Numbers as Fixed-Point Numbers...
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
     const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
-    const pressure = float_to_fixed(event.*.pressure);
-    const temperature = float_to_fixed(event.*.temperature);
+    const pressure = floatToFixed(event.*.pressure);
+    const temperature = floatToFixed(event.*.temperature);
     debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
     debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
 }
@@ -871,8 +871,8 @@ const len = @sizeOf(@TypeOf(sensor_data));
 if (c.read(fd, &sensor_data, len) >= len) {
 
     // Convert the Sensor Data to Fixed-Point Numbers
-    const pressure    = float_to_fixed(sensor_data.pressure);
-    const temperature = float_to_fixed(sensor_data.temperature);
+    const pressure    = floatToFixed(sensor_data.pressure);
+    const temperature = floatToFixed(sensor_data.temperature);
 
     // Print the Sensor Data
     debug("pressure:{}.{:0>2}", .{
@@ -911,7 +911,7 @@ const len = @sizeOf(@TypeOf(sensor_data));
 if (c.read(fd, &sensor_data, len) >= len) {
 
     // Convert the Sensor Data to Fixed-Point Numbers
-    const humidity = float_to_fixed(sensor_data.humidity);
+    const humidity = floatToFixed(sensor_data.humidity);
 
     // Print the Sensor Data
     debug("humidity:{}.{:0>2}", .{
