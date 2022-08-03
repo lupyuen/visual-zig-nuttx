@@ -42,7 +42,7 @@ pub export fn sensortest_main(
             return 0;
         }
         else if (std.mem.eql(u8, cmd, "visual")) {
-            visual.main(argc, argv)
+            visual.main()
                 catch { return -1; };
             return 0;
         }

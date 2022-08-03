@@ -13,14 +13,16 @@ const c = sen.c;
 //  Main Function
 
 /// Run the Visual Program that reads Sensor Data
-pub fn main(
-    argc: c_int, 
-    argv: [*c]const [*c]u8
-) !void {
-    _ = argc;
-    _ = argv;
+pub fn main() !void {
     debug("Start main", .{});
     defer { debug("End main", .{}); }
+
+    // Test Visual Program
+    var count: usize = 0;
+    while (count < 10) : (count += 1) {
+        const a: f32 = 123.45;
+        debug("{}", .{ a });
+    }
 
     // Read the Temperature
     const temperature = blk: {
