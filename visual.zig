@@ -21,7 +21,7 @@ pub fn main() !void {
     var count: usize = 0;
     while (count < 10) : (count += 1) {
         const a: f32 = 123.45;
-        debug("{}", .{ a });
+        debug("a={}", .{ floatToFixed(a) });
     }
 
     // Read the Temperature
