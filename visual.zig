@@ -25,7 +25,7 @@ pub fn main() !void {
     }
 
     // Read the Temperature
-    const temperature = blk: {
+    const temperature: f32 = blk: {
         // Open the Sensor Device
         const fd = c.open(
             "/dev/sensor/baro0",       // Path of Sensor Device
