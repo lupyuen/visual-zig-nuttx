@@ -110,7 +110,7 @@ pub fn main() !void {
     };
 
     // Print the Temperature
-    debug("temperature:{}", .{
+    debug("temperature={}", .{
         floatToFixed(temperature)
     });
 }
