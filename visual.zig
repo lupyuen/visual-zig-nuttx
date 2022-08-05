@@ -38,7 +38,7 @@ pub fn main() !void {
             return error.OpenError;
         }
 
-        // Close the Sensor Device when this function returns
+        // Close the Sensor Device when this block returns
         defer {
             _ = c.close(fd);
         }
