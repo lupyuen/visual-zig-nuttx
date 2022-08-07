@@ -2,7 +2,9 @@
 
 # Visual Programming for Zig with NuttX Sensors
 
-Read the article...
+Read the articles...
+
+-   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
 -   ["Read NuttX Sensor Data with Zig"](https://lupyuen.github.io/articles/sensor)
 
@@ -1033,8 +1035,10 @@ TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`
 
 # Customise Blockly
 
-TODO: Customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App
+Next we customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App.
 
-[Blockly Source Code: lupyuen3/blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
+Read the article...
+
+-   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
 ![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
