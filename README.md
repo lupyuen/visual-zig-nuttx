@@ -40,7 +40,7 @@ fd = open(devname, O_RDONLY | O_NONBLOCK);
 ioctl(fd, SNIOC_SET_INTERVAL, interval);
 
 // Set Batch Latency
-ioctl(fd, SNIOC_BATCH, &latency);
+ioctl(fd, SNIOC_BATCH, latency);
 
 // Enable Sensor and switch to Normal Power Mode
 ioctl(fd, SNIOC_ACTIVATE, 1);

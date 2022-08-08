@@ -93,7 +93,7 @@ fn test_sensor() !void {
 
     // Set Batch Latency
     var latency: c_uint = 0;  // No latency
-    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+    ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
 
     // Check for error
     if (ret < 0 and errno() != c.ENOTSUP) {
@@ -167,7 +167,7 @@ fn test_sensor2() !void {
 
     // Set Batch Latency
     var latency: c_uint = 0;  // No latency
-    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+    ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
 
     // Check for error
     if (ret < 0 and errno() != c.ENOTSUP) {

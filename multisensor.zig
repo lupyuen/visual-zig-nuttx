@@ -105,7 +105,7 @@ pub fn test_multisensor(
     }
 
     // Set Batch Latency
-    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+    ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.BatchError;
