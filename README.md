@@ -325,7 +325,7 @@ Zig seems to have a problem passing the Pressure and Temperature values (both `f
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
        name, 
        event.*.timestamp, 
@@ -341,7 +341,7 @@ The workaround is to convert the Float values to Integer AND split into two call
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
@@ -390,7 +390,7 @@ Then we pass the Floats to `print_float` for printing...
 
 ```zig
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
@@ -468,7 +468,7 @@ _(Note: We observed this issue with Zig Compiler version 0.10.0, it might have b
 When we call the Zig Debug Logger `debug` to print Floating-Point Numbers (32-bit)...
 
 ```zig
-var event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+var event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
 debug("pressure: {}",    .{ event.*.pressure });
 debug("temperature: {}", .{ event.*.temperature });
 ```
@@ -540,7 +540,7 @@ This is how we print Floating-Point Numbers as Fixed-Point Numbers...
 /// Print 2 floats
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_baro, &buffer[0]);
     const pressure = floatToFixed(event.*.pressure);
     const temperature = floatToFixed(event.*.temperature);
     debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
@@ -666,7 +666,7 @@ RISC-V Disassembly shows that it's checking `andi a0,a0,7`...
 
 ```text
 nuttx/visual-zig-nuttx/sensortest.zig:196
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
 23014f2a: 85aa     mv      a1,a0
 23014f2c: fcb42e23 sw      a1,-36(s0)
 23014f30: 891d     andi    a0,a0,7
@@ -693,7 +693,7 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
 
-Probably because `struct_sensor_event_baro` contains a `timestamp` field that's a 64-bit Integer.
+Probably because `struct_sensor_baro` contains a `timestamp` field that's a 64-bit Integer.
 
 # Clean Up
 
@@ -866,7 +866,7 @@ Reading Sensor Data from a single sensor looks a lot simpler (because we don't n
 // Omitted: Open the Sensor Device, enable the Sensor and poll for Sensor Data
 ...
 // Define the Sensor Data Type
-var sensor_data = std.mem.zeroes(c.struct_sensor_event_baro);
+var sensor_data = std.mem.zeroes(c.struct_sensor_baro);
 const len = @sizeOf(@TypeOf(sensor_data));
 
 // Read the Sensor Data
@@ -906,7 +906,7 @@ To read a Humidity Sensor (like BME280), the code looks highly similar...
 
 ```zig
 // Define the Sensor Data Type
-var sensor_data = std.mem.zeroes(c.struct_sensor_event_humi);
+var sensor_data = std.mem.zeroes(c.struct_sensor_humi);
 const len = @sizeOf(@TypeOf(sensor_data));
 
 // Read the Sensor Data

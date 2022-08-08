@@ -143,7 +143,7 @@ pub fn test_multisensor(
 /// Print X, Y, Z, Temperature
 fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_accel, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_accel, &buffer[0]);
     const x = floatToFixed(event.*.x);
     const y = floatToFixed(event.*.y);
     const z = floatToFixed(event.*.z);
@@ -157,7 +157,7 @@ fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
 /// Print 3 floats
 fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_rgb, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_rgb, &buffer[0]);
     const r = floatToFixed(event.*.r);
     const g = floatToFixed(event.*.g);
     const b = floatToFixed(event.*.b);
@@ -169,7 +169,7 @@ fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
 /// Print 2 floats
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_baro, &buffer[0]);
     const pressure = floatToFixed(event.*.pressure);
     const temperature = floatToFixed(event.*.temperature);
     debug("value1:{}", .{ pressure });
@@ -179,7 +179,7 @@ fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
 /// Print a float
 fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_prox, &buffer[0]);
     const proximity = floatToFixed(event.*.proximity);
     debug("value:{}", .{ proximity });
 }
@@ -187,14 +187,14 @@ fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
 /// Print a boolean
 fn print_valb(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_hall, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_hall, &buffer[0]);
     debug("value:{}", .{ @as(c_int, @boolToInt(event.*.hall)) });
 }
 
 /// Print 2 integers
 fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ots, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ots, &buffer[0]);
     debug("value1:{}", .{ event.*.x });
     debug("value2:{}", .{ event.*.y });
 }
@@ -202,7 +202,7 @@ fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
 /// Print PPGD
 fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ppgd, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ppgd, &buffer[0]);
     debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
     debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
     debug("current:{}", .{ event.*.current });
@@ -213,7 +213,7 @@ fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
 /// Print PPGQ
 fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ppgq, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ppgq, &buffer[0]);
     debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
     debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
     debug("ppg3:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 2))] });
@@ -228,7 +228,7 @@ fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
 /// Print GPS
 fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_gps, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_gps, &buffer[0]);
     const latitude = floatToFixed(event.*.latitude);
     const longitude = floatToFixed(event.*.longitude);
     const altitude = floatToFixed(event.*.altitude);
@@ -256,7 +256,7 @@ fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
 /// Print GPS Count
 fn print_gps_satellite(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_gps_satellite, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_gps_satellite, &buffer[0]);
     debug("count:{}", .{ event.*.count });
     debug("satellites:{}", .{ event.*.satellites });
 }
@@ -274,152 +274,152 @@ export fn exit_handler(signo: c_int) void {
 const g_sensor_info = [30]sensor_info{
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_accel),
+        .esize = @sizeOf(c.struct_sensor_accel),
         .name = "accel",
     },
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_mag),
+        .esize = @sizeOf(c.struct_sensor_mag),
         .name = "mag",
     },
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_gyro),
+        .esize = @sizeOf(c.struct_sensor_gyro),
         .name = "gyro",
     },
     sensor_info{
         .print = print_valf2,
-        .esize = @sizeOf(c.struct_sensor_event_baro),
+        .esize = @sizeOf(c.struct_sensor_baro),
         .name = "baro",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_light),
+        .esize = @sizeOf(c.struct_sensor_light),
         .name = "light",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_prox),
+        .esize = @sizeOf(c.struct_sensor_prox),
         .name = "prox",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_humi),
+        .esize = @sizeOf(c.struct_sensor_humi),
         .name = "humi",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_temp),
+        .esize = @sizeOf(c.struct_sensor_temp),
         .name = "temp",
     },
     sensor_info{
         .print = print_valf3,
-        .esize = @sizeOf(c.struct_sensor_event_rgb),
+        .esize = @sizeOf(c.struct_sensor_rgb),
         .name = "rgb",
     },
     sensor_info{
         .print = print_valb,
-        .esize = @sizeOf(c.struct_sensor_event_hall),
+        .esize = @sizeOf(c.struct_sensor_hall),
         .name = "hall",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ir),
+        .esize = @sizeOf(c.struct_sensor_ir),
         .name = "ir",
     },
     sensor_info{
         .print = print_gps,
-        .esize = @sizeOf(c.struct_sensor_event_gps),
+        .esize = @sizeOf(c.struct_sensor_gps),
         .name = "gps",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_uv),
+        .esize = @sizeOf(c.struct_sensor_uv),
         .name = "uv",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_noise),
+        .esize = @sizeOf(c.struct_sensor_noise),
         .name = "noise",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm25),
+        .esize = @sizeOf(c.struct_sensor_pm25),
         .name = "pm25",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm1p0),
+        .esize = @sizeOf(c.struct_sensor_pm1p0),
         .name = "pm1p0",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm10),
+        .esize = @sizeOf(c.struct_sensor_pm10),
         .name = "pm10",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_co2),
+        .esize = @sizeOf(c.struct_sensor_co2),
         .name = "co2",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hcho),
+        .esize = @sizeOf(c.struct_sensor_hcho),
         .name = "hcho",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_tvoc),
+        .esize = @sizeOf(c.struct_sensor_tvoc),
         .name = "tvoc",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ph),
+        .esize = @sizeOf(c.struct_sensor_ph),
         .name = "ph",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_dust),
+        .esize = @sizeOf(c.struct_sensor_dust),
         .name = "dust",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hrate),
+        .esize = @sizeOf(c.struct_sensor_hrate),
         .name = "hrate",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hbeat),
+        .esize = @sizeOf(c.struct_sensor_hbeat),
         .name = "hbeat",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ecg),
+        .esize = @sizeOf(c.struct_sensor_ecg),
         .name = "ecg",
     },
     sensor_info{
         .print = print_ppgd,
-        .esize = @sizeOf(c.struct_sensor_event_ppgd),
+        .esize = @sizeOf(c.struct_sensor_ppgd),
         .name = "ppgd",
     },
     sensor_info{
         .print = print_ppgq,
-        .esize = @sizeOf(c.struct_sensor_event_ppgq),
+        .esize = @sizeOf(c.struct_sensor_ppgq),
         .name = "ppgq",
     },
     sensor_info{
         .print = print_valf2,
-        .esize = @sizeOf(c.struct_sensor_event_impd),
+        .esize = @sizeOf(c.struct_sensor_impd),
         .name = "impd",
     },
     sensor_info{
         .print = print_vali2,
-        .esize = @sizeOf(c.struct_sensor_event_ots),
+        .esize = @sizeOf(c.struct_sensor_ots),
         .name = "ots",
     },
     sensor_info{
         .print = print_gps_satellite,
-        .esize = @sizeOf(c.struct_sensor_event_gps_satellite),
+        .esize = @sizeOf(c.struct_sensor_gps_satellite),
         .name = "gps_satellite",
     },
 };

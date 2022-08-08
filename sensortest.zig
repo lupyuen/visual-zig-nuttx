@@ -110,7 +110,7 @@ fn test_sensor() !void {
     if (c.poll(&fds, 1, -1) > 0) {
 
         // Define the Sensor Data Type
-        var sensor_data = std.mem.zeroes(c.struct_sensor_event_baro);
+        var sensor_data = std.mem.zeroes(c.struct_sensor_baro);
         const len = @sizeOf(@TypeOf(sensor_data));
 
         // Read the Sensor Data
@@ -184,7 +184,7 @@ fn test_sensor2() !void {
     if (c.poll(&fds, 1, -1) > 0) {
 
         // Define the Sensor Data Type
-        var sensor_data = std.mem.zeroes(c.struct_sensor_event_humi);
+        var sensor_data = std.mem.zeroes(c.struct_sensor_humi);
         const len = @sizeOf(@TypeOf(sensor_data));
 
         // Read the Sensor Data
