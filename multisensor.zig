@@ -98,7 +98,7 @@ pub fn test_multisensor(
     // Set Standby Interval
     // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
     const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
-    ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+    ret = c.ioctl(fd, SNIOC_SET_INTERVAL, interval);
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.IntervalError;

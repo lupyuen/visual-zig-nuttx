@@ -48,7 +48,7 @@ pub fn main() !void {
         // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
         const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
         var interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
-        var ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+        var ret = c.ioctl(fd, SNIOC_SET_INTERVAL, interval);
 
         // Check for error
         if (ret < 0 and errno() != c.ENOTSUP) {

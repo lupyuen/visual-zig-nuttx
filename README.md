@@ -37,7 +37,7 @@ Here are the steps for reading a NuttX Sensor...
 fd = open(devname, O_RDONLY | O_NONBLOCK);
 
 // Set Standby Interval
-ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+ioctl(fd, SNIOC_SET_INTERVAL, interval);
 
 // Set Batch Latency
 ioctl(fd, SNIOC_BATCH, &latency);
