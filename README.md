@@ -42,9 +42,6 @@ ioctl(fd, SNIOC_SET_INTERVAL, interval);
 // Set Batch Latency
 ioctl(fd, SNIOC_BATCH, latency);
 
-// Enable Sensor and switch to Normal Power Mode
-ioctl(fd, SNIOC_ACTIVATE, 1);
-
 //  If Sensor Data is available...
 if (poll(&fds, 1, -1) > 0) {
 
@@ -65,9 +62,6 @@ if (poll(&fds, 1, -1) > 0) {
     );
   }
 }
-
-// Disable Sensor and switch to Low Power Mode
-ioctl(fd, SNIOC_ACTIVATE, 0);
 
 // Close the Sensor Device and free the buffer
 close(fd);
