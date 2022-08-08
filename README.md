@@ -33,7 +33,7 @@ Here are the steps for reading a NuttX Sensor...
 ```c
 // From https://lupyuen.github.io/articles/bme280#sensor-test-app
 // Open the Sensor Device.
-// devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+// devname looks like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 fd = open(devname, O_RDONLY | O_NONBLOCK);
 
 // Set Standby Interval
@@ -360,13 +360,13 @@ Now our Zig Sensor App prints the correct values, but truncated as Integers...
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 baro0: timestamp:42610000 value1:1003 value2:31
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_humi0 with interval(1000000us), latency(0us)
 humi0: timestamp:32420000 value:68
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -408,13 +408,13 @@ Finally we see the Pressure (`value1`), Temperature (`value2`) and Humidity (`va
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 baro0: timestamp:17780000 value1:1006.12 value2:29.65
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_humi0 with interval(1000000us), latency(0us)
 humi0: timestamp:28580000 value:77.44
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -609,7 +609,7 @@ pub export fn sensortest_main(...) {
 To a Static Buffer...
 
 ```zig
-/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// Device Name, like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 /// (Aligned to 8 bytes because it's passed to C)
 var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 ```
@@ -653,7 +653,7 @@ It triggers a Zig Panic due to Incorrect Aligment...
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 
 !ZIG PANIC!
 incorrect alignment
@@ -800,7 +800,7 @@ NuttX 10.3.0 32c8fdf272 Jul 18 2022 16:38:47 risc-v bl602evb
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
-SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
+SensorTest: Test /dev/sensor/sensor_baro0  with interval(1000000), latency(0)
 value1:1007.65
 value2:27.68
 SensorTest: Received message: baro0, number:1/1
@@ -808,7 +808,7 @@ SensorTest: Received message: baro0, number:1/1
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
-SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
+SensorTest: Test /dev/sensor/sensor_humi0  with interval(1000000), latency(0)
 value:78.91
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -819,16 +819,16 @@ We also check that errors are handled correctly...
 nsh> sensortest -n 1 baro
 Zig Sensor Test
 test_multisensor
-Failed to open device:/dev/sensor/baro , ret:No such file or directory
+Failed to open device:/dev/sensor/sensor_baro , ret:No such file or directory
 
 nsh> sensortest -n 1 invalid
 Zig Sensor Test
 test_multisensor
 The sensor node name:invalid is invalid
 sensortest test
- Test barometer sensor (/dev/sensor/baro0)
+ Test barometer sensor (/dev/sensor/sensor_baro0)
 sensortest test2
- Test humidity sensor (/dev/sensor/humi0)
+ Test humidity sensor (/dev/sensor/sensor_humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -838,14 +838,14 @@ sensortest [arguments...] <command>
         [-n <val>]  The number of output data
                     default: 0
  Commands:
-        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
+        <sensor_node_name> ex, accel0(/dev/sensor/sensor_accel0)
 
 nsh> sensortest
 Zig Sensor Test
 sensortest test
- Test barometer sensor (/dev/sensor/baro0)
+ Test barometer sensor (/dev/sensor/sensor_baro0)
 sensortest test2
- Test humidity sensor (/dev/sensor/humi0)
+ Test humidity sensor (/dev/sensor/sensor_humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -855,7 +855,7 @@ sensortest [arguments...] <command>
         [-n <val>]  The number of output data
                     default: 0
  Commands:
-        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
+        <sensor_node_name> ex, accel0(/dev/sensor/sensor_accel0)
 ```
 
 # Read Barometer Sensor

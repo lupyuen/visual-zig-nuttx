@@ -29,7 +29,7 @@ pub fn main() !void {
 
         // Open the Sensor Device
         const fd = c.open(
-            "/dev/sensor/baro0",       // Path of Sensor Device
+            "/dev/sensor/sensor_baro0",       // Path of Sensor Device
             c.O_RDONLY | c.O_NONBLOCK  // Open for read-only
         );
 

@@ -72,10 +72,10 @@ pub fn test_multisensor(
         return error.NameError;
     }
 
-    // Compose the Device Name. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+    // Compose the Device Name. devname looks like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
     const devname = std.fmt.bufPrint(
         &devname_buffer,
-        "/dev/sensor/{s}\x00",
+        "/dev/sensor/sensor_{s}\x00",
         .{ name }
     ) catch { std.log.err("Path overflow", .{}); return error.OpenError; };
 
@@ -428,7 +428,7 @@ const g_sensor_info = [30]sensor_info{
 /// (Aligned to 8 bytes because it's passed to C)
 var sensor_data align(8) = std.mem.zeroes([256]u8);
 
-/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// Device Name, like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 /// (Aligned to 8 bytes because it's passed to C)
 var devname_buffer align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 
