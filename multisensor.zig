@@ -111,13 +111,6 @@ pub fn test_multisensor(
         return error.BatchError;
     }
 
-    // Enable Sensor and switch to Normal Power Mode
-    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
-    if (ret < 0 and errno() != c.ENOTSUP) {
-        std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return error.EnableError;
-    }
-
     // Prepare to poll Sensor
     debug("SensorTest: Test {s} with interval({}), latency({})", .{ devname, interval, latency });
     var fds = std.mem.zeroes(c.struct_pollfd);
@@ -142,13 +135,6 @@ pub fn test_multisensor(
         }
     }
     debug("SensorTest: Received message: {s}, number:{}/{}", .{ name, received, count });
-
-    // Disable Sensor and switch to Low Power Mode
-    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
-    if (ret < 0) {
-        std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return error.DisableError;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

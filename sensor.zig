@@ -82,6 +82,4 @@ pub const SensorError = error{
     OpenError,      // Failed to open device
     IntervalError,  // Failed to set sensor interval
     BatchError,     // Failed to set sensor batch
-    EnableError,    // Failed to activate sensor
-    DisableError,   // Failed to disable sensor
 };

@@ -66,15 +66,6 @@ pub fn main() !void {
             return error.BatchError;
         }
 
-        // Enable Sensor and switch to Normal Power Mode
-        ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
-
-        // Check for error
-        if (ret < 0 and errno() != c.ENOTSUP) {
-            std.log.err("Failed to enable sensor:{s}", .{ c.strerror(errno()) });
-            return error.EnableError;
-        }
-
         // Prepare to poll Sensor
         var fds = std.mem.zeroes(c.struct_pollfd);
         fds.fd = fd;
@@ -97,15 +88,6 @@ pub fn main() !void {
             } else { std.log.err("Sensor data incorrect size", .{}); }
         } else { std.log.err("Sensor data not available", .{}); }
 
-        // Disable Sensor and switch to Low Power Mode
-        ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
-
-        // Check for error
-        if (ret < 0) {
-            std.log.err("Failed to disable sensor:{s}", .{ c.strerror(errno()) });
-            return error.DisableError;
-        }
-        
         // Return the Sensor Value
         break :blk sensor_value;
     };
