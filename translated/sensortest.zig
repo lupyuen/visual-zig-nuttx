@@ -88,7 +88,7 @@ pub const mode_t = c_uint;
 pub const rsize_t = _size_t;
 pub const uid_t = i16;
 pub const gid_t = i16;
-pub const dev_t = u16;
+pub const dev_t = u32;
 pub const ino_t = u16;
 pub const nlink_t = u16;
 pub const pid_t = c_int;
@@ -199,217 +199,11 @@ pub extern fn timer_gettime(timerid: timer_t, value: [*c]struct_itimerspec) c_in
 pub extern fn timer_getoverrun(timerid: timer_t) c_int;
 pub extern fn clock_nanosleep(clockid: clockid_t, flags: c_int, rqtp: [*c]const struct_timespec, rmtp: [*c]struct_timespec) c_int;
 pub extern fn nanosleep(rqtp: [*c]const struct_timespec, rmtp: [*c]struct_timespec) c_int;
-pub const struct_winsize = extern struct {
-    ws_row: u16,
-    ws_col: u16,
-    ws_xpixel: u16,
-    ws_ypixel: u16,
-};
-pub const struct_serial_rs485 = extern struct {
-    flags: u32,
-    delay_rts_before_send: u32,
-    delay_rts_after_send: u32,
-};
-pub fn sensor_get_timestamp() callconv(.C) u64 {
-    var ts: struct_timespec = undefined;
-    _ = clock_systime_timespec(&ts);
-    return (@as(c_ulonglong, 1000000) *% @bitCast(c_ulonglong, @as(c_ulonglong, ts.tv_sec))) +% @bitCast(c_ulonglong, @as(c_longlong, @divTrunc(ts.tv_nsec, @bitCast(c_long, @as(c_long, @as(c_int, 1000))))));
-}
-pub const struct_sensor_event_accel = extern struct {
-    timestamp: u64,
-    x: f32,
-    y: f32,
-    z: f32,
-    temperature: f32,
-};
-pub const struct_sensor_event_gyro = extern struct {
-    timestamp: u64,
-    x: f32,
-    y: f32,
-    z: f32,
-    temperature: f32,
-};
-pub const struct_sensor_event_mag = extern struct {
-    timestamp: u64,
-    x: f32,
-    y: f32,
-    z: f32,
-    temperature: f32,
-};
-pub const struct_sensor_event_baro = extern struct {
-    timestamp: u64,
-    pressure: f32,
-    temperature: f32,
-};
-pub const struct_sensor_event_prox = extern struct {
-    timestamp: u64,
-    proximity: f32,
-};
-pub const struct_sensor_event_light = extern struct {
-    timestamp: u64,
-    light: f32,
-};
-pub const struct_sensor_event_humi = extern struct {
-    timestamp: u64,
-    humidity: f32,
-};
-pub const struct_sensor_event_temp = extern struct {
-    timestamp: u64,
-    temperature: f32,
-};
-pub const struct_sensor_event_rgb = extern struct {
-    timestamp: u64,
-    r: f32,
-    g: f32,
-    b: f32,
-};
-pub const struct_sensor_event_hall = extern struct {
-    timestamp: u64,
-    hall: bool,
-};
-pub const struct_sensor_event_ir = extern struct {
-    timestamp: u64,
-    ir: f32,
-};
-pub const struct_sensor_event_gps = extern struct {
-    timestamp: u64,
-    time_utc: u64,
-    latitude: f32,
-    longitude: f32,
-    altitude: f32,
-    altitude_ellipsoid: f32,
-    eph: f32,
-    epv: f32,
-    hdop: f32,
-    vdop: f32,
-    ground_speed: f32,
-    course: f32,
-    satellites_used: u32,
-};
-pub const struct_sensor_event_uv = extern struct {
-    timestamp: u64,
-    uvi: f32,
-};
-pub const struct_sensor_event_noise = extern struct {
-    timestamp: u64,
-    db: f32,
-};
-pub const struct_sensor_event_pm25 = extern struct {
-    timestamp: u64,
-    pm25: f32,
-};
-pub const struct_sensor_event_pm10 = extern struct {
-    timestamp: u64,
-    pm10: f32,
-};
-pub const struct_sensor_event_pm1p0 = extern struct {
-    timestamp: u64,
-    pm1p0: f32,
-};
-pub const struct_sensor_event_co2 = extern struct {
-    timestamp: u64,
-    co2: f32,
-};
-pub const struct_sensor_event_hcho = extern struct {
-    timestamp: u64,
-    hcho: f32,
-};
-pub const struct_sensor_event_tvoc = extern struct {
-    timestamp: u64,
-    tvoc: f32,
-};
-pub const struct_sensor_event_ph = extern struct {
-    timestamp: u64,
-    ph: f32,
-};
-pub const struct_sensor_event_dust = extern struct {
-    timestamp: u64,
-    dust: f32,
-};
-pub const struct_sensor_event_hrate = extern struct {
-    timestamp: u64,
-    bpm: f32,
-};
-pub const struct_sensor_event_hbeat = extern struct {
-    timestamp: u64,
-    beat: f32,
-};
-pub const struct_sensor_event_ecg = extern struct {
-    timestamp: u64,
-    ecg: f32,
-};
-pub const struct_sensor_event_ppgd = extern struct {
-    timestamp: u64,
-    ppg: [2]u32,
-    current: u32,
-    gain: [2]u16,
-};
-pub const struct_sensor_event_ppgq = extern struct {
-    timestamp: u64,
-    ppg: [4]u32,
-    current: u32,
-    gain: [4]u16,
-};
-pub const struct_sensor_event_impd = extern struct {
-    timestamp: u64,
-    real: f32,
-    imag: f32,
-};
-pub const struct_sensor_event_ots = extern struct {
-    timestamp: u64,
-    x: i32,
-    y: i32,
-};
-pub const struct_satellite = extern struct {
-    svid: u32,
-    elevation: u32,
-    azimuth: u32,
-    snr: u32,
-};
-pub const struct_sensor_event_gps_satellite = extern struct {
-    timestamp: u64,
-    count: u32,
-    satellites: u32,
-    info: [4]struct_satellite,
-};
-pub const struct_sensor_ops_s = extern struct {
-    activate: ?fn ([*c]struct_sensor_lowerhalf_s, bool) callconv(.C) c_int,
-    set_interval: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]c_uint) callconv(.C) c_int,
-    batch: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]c_uint) callconv(.C) c_int,
-    fetch: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]u8, usize) callconv(.C) c_int,
-    selftest: ?fn ([*c]struct_sensor_lowerhalf_s, c_ulong) callconv(.C) c_int,
-    set_calibvalue: ?fn ([*c]struct_sensor_lowerhalf_s, c_ulong) callconv(.C) c_int,
-    control: ?fn ([*c]struct_sensor_lowerhalf_s, c_int, c_ulong) callconv(.C) c_int,
-};
-const union_unnamed_2 = extern union {
-    push_event: ?fn (?*anyopaque, ?*const anyopaque, usize) callconv(.C) void,
-    notify_event: ?fn (?*anyopaque) callconv(.C) void,
-};
-pub const struct_sensor_lowerhalf_s = extern struct {
-    type: c_int,
-    buffer_number: u32,
-    batch_number: u32,
-    uncalibrated: bool,
-    ops: [*c]const struct_sensor_ops_s,
-    unnamed_0: union_unnamed_2,
-    priv: ?*anyopaque,
-};
-pub extern fn sensor_register(dev: [*c]struct_sensor_lowerhalf_s, devno: c_int) c_int;
-pub extern fn sensor_custom_register(dev: [*c]struct_sensor_lowerhalf_s, path: [*c]const u8, esize: u8) c_int;
-pub extern fn sensor_unregister(dev: [*c]struct_sensor_lowerhalf_s, devno: c_int) void;
-pub extern fn sensor_custom_unregister(dev: [*c]struct_sensor_lowerhalf_s, path: [*c]const u8) void;
-pub extern fn ioctl(fd: c_int, req: c_int, ...) c_int;
-pub const max_align_t = extern struct {
-    __clang_max_align_nonce1: c_longlong align(8),
-    __clang_max_align_nonce2: c_longdouble align(16),
-};
-pub const imaxdiv_t = ?*anyopaque;
-pub extern fn imaxabs(j: intmax_t) intmax_t;
-pub extern fn imaxdiv(number: intmax_t, denom: intmax_t) imaxdiv_t;
-pub extern fn strtoimax(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) intmax_t;
-pub extern fn strtoumax(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) uintmax_t;
-pub extern fn wcstoimax(nptr: [*c]const wchar_t, endptr: [*c][*c]wchar_t, base: c_int) intmax_t;
-pub extern fn wcstoumax(nptr: [*c]const wchar_t, endptr: [*c][*c]wchar_t, base: c_int) uintmax_t;
+pub const __builtin_va_list = ?*anyopaque;
+pub const va_list = __builtin_va_list;
+pub const __gnuc_va_list = __builtin_va_list;
+pub extern fn __errno() [*c]c_int;
+pub extern fn _assert(filename: [*c]const u8, linenum: c_int) noreturn;
 pub extern fn vfork() pid_t;
 pub extern fn getpid() pid_t;
 pub extern fn gettid() pid_t;
@@ -469,76 +263,6 @@ pub extern fn getegid() gid_t;
 pub extern fn setreuid(ruid: uid_t, euid: uid_t) c_int;
 pub extern fn setregid(rgid: gid_t, egid: gid_t) c_int;
 pub extern fn getentropy(buffer: ?*anyopaque, length: usize) c_int;
-pub const struct_div_s = extern struct {
-    quot: c_int,
-    rem: c_int,
-};
-pub const div_t = struct_div_s;
-pub const struct_ldiv_s = extern struct {
-    quot: c_long,
-    rem: c_long,
-};
-pub const ldiv_t = struct_ldiv_s;
-pub const struct_lldiv_s = extern struct {
-    quot: c_long,
-    rem: c_long,
-};
-pub const lldiv_t = struct_lldiv_s;
-pub extern fn srand(seed: c_uint) void;
-pub extern fn rand() c_int;
-pub extern fn random() c_long;
-pub extern fn arc4random_buf(bytes: ?*anyopaque, nbytes: usize) void;
-pub extern fn get_environ_ptr() [*c][*c]u8;
-pub extern fn getenv(name: [*c]const u8) [*c]u8;
-pub extern fn putenv(string: [*c]const u8) c_int;
-pub extern fn clearenv() c_int;
-pub extern fn setenv(name: [*c]const u8, value: [*c]const u8, overwrite: c_int) c_int;
-pub extern fn unsetenv(name: [*c]const u8) c_int;
-pub extern fn exit(status: c_int) noreturn;
-pub extern fn abort() noreturn;
-pub extern fn atexit(func: ?fn () callconv(.C) void) c_int;
-pub extern fn on_exit(func: ?fn (c_int, ?*anyopaque) callconv(.C) void, arg: ?*anyopaque) c_int;
-pub extern fn _Exit(status: c_int) noreturn;
-pub extern fn system(cmd: [*c]const u8) c_int;
-pub extern fn realpath(path: [*c]const u8, resolved: [*c]u8) [*c]u8;
-pub extern fn strtol(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_long;
-pub extern fn strtoul(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_ulong;
-pub extern fn strtoll(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_longlong;
-pub extern fn strtoull(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_ulonglong;
-pub extern fn strtof(str: [*c]const u8, endptr: [*c][*c]u8) f32;
-pub extern fn strtod(str: [*c]const u8, endptr: [*c][*c]u8) f64;
-pub extern fn strtold(str: [*c]const u8, endptr: [*c][*c]u8) c_longdouble;
-pub extern fn atoi(nptr: [*c]const u8) c_int;
-pub extern fn atol(nptr: [*c]const u8) c_long;
-pub extern fn atoll(nptr: [*c]const u8) c_longlong;
-pub extern fn atof(nptr: [*c]const u8) f64;
-pub extern fn itoa(val: c_int, str: [*c]u8, base: c_int) [*c]u8;
-pub extern fn malloc(usize) ?*anyopaque;
-pub extern fn valloc(usize) ?*anyopaque;
-pub extern fn free(?*anyopaque) void;
-pub extern fn realloc(?*anyopaque, usize) ?*anyopaque;
-pub extern fn memalign(usize, usize) ?*anyopaque;
-pub extern fn zalloc(usize) ?*anyopaque;
-pub extern fn calloc(usize, usize) ?*anyopaque;
-pub extern fn aligned_alloc(usize, usize) ?*anyopaque;
-pub extern fn posix_memalign([*c]?*anyopaque, usize, usize) c_int;
-pub extern fn abs(j: c_int) c_int;
-pub extern fn labs(j: c_long) c_long;
-pub extern fn llabs(j: c_longlong) c_longlong;
-pub extern fn div(number: c_int, denom: c_int) div_t;
-pub extern fn ldiv(number: c_long, denom: c_long) ldiv_t;
-pub extern fn lldiv(number: c_longlong, denom: c_longlong) lldiv_t;
-pub extern fn mktemp(path_template: [*c]u8) [*c]u8;
-pub extern fn mkstemp(path_template: [*c]u8) c_int;
-pub extern fn mkdtemp(path_template: [*c]u8) [*c]u8;
-pub extern fn qsort(base: ?*anyopaque, nel: usize, width: usize, compar: ?fn (?*const anyopaque, ?*const anyopaque) callconv(.C) c_int) void;
-pub extern fn bsearch(key: ?*const anyopaque, base: ?*const anyopaque, nel: usize, width: usize, compar: ?fn (?*const anyopaque, ?*const anyopaque) callconv(.C) c_int) ?*anyopaque;
-pub extern fn getprogname() [*c]const u8;
-pub const __builtin_va_list = ?*anyopaque;
-pub const va_list = __builtin_va_list;
-pub const __gnuc_va_list = __builtin_va_list;
-pub extern fn __errno() [*c]c_int;
-pub extern fn _assert(filename: [*c]const u8, linenum: c_int) noreturn;
 pub const struct_sem_s = extern struct {
     semcount: i16,
 };
@@ -659,7 +383,7 @@ pub fn nxrmutex_lock(arg_rmutex: [*c]rmutex_t) callconv(.C) c_int {
     var ret: c_int = undefined;
     if (rmutex.*.holder == tid) {
         {
-            if (!(@bitCast(c_int, @as(c_uint, rmutex.*.count)) < @as(c_int, 65535))) {
+            if (!(@bitCast(c_uint, @as(c_uint, rmutex.*.count)) < @as(c_uint, 65535))) {
                 _assert("/home/user/nuttx/nuttx/include/nuttx/mutex.h", @as(c_int, 342));
             }
         }
@@ -680,7 +404,7 @@ pub fn nxrmutex_trylock(arg_rmutex: [*c]rmutex_t) callconv(.C) c_int {
     var ret: c_int = undefined;
     if (rmutex.*.holder == tid) {
         {
-            if (!(@bitCast(c_int, @as(c_uint, rmutex.*.count)) < @as(c_int, 65535))) {
+            if (!(@bitCast(c_uint, @as(c_uint, rmutex.*.count)) < @as(c_uint, 65535))) {
                 _assert("/home/user/nuttx/nuttx/include/nuttx/mutex.h", @as(c_int, 389));
             }
         }
@@ -971,6 +695,323 @@ pub extern fn file_fstat(filep: [*c]struct_file, buf: ?*struct_stat) c_int;
 pub extern fn nx_stat(path: [*c]const u8, buf: ?*struct_stat, resolve: c_int) c_int;
 pub extern fn file_fchstat(filep: [*c]struct_file, buf: ?*struct_stat, flags: c_int) c_int;
 pub extern fn nx_unlink(pathname: [*c]const u8) c_int;
+pub const struct_winsize = extern struct {
+    ws_row: u16,
+    ws_col: u16,
+    ws_xpixel: u16,
+    ws_ypixel: u16,
+};
+pub const struct_serial_rs485 = extern struct {
+    flags: u32,
+    delay_rts_before_send: u32,
+    delay_rts_after_send: u32,
+};
+pub fn sensor_get_timestamp() callconv(.C) u64 {
+    var ts: struct_timespec = undefined;
+    _ = clock_systime_timespec(&ts);
+    return (@as(c_ulonglong, 1000000) *% @bitCast(c_ulonglong, @as(c_ulonglong, ts.tv_sec))) +% @bitCast(c_ulonglong, @as(c_longlong, @divTrunc(ts.tv_nsec, @bitCast(c_long, @as(c_long, @as(c_int, 1000))))));
+}
+pub const struct_sensor_accel = extern struct {
+    timestamp: u64,
+    x: f32,
+    y: f32,
+    z: f32,
+    temperature: f32,
+};
+pub const struct_sensor_gyro = extern struct {
+    timestamp: u64,
+    x: f32,
+    y: f32,
+    z: f32,
+    temperature: f32,
+};
+pub const struct_sensor_mag = extern struct {
+    timestamp: u64,
+    x: f32,
+    y: f32,
+    z: f32,
+    temperature: f32,
+};
+pub const struct_sensor_baro = extern struct {
+    timestamp: u64,
+    pressure: f32,
+    temperature: f32,
+};
+pub const struct_sensor_prox = extern struct {
+    timestamp: u64,
+    proximity: f32,
+};
+pub const struct_sensor_light = extern struct {
+    timestamp: u64,
+    light: f32,
+};
+pub const struct_sensor_humi = extern struct {
+    timestamp: u64,
+    humidity: f32,
+};
+pub const struct_sensor_temp = extern struct {
+    timestamp: u64,
+    temperature: f32,
+};
+pub const struct_sensor_rgb = extern struct {
+    timestamp: u64,
+    r: f32,
+    g: f32,
+    b: f32,
+};
+pub const struct_sensor_hall = extern struct {
+    timestamp: u64,
+    hall: bool,
+};
+pub const struct_sensor_ir = extern struct {
+    timestamp: u64,
+    ir: f32,
+};
+pub const struct_sensor_gps = extern struct {
+    timestamp: u64,
+    time_utc: u64,
+    latitude: f32,
+    longitude: f32,
+    altitude: f32,
+    altitude_ellipsoid: f32,
+    eph: f32,
+    epv: f32,
+    hdop: f32,
+    vdop: f32,
+    ground_speed: f32,
+    course: f32,
+    satellites_used: u32,
+};
+pub const struct_sensor_uv = extern struct {
+    timestamp: u64,
+    uvi: f32,
+};
+pub const struct_sensor_noise = extern struct {
+    timestamp: u64,
+    db: f32,
+};
+pub const struct_sensor_pm25 = extern struct {
+    timestamp: u64,
+    pm25: f32,
+};
+pub const struct_sensor_pm10 = extern struct {
+    timestamp: u64,
+    pm10: f32,
+};
+pub const struct_sensor_pm1p0 = extern struct {
+    timestamp: u64,
+    pm1p0: f32,
+};
+pub const struct_sensor_co2 = extern struct {
+    timestamp: u64,
+    co2: f32,
+};
+pub const struct_sensor_hcho = extern struct {
+    timestamp: u64,
+    hcho: f32,
+};
+pub const struct_sensor_tvoc = extern struct {
+    timestamp: u64,
+    tvoc: f32,
+};
+pub const struct_sensor_ph = extern struct {
+    timestamp: u64,
+    ph: f32,
+};
+pub const struct_sensor_dust = extern struct {
+    timestamp: u64,
+    dust: f32,
+};
+pub const struct_sensor_hrate = extern struct {
+    timestamp: u64,
+    bpm: f32,
+};
+pub const struct_sensor_hbeat = extern struct {
+    timestamp: u64,
+    beat: f32,
+};
+pub const struct_sensor_ecg = extern struct {
+    timestamp: u64,
+    ecg: f32,
+};
+pub const struct_sensor_ppgd = extern struct {
+    timestamp: u64,
+    ppg: [2]u32,
+    current: u32,
+    gain: [2]u16,
+};
+pub const struct_sensor_ppgq = extern struct {
+    timestamp: u64,
+    ppg: [4]u32,
+    current: u32,
+    gain: [4]u16,
+};
+pub const struct_sensor_impd = extern struct {
+    timestamp: u64,
+    real: f32,
+    imag: f32,
+};
+pub const struct_sensor_ots = extern struct {
+    timestamp: u64,
+    x: i32,
+    y: i32,
+};
+pub const struct_satellite = extern struct {
+    svid: u32,
+    elevation: u32,
+    azimuth: u32,
+    snr: u32,
+};
+pub const struct_sensor_gps_satellite = extern struct {
+    timestamp: u64,
+    count: u32,
+    satellites: u32,
+    info: [4]struct_satellite,
+};
+pub const struct_sensor_wake_gesture = extern struct {
+    timestamp: u64,
+    event: u32,
+};
+pub const struct_sensor_cap = extern struct {
+    timestamp: u64,
+    status: i32,
+    rawdata: [4]i32,
+};
+pub const struct_sensor_ops_s = extern struct {
+    open: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file) callconv(.C) c_int,
+    close: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file) callconv(.C) c_int,
+    activate: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, bool) callconv(.C) c_int,
+    set_interval: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, [*c]c_ulong) callconv(.C) c_int,
+    batch: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, [*c]c_ulong) callconv(.C) c_int,
+    fetch: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, [*c]u8, usize) callconv(.C) c_int,
+    selftest: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, c_ulong) callconv(.C) c_int,
+    set_calibvalue: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, c_ulong) callconv(.C) c_int,
+    calibrate: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, c_ulong) callconv(.C) c_int,
+    control: ?fn ([*c]struct_sensor_lowerhalf_s, [*c]struct_file, c_int, c_ulong) callconv(.C) c_int,
+};
+pub const sensor_push_event_t = ?fn (?*anyopaque, ?*const anyopaque, usize) callconv(.C) isize;
+pub const sensor_notify_event_t = ?fn (?*anyopaque) callconv(.C) void;
+const union_unnamed_2 = extern union {
+    push_event: sensor_push_event_t,
+    notify_event: sensor_notify_event_t,
+};
+pub const struct_sensor_lowerhalf_s = extern struct {
+    type: c_int,
+    nbuffer: c_ulong,
+    uncalibrated: bool,
+    ops: [*c]const struct_sensor_ops_s,
+    unnamed_0: union_unnamed_2,
+    sensor_lock: ?fn (?*anyopaque) callconv(.C) void,
+    sensor_unlock: ?fn (?*anyopaque) callconv(.C) void,
+    priv: ?*anyopaque,
+    persist: bool,
+};
+pub const struct_sensor_state_s = extern struct {
+    esize: c_ulong,
+    nbuffer: c_ulong,
+    min_latency: c_ulong,
+    min_interval: c_ulong,
+    nsubscribers: c_ulong,
+    nadvertisers: c_ulong,
+    generation: c_ulong,
+    priv: ?*anyopaque,
+};
+pub const struct_sensor_ustate_s = extern struct {
+    esize: c_ulong,
+    latency: c_ulong,
+    interval: c_ulong,
+    generation: c_ulong,
+};
+pub const struct_sensor_ioctl_s = extern struct {
+    len: usize,
+    data: [1]u8,
+};
+pub extern fn sensor_register(dev: [*c]struct_sensor_lowerhalf_s, devno: c_int) c_int;
+pub extern fn sensor_custom_register(dev: [*c]struct_sensor_lowerhalf_s, path: [*c]const u8, esize: c_ulong) c_int;
+pub extern fn sensor_unregister(dev: [*c]struct_sensor_lowerhalf_s, devno: c_int) void;
+pub extern fn sensor_custom_unregister(dev: [*c]struct_sensor_lowerhalf_s, path: [*c]const u8) void;
+pub extern fn ioctl(fd: c_int, req: c_int, ...) c_int;
+pub const max_align_t = extern struct {
+    __clang_max_align_nonce1: c_longlong align(8),
+    __clang_max_align_nonce2: c_longdouble align(16),
+};
+pub const imaxdiv_t = ?*anyopaque;
+pub extern fn imaxabs(j: intmax_t) intmax_t;
+pub extern fn imaxdiv(number: intmax_t, denom: intmax_t) imaxdiv_t;
+pub extern fn strtoimax(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) intmax_t;
+pub extern fn strtoumax(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) uintmax_t;
+pub extern fn wcstoimax(nptr: [*c]const wchar_t, endptr: [*c][*c]wchar_t, base: c_int) intmax_t;
+pub extern fn wcstoumax(nptr: [*c]const wchar_t, endptr: [*c][*c]wchar_t, base: c_int) uintmax_t;
+pub const struct_div_s = extern struct {
+    quot: c_int,
+    rem: c_int,
+};
+pub const div_t = struct_div_s;
+pub const struct_ldiv_s = extern struct {
+    quot: c_long,
+    rem: c_long,
+};
+pub const ldiv_t = struct_ldiv_s;
+pub const struct_lldiv_s = extern struct {
+    quot: c_long,
+    rem: c_long,
+};
+pub const lldiv_t = struct_lldiv_s;
+pub extern fn srand(seed: c_uint) void;
+pub extern fn rand() c_int;
+pub extern fn random() c_long;
+pub extern fn arc4random_buf(bytes: ?*anyopaque, nbytes: usize) void;
+pub extern fn get_environ_ptr() [*c][*c]u8;
+pub extern fn getenv(name: [*c]const u8) [*c]u8;
+pub extern fn putenv(string: [*c]const u8) c_int;
+pub extern fn clearenv() c_int;
+pub extern fn setenv(name: [*c]const u8, value: [*c]const u8, overwrite: c_int) c_int;
+pub extern fn unsetenv(name: [*c]const u8) c_int;
+pub extern fn exit(status: c_int) noreturn;
+pub extern fn abort() noreturn;
+pub extern fn atexit(func: ?fn () callconv(.C) void) c_int;
+pub extern fn on_exit(func: ?fn (c_int, ?*anyopaque) callconv(.C) void, arg: ?*anyopaque) c_int;
+pub extern fn _Exit(status: c_int) noreturn;
+pub extern fn system(cmd: [*c]const u8) c_int;
+pub extern fn realpath(path: [*c]const u8, resolved: [*c]u8) [*c]u8;
+pub extern fn strtol(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_long;
+pub extern fn strtoul(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_ulong;
+pub extern fn strtoll(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_longlong;
+pub extern fn strtoull(nptr: [*c]const u8, endptr: [*c][*c]u8, base: c_int) c_ulonglong;
+pub extern fn strtof(str: [*c]const u8, endptr: [*c][*c]u8) f32;
+pub extern fn strtod(str: [*c]const u8, endptr: [*c][*c]u8) f64;
+pub extern fn strtold(str: [*c]const u8, endptr: [*c][*c]u8) c_longdouble;
+pub extern fn atoi(nptr: [*c]const u8) c_int;
+pub extern fn atol(nptr: [*c]const u8) c_long;
+pub extern fn atoll(nptr: [*c]const u8) c_longlong;
+pub extern fn atof(nptr: [*c]const u8) f64;
+pub extern fn itoa(val: c_int, str: [*c]u8, base: c_int) [*c]u8;
+pub extern fn mblen(s: [*c]const u8, n: usize) c_int;
+pub extern fn mbtowc(pwc: [*c]wchar_t, s: [*c]const u8, n: usize) c_int;
+pub extern fn mbstowcs(dst: [*c]wchar_t, src: [*c]const u8, len: usize) usize;
+pub extern fn wctomb(s: [*c]u8, wchar: wchar_t) c_int;
+pub extern fn wcstombs(dst: [*c]u8, src: [*c]const wchar_t, len: usize) usize;
+pub extern fn malloc(usize) ?*anyopaque;
+pub extern fn valloc(usize) ?*anyopaque;
+pub extern fn free(?*anyopaque) void;
+pub extern fn realloc(?*anyopaque, usize) ?*anyopaque;
+pub extern fn memalign(usize, usize) ?*anyopaque;
+pub extern fn zalloc(usize) ?*anyopaque;
+pub extern fn calloc(usize, usize) ?*anyopaque;
+pub extern fn aligned_alloc(usize, usize) ?*anyopaque;
+pub extern fn posix_memalign([*c]?*anyopaque, usize, usize) c_int;
+pub extern fn abs(j: c_int) c_int;
+pub extern fn labs(j: c_long) c_long;
+pub extern fn llabs(j: c_longlong) c_longlong;
+pub extern fn div(number: c_int, denom: c_int) div_t;
+pub extern fn ldiv(number: c_long, denom: c_long) ldiv_t;
+pub extern fn lldiv(number: c_longlong, denom: c_longlong) lldiv_t;
+pub extern fn mktemp(path_template: [*c]u8) [*c]u8;
+pub extern fn mkstemp(path_template: [*c]u8) c_int;
+pub extern fn mkdtemp(path_template: [*c]u8) [*c]u8;
+pub extern fn qsort(base: ?*anyopaque, nel: usize, width: usize, compar: ?fn (?*const anyopaque, ?*const anyopaque) callconv(.C) c_int) void;
+pub extern fn bsearch(key: ?*const anyopaque, base: ?*const anyopaque, nel: usize, width: usize, compar: ?fn (?*const anyopaque, ?*const anyopaque) callconv(.C) c_int) ?*anyopaque;
+pub extern fn getprogname() [*c]const u8;
 pub const struct_dq_entry_s = extern struct {
     flink: [*c]struct_dq_entry_s,
     blink: [*c]struct_dq_entry_s,
@@ -1036,6 +1077,7 @@ pub extern fn memcmp(s1: ?*const anyopaque, s2: ?*const anyopaque, n: usize) c_i
 pub extern fn memcpy(dest: ?*anyopaque, src: ?*const anyopaque, n: usize) ?*anyopaque;
 pub extern fn memmove(dest: ?*anyopaque, src: ?*const anyopaque, count: usize) ?*anyopaque;
 pub extern fn memset(s: ?*anyopaque, c: c_int, n: usize) ?*anyopaque;
+pub extern fn memmem(haystack: ?*const anyopaque, haystacklen: usize, needle: ?*const anyopaque, needlelen: usize) ?*anyopaque;
 pub extern fn explicit_bzero(s: ?*anyopaque, n: usize) void;
 pub extern fn ffs(j: c_int) c_int;
 pub extern fn ffsl(j: c_long) c_int;
@@ -1284,6 +1326,8 @@ pub extern fn nxsched_get_files() [*c]struct_filelist;
 pub extern fn nxsched_get_streams() [*c]struct_streamlist;
 pub extern fn nxtask_init(tcb: [*c]struct_task_tcb_s, name: [*c]const u8, priority: c_int, stack: ?*anyopaque, stack_size: u32, entry: main_t, argv: [*c]const [*c]u8, envp: [*c]const [*c]u8) c_int;
 pub extern fn nxtask_uninit(tcb: [*c]struct_task_tcb_s) void;
+pub extern fn nxtask_create(name: [*c]const u8, priority: c_int, stack_size: c_int, entry: main_t, argv: [*c]const [*c]u8) c_int;
+pub extern fn nxtask_delete(pid: pid_t) c_int;
 pub extern fn nxtask_activate(tcb: [*c]struct_tcb_s) void;
 pub extern fn nxtask_startup(entrypt: main_t, argc: c_int, argv: [*c][*c]u8) void;
 pub extern fn nxtask_setup_vfork(retaddr: start_t) [*c]struct_task_tcb_s;
@@ -1385,213 +1429,213 @@ pub const struct_sensor_info = extern struct {
 pub fn print_vec3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_accel = @intToPtr([*c]struct_sensor_event_accel, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_accel = @intToPtr([*c]struct_sensor_accel, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu x:%.2f y:%.2f z:%.2f, temperature:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.x), @floatCast(f64, event.*.y), @floatCast(f64, event.*.z), @floatCast(f64, event.*.temperature));
 }
 pub fn print_valf3(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_rgb = @intToPtr([*c]struct_sensor_event_rgb, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_rgb = @intToPtr([*c]struct_sensor_rgb, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f, value3:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.r), @floatCast(f64, event.*.g), @floatCast(f64, event.*.b));
 }
 pub fn print_valf2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_baro = @intToPtr([*c]struct_sensor_event_baro, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_baro = @intToPtr([*c]struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.pressure), @floatCast(f64, event.*.temperature));
 }
 pub fn print_valf(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_prox = @intToPtr([*c]struct_sensor_event_prox, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_prox = @intToPtr([*c]struct_sensor_prox, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value:%.2f\n", name, event.*.timestamp, @floatCast(f64, event.*.proximity));
 }
 pub fn print_valb(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_hall = @intToPtr([*c]struct_sensor_event_hall, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_hall = @intToPtr([*c]struct_sensor_hall, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value:%d\n", name, event.*.timestamp, @as(c_int, @boolToInt(event.*.hall)));
 }
 pub fn print_vali2(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_ots = @intToPtr([*c]struct_sensor_event_ots, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_ots = @intToPtr([*c]struct_sensor_ots, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:% li value2:% li\n", name, event.*.timestamp, event.*.x, event.*.y);
 }
 pub fn print_ppgd(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_ppgd = @intToPtr([*c]struct_sensor_event_ppgd, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_ppgd = @intToPtr([*c]struct_sensor_ppgd, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu current:%lu gain1:%u gain2:%u\n", name, event.*.timestamp, event.*.ppg[@intCast(c_uint, @as(c_int, 0))], event.*.ppg[@intCast(c_uint, @as(c_int, 1))], event.*.current, @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])));
 }
 pub fn print_ppgq(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_ppgq = @intToPtr([*c]struct_sensor_event_ppgq, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_ppgq = @intToPtr([*c]struct_sensor_ppgq, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ppg1:%lu ppg2:%lu ppg3:%lu ppg4:%lu current:%lu gain1:%u gain2:%u gain3:%u gain4:%u\n", name, event.*.timestamp, event.*.ppg[@intCast(c_uint, @as(c_int, 0))], event.*.ppg[@intCast(c_uint, @as(c_int, 1))], event.*.ppg[@intCast(c_uint, @as(c_int, 2))], event.*.ppg[@intCast(c_uint, @as(c_int, 3))], event.*.current, @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 0))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 1))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 2))])), @bitCast(c_int, @as(c_uint, event.*.gain[@intCast(c_uint, @as(c_int, 3))])));
 }
 pub fn print_gps(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_gps = @intToPtr([*c]struct_sensor_event_gps, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_gps = @intToPtr([*c]struct_sensor_gps, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu time_utc: %llu latitude: %f longitude: %f altitude: %f altitude_ellipsoid: %f eph: %f epv: %f hdop: %f vdop: %f ground_speed: %f course: %f satellites_used: %lu\n", name, event.*.timestamp, event.*.time_utc, @floatCast(f64, event.*.latitude), @floatCast(f64, event.*.longitude), @floatCast(f64, event.*.altitude), @floatCast(f64, event.*.altitude_ellipsoid), @floatCast(f64, event.*.eph), @floatCast(f64, event.*.epv), @floatCast(f64, event.*.hdop), @floatCast(f64, event.*.vdop), @floatCast(f64, event.*.ground_speed), @floatCast(f64, event.*.course), event.*.satellites_used);
 }
 pub fn print_gps_satellite(arg_buffer: [*c]const u8, arg_name: [*c]const u8) callconv(.C) void {
     var buffer = arg_buffer;
     var name = arg_name;
-    var event: [*c]struct_sensor_event_gps_satellite = @intToPtr([*c]struct_sensor_event_gps_satellite, @ptrToInt(buffer));
+    var event: [*c]struct_sensor_gps_satellite = @intToPtr([*c]struct_sensor_gps_satellite, @ptrToInt(buffer));
     _ = printf("%s: timestamp: %llu count: %lu satellites: %lu\n", name, event.*.timestamp, event.*.count, event.*.satellites);
 }
 pub var g_should_exit: bool = @as(c_int, 0) != 0;
 pub const g_sensor_info: [30]struct_sensor_info = [30]struct_sensor_info{
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_accel))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_accel))),
         .name = "accel",
     },
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_mag))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_mag))),
         .name = "mag",
     },
     struct_sensor_info{
         .print = print_vec3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_gyro))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_gyro))),
         .name = "gyro",
     },
     struct_sensor_info{
         .print = print_valf2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_baro))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_baro))),
         .name = "baro",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_light))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_light))),
         .name = "light",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_prox))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_prox))),
         .name = "prox",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_humi))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_humi))),
         .name = "humi",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_temp))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_temp))),
         .name = "temp",
     },
     struct_sensor_info{
         .print = print_valf3,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_rgb))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_rgb))),
         .name = "rgb",
     },
     struct_sensor_info{
         .print = print_valb,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_hall))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_hall))),
         .name = "hall",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ir))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ir))),
         .name = "ir",
     },
     struct_sensor_info{
         .print = print_gps,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_gps))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_gps))),
         .name = "gps",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_uv))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_uv))),
         .name = "uv",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_noise))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_noise))),
         .name = "noise",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_pm25))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_pm25))),
         .name = "pm25",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_pm1p0))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_pm1p0))),
         .name = "pm1p0",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_pm10))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_pm10))),
         .name = "pm10",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_co2))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_co2))),
         .name = "co2",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_hcho))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_hcho))),
         .name = "hcho",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_tvoc))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_tvoc))),
         .name = "tvoc",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ph))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ph))),
         .name = "ph",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_dust))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_dust))),
         .name = "dust",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_hrate))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_hrate))),
         .name = "hrate",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_hbeat))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_hbeat))),
         .name = "hbeat",
     },
     struct_sensor_info{
         .print = print_valf,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ecg))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ecg))),
         .name = "ecg",
     },
     struct_sensor_info{
         .print = print_ppgd,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ppgd))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ppgd))),
         .name = "ppgd",
     },
     struct_sensor_info{
         .print = print_ppgq,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ppgq))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ppgq))),
         .name = "ppgq",
     },
     struct_sensor_info{
         .print = print_valf2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_impd))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_impd))),
         .name = "impd",
     },
     struct_sensor_info{
         .print = print_vali2,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_ots))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_ots))),
         .name = "ots",
     },
     struct_sensor_info{
         .print = print_gps_satellite,
-        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_event_gps_satellite))),
+        .esize = @bitCast(u8, @truncate(u8, @sizeOf(struct_sensor_gps_satellite))),
         .name = "gps_satellite",
     },
 };
@@ -1692,14 +1736,14 @@ pub export fn sensortest_main(arg_argc: c_int, arg_argv: [*c][*c]u8) c_int {
         ret = -@as(c_int, 22);
         return ret;
     }
-    _ = snprintf(@ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), @bitCast(usize, @as(c_int, 256)), "/dev/sensor/%s", name);
+    _ = snprintf(@ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), @bitCast(usize, @as(c_int, 256)), "/dev/sensor/sensor_%s", name);
     fd = open(@ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), (@as(c_int, 1) << @intCast(@import("std").math.Log2Int(c_int), 0)) | (@as(c_int, 1) << @intCast(@import("std").math.Log2Int(c_int), 6)));
     if (fd < @as(c_int, 0)) {
         ret = -__errno().*;
         _ = printf("Failed to open device:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), strerror(__errno().*));
         return ret;
     }
-    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 129), &interval);
+    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 129), interval);
     if (ret < @as(c_int, 0)) {
         ret = -__errno().*;
         if (ret != -@as(c_int, 134)) {
@@ -1707,19 +1751,11 @@ pub export fn sensortest_main(arg_argc: c_int, arg_argv: [*c][*c]u8) c_int {
             return ret;
         }
     }
-    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 130), &latency);
+    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 130), latency);
     if (ret < @as(c_int, 0)) {
         ret = -__errno().*;
         if (ret != -@as(c_int, 134)) {
             _ = printf("Failed to batch for sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), strerror(__errno().*));
-            return ret;
-        }
-    }
-    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 1));
-    if (ret < @as(c_int, 0)) {
-        ret = -__errno().*;
-        if (ret != -@as(c_int, 134)) {
-            _ = printf("Failed to enable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), strerror(__errno().*));
             return ret;
         }
     }
@@ -1735,12 +1771,6 @@ pub export fn sensortest_main(arg_argc: c_int, arg_argv: [*c][*c]u8) c_int {
         }
     }
     _ = printf("SensorTest: Received message: %s, number:%d/%d\n", name, received, count);
-    ret = ioctl(fd, @as(c_int, 2560) | @as(c_int, 128), @as(c_int, 0));
-    if (ret < @as(c_int, 0)) {
-        ret = -__errno().*;
-        _ = printf("Failed to disable sensor:%s, ret:%s\n", @ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &devname)), strerror(__errno().*));
-        return ret;
-    }
     _ = close(fd);
     free(@ptrCast(?*anyopaque, buffer));
     getoptindp().* = 0;
@@ -1755,9 +1785,9 @@ pub const __FLT16_MIN__ = @compileError("unable to translate C expr: unexpected 
 pub const __INT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `LL`"); // (no file):179:9
 pub const __UINT32_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `U`"); // (no file):201:9
 pub const __UINT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `ULL`"); // (no file):209:9
-pub const CONFIG_INIT_ENTRYPOINT = @compileError("unable to translate macro: undefined identifier `nsh_main`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:101:9
-pub const CONFIG_RAM_VEND = @compileError("unable to translate macro: undefined identifier `CONFIG_RAM_VSTART`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:364:11
-pub const CONFIG_FLASH_END = @compileError("unable to translate macro: undefined identifier `CONFIG_FLASH_START`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:372:11
+pub const CONFIG_INIT_ENTRYPOINT = @compileError("unable to translate macro: undefined identifier `nsh_main`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:102:9
+pub const CONFIG_RAM_VEND = @compileError("unable to translate macro: undefined identifier `CONFIG_RAM_VSTART`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:366:11
+pub const CONFIG_FLASH_END = @compileError("unable to translate macro: undefined identifier `CONFIG_FLASH_START`"); // /home/user/nuttx/nuttx/include/nuttx/config.h:374:11
 pub const TZ_MAX_TIMES = @compileError("unable to translate macro: undefined identifier `CONFIG_LIBC_TZ_MAX_TIMES`"); // /home/user/nuttx/nuttx/include/limits.h:220:9
 pub const TZ_MAX_TYPES = @compileError("unable to translate macro: undefined identifier `CONFIG_LIBC_TZ_MAX_TYPES`"); // /home/user/nuttx/nuttx/include/limits.h:221:9
 pub const NL_TEXTMAX = @compileError("unable to translate macro: undefined identifier `_POSIX2_LINE_MAX`"); // /home/user/nuttx/nuttx/include/limits.h:281:9
@@ -1789,7 +1819,7 @@ pub const sysloglike = @compileError("unable to translate macro: undefined ident
 pub const scanflike = @compileError("unable to translate macro: undefined identifier `__attribute__`"); // /home/user/nuttx/nuttx/include/nuttx/compiler.h:236:11
 pub const strftimelike = @compileError("unable to translate macro: undefined identifier `__attribute__`"); // /home/user/nuttx/nuttx/include/nuttx/compiler.h:237:11
 pub const no_builtin = @compileError("unable to translate macro: undefined identifier `__attribute__`"); // /home/user/nuttx/nuttx/include/nuttx/compiler.h:391:13
-pub const EXTERN = @compileError("unable to translate C expr: unexpected token 'extern'"); // /home/user/nuttx/nuttx/include/nuttx/compiler.h:805:9
+pub const EXTERN = @compileError("unable to translate C expr: unexpected token 'extern'"); // /home/user/nuttx/nuttx/include/nuttx/compiler.h:807:9
 pub const __stdint_join3 = @compileError("unable to translate C expr: unexpected token '##'"); // /home/user/zig-linux-x86_64-0.10.0-dev.2674+d980c6a38/lib/include/stdint.h:245:9
 pub const __int_c_join = @compileError("unable to translate C expr: unexpected token '##'"); // /home/user/zig-linux-x86_64-0.10.0-dev.2674+d980c6a38/lib/include/stdint.h:282:9
 pub const __uint_c = @compileError("unable to translate macro: undefined identifier `U`"); // /home/user/zig-linux-x86_64-0.10.0-dev.2674+d980c6a38/lib/include/stdint.h:284:9
@@ -1835,7 +1865,7 @@ pub const __STR = @compileError("unable to translate C expr: unexpected token '#
 pub const _SCHED_GETAFFINITY = @compileError("unable to translate macro: undefined identifier `sched_getaffinity`"); // /home/user/nuttx/nuttx/include/nuttx/sched.h:169:11
 pub const _SCHED_SETAFFINITY = @compileError("unable to translate macro: undefined identifier `sched_setaffinity`"); // /home/user/nuttx/nuttx/include/nuttx/sched.h:170:11
 pub const FIRST_ASSIGNED_STATE = @compileError("unable to translate macro: undefined identifier `TSTATE_TASK_ASSIGNED`"); // /home/user/nuttx/nuttx/include/nuttx/sched.h:237:9
-pub const nxsched_suspend_scheduler = @compileError("unable to translate C expr: unexpected token 'Eof'"); // /home/user/nuttx/nuttx/include/nuttx/sched.h:1086:11
+pub const nxsched_suspend_scheduler = @compileError("unable to translate C expr: unexpected token 'Eof'"); // /home/user/nuttx/nuttx/include/nuttx/sched.h:1154:11
 pub const ARRAYSIZE = @compileError("unable to translate C expr: expected ')' instead got '['"); // sensortest.c:48:9
 pub const __llvm__ = @as(c_int, 1);
 pub const __clang__ = @as(c_int, 1);
@@ -2254,6 +2284,7 @@ pub const CONFIG_ARCH_HAVE_SYSCALL_HOOKS = @as(c_int, 1);
 pub const CONFIG_ARCH_HAVE_BACKTRACE = @as(c_int, 1);
 pub const CONFIG_ARCH_FPU = @as(c_int, 1);
 pub const CONFIG_ARCH_STACKDUMP = @as(c_int, 1);
+pub const CONFIG_ARCH_STACKDUMP_MAX_LENGTH = @as(c_int, 0);
 pub const CONFIG_BOARD_LOOPSPERMSEC = @as(c_int, 10000);
 pub const CONFIG_ARCH_HAVE_INTERRUPTSTACK = @as(c_int, 1);
 pub const CONFIG_ARCH_INTERRUPTSTACK = @as(c_int, 8192);
@@ -2328,7 +2359,6 @@ pub const CONFIG_DEV_NULL = @as(c_int, 1);
 pub const CONFIG_DEV_ZERO = @as(c_int, 1);
 pub const CONFIG_ARCH_HAVE_RDWR_MEM_CPU_RUN = @as(c_int, 1);
 pub const CONFIG_SENSORS = @as(c_int, 1);
-pub const CONFIG_SENSORS_NPOLLWAITERS = @as(c_int, 2);
 pub const CONFIG_SENSORS_BME280 = @as(c_int, 1);
 pub const CONFIG_BME280_I2C_FREQUENCY = @import("std").zig.c_translation.promoteIntLiteral(c_int, 400000, .decimal);
 pub const CONFIG_ARCH_HAVE_SERIAL_TERMIOS = @as(c_int, 1);
@@ -2346,6 +2376,7 @@ pub const CONFIG_UART0_BITS = @as(c_int, 8);
 pub const CONFIG_UART0_PARITY = @as(c_int, 0);
 pub const CONFIG_UART0_2STOP = @as(c_int, 0);
 pub const CONFIG_SYSLOG_MAX_CHANNELS = @as(c_int, 1);
+pub const CONFIG_SYSLOG_DEVPATH = "/dev/ttyS1";
 pub const CONFIG_SYSLOG_DEFAULT = @as(c_int, 1);
 pub const CONFIG_DRIVERS_RF = @as(c_int, 1);
 pub const CONFIG_RF_SPI_TEST_DRIVER = @as(c_int, 1);
@@ -2365,6 +2396,7 @@ pub const CONFIG_NXFONTS_PACKEDMSFIRST = @as(c_int, 1);
 pub const CONFIG_MM_DEFAULT_MANAGER = @as(c_int, 1);
 pub const CONFIG_MM_REGIONS = @as(c_int, 1);
 pub const CONFIG_MM_CIRCBUF = @as(c_int, 1);
+pub const CONFIG_MM_BACKTRACE = -@as(c_int, 1);
 pub const CONFIG_BINFMT_DISABLE = @as(c_int, 1);
 pub const CONFIG_STDIO_DISABLE_BUFFERING = @as(c_int, 1);
 pub const CONFIG_NUNGET_CHARS = @as(c_int, 2);
@@ -2549,7 +2581,7 @@ pub const PTR_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_int, 21
 pub const UPTR_MAX = @import("std").zig.c_translation.promoteIntLiteral(c_uint, 4294967295, .decimal);
 pub const WCHAR_MIN = -__WCHAR_MAX__ - @as(c_int, 1);
 pub const WCHAR_MAX = __WCHAR_MAX__;
-pub const MB_LEN_MAX = @as(c_int, 1);
+pub const MB_LEN_MAX = @as(c_int, 4);
 pub const _POSIX_ARG_MAX = @as(c_int, 4096);
 pub const _POSIX_CHILD_MAX = @as(c_int, 6);
 pub const _POSIX_LINK_MAX = @as(c_int, 8);
@@ -2652,7 +2684,7 @@ pub const CONFIG_HAVE_LONG_DOUBLE = @as(c_int, 1);
 pub const IOBJ = "";
 pub const IPTR = "";
 pub inline fn UNUSED(a: anytype) anyopaque {
-    return @import("std").zig.c_translation.cast(anyopaque, (@as(c_int, 1) != 0) or (a != 0));
+    return @import("std").zig.c_translation.cast(anyopaque, (@as(c_int, 1) != 0) or ((&a) != 0));
 }
 pub const __CLANG_STDINT_H = "";
 pub const __int_least64_t = i64;
@@ -2791,6 +2823,722 @@ pub const timelocal = mktime;
 pub inline fn strftime_l(s: anytype, m: anytype, f: anytype, t: anytype, l: anytype) @TypeOf(strftime(s, m, f, t)) {
     _ = l;
     return strftime(s, m, f, t);
+}
+pub const __INCLUDE_NUTTX_FS_FS_H = "";
+pub const __STDARG_H = "";
+pub const _VA_LIST = "";
+pub const __GNUC_VA_LIST = @as(c_int, 1);
+pub const __INCLUDE_NUTTX_MUTEX_H = "";
+pub const __INCLUDE_ERRNO_H = "";
+pub const errno = __errno().*;
+pub inline fn get_errno() @TypeOf(errno) {
+    return errno;
+}
+pub const EPERM = @as(c_int, 1);
+pub const EPERM_STR = "Operation not permitted";
+pub const ENOENT = @as(c_int, 2);
+pub const ENOENT_STR = "No such file or directory";
+pub const ESRCH = @as(c_int, 3);
+pub const ESRCH_STR = "No such process";
+pub const EINTR = @as(c_int, 4);
+pub const EINTR_STR = "Interrupted system call";
+pub const EIO = @as(c_int, 5);
+pub const EIO_STR = "I/O error";
+pub const ENXIO = @as(c_int, 6);
+pub const ENXIO_STR = "No such device or address";
+pub const E2BIG = @as(c_int, 7);
+pub const E2BIG_STR = "Arg list too long";
+pub const ENOEXEC = @as(c_int, 8);
+pub const ENOEXEC_STR = "Exec format error";
+pub const EBADF = @as(c_int, 9);
+pub const EBADF_STR = "Bad file number";
+pub const ECHILD = @as(c_int, 10);
+pub const ECHILD_STR = "No child processes";
+pub const EAGAIN = @as(c_int, 11);
+pub const EWOULDBLOCK = EAGAIN;
+pub const EAGAIN_STR = "Try again";
+pub const ENOMEM = @as(c_int, 12);
+pub const ENOMEM_STR = "Out of memory";
+pub const EACCES = @as(c_int, 13);
+pub const EACCES_STR = "Permission denied";
+pub const EFAULT = @as(c_int, 14);
+pub const EFAULT_STR = "Bad address";
+pub const ENOTBLK = @as(c_int, 15);
+pub const ENOTBLK_STR = "Block device required";
+pub const EBUSY = @as(c_int, 16);
+pub const EBUSY_STR = "Device or resource busy";
+pub const EEXIST = @as(c_int, 17);
+pub const EEXIST_STR = "File exists";
+pub const EXDEV = @as(c_int, 18);
+pub const EXDEV_STR = "Cross-device link";
+pub const ENODEV = @as(c_int, 19);
+pub const ENODEV_STR = "No such device";
+pub const ENOTDIR = @as(c_int, 20);
+pub const ENOTDIR_STR = "Not a directory";
+pub const EISDIR = @as(c_int, 21);
+pub const EISDIR_STR = "Is a directory";
+pub const EINVAL = @as(c_int, 22);
+pub const EINVAL_STR = "Invalid argument";
+pub const ENFILE = @as(c_int, 23);
+pub const ENFILE_STR = "File table overflow";
+pub const EMFILE = @as(c_int, 24);
+pub const EMFILE_STR = "Too many open files";
+pub const ENOTTY = @as(c_int, 25);
+pub const ENOTTY_STR = "Not a typewriter";
+pub const ETXTBSY = @as(c_int, 26);
+pub const ETXTBSY_STR = "Text file busy";
+pub const EFBIG = @as(c_int, 27);
+pub const EFBIG_STR = "File too large";
+pub const ENOSPC = @as(c_int, 28);
+pub const ENOSPC_STR = "No space left on device";
+pub const ESPIPE = @as(c_int, 29);
+pub const ESPIPE_STR = "Illegal seek";
+pub const EROFS = @as(c_int, 30);
+pub const EROFS_STR = "Read-only file system";
+pub const EMLINK = @as(c_int, 31);
+pub const EMLINK_STR = "Too many links";
+pub const EPIPE = @as(c_int, 32);
+pub const EPIPE_STR = "Broken pipe";
+pub const EDOM = @as(c_int, 33);
+pub const EDOM_STR = "Math argument out of domain of func";
+pub const ERANGE = @as(c_int, 34);
+pub const ERANGE_STR = "Math result not representable";
+pub const ENOMSG = @as(c_int, 35);
+pub const ENOMSG_STR = "No message of desired type";
+pub const EIDRM = @as(c_int, 36);
+pub const EIDRM_STR = "Identifier removed";
+pub const ECHRNG = @as(c_int, 37);
+pub const ECHRNG_STR = "Channel number out of range";
+pub const EL2NSYNC = @as(c_int, 38);
+pub const EL2NSYNC_STR = "Level 2 not synchronized";
+pub const EL3HLT = @as(c_int, 39);
+pub const EL3HLT_STR = "Level 3 halted";
+pub const EL3RST = @as(c_int, 40);
+pub const EL3RST_STR = "Level 3 reset";
+pub const ELNRNG = @as(c_int, 41);
+pub const ELNRNG_STR = "Link number out of range";
+pub const EUNATCH = @as(c_int, 42);
+pub const EUNATCH_STR = "Protocol driver not attached";
+pub const ENOCSI = @as(c_int, 43);
+pub const ENOCSI_STR = "No CSI structure available";
+pub const EL2HLT = @as(c_int, 44);
+pub const EL2HLT_STR = "Level 2 halted";
+pub const EDEADLK = @as(c_int, 45);
+pub const EDEADLK_STR = "Resource deadlock would occur";
+pub const ENOLCK = @as(c_int, 46);
+pub const ENOLCK_STR = "No record locks available";
+pub const EBADE = @as(c_int, 50);
+pub const EBADE_STR = "Invalid exchange";
+pub const EBADR = @as(c_int, 51);
+pub const EBADR_STR = "Invalid request descriptor";
+pub const EXFULL = @as(c_int, 52);
+pub const EXFULL_STR = "Exchange full";
+pub const ENOANO = @as(c_int, 53);
+pub const ENOANO_STR = "No anode";
+pub const EBADRQC = @as(c_int, 54);
+pub const EBADRQC_STR = "Invalid request code";
+pub const EBADSLT = @as(c_int, 55);
+pub const EBADSLT_STR = "Invalid slot";
+pub const EDEADLOCK = @as(c_int, 56);
+pub const EDEADLOCK_STR = "File locking deadlock error";
+pub const EBFONT = @as(c_int, 57);
+pub const EBFONT_STR = "Bad font file format";
+pub const ENOSTR = @as(c_int, 60);
+pub const ENOSTR_STR = "Device not a stream";
+pub const ENODATA = @as(c_int, 61);
+pub const ENODATA_STR = "No data available";
+pub const ETIME = @as(c_int, 62);
+pub const ETIME_STR = "Timer expired";
+pub const ENOSR = @as(c_int, 63);
+pub const ENOSR_STR = "Out of streams resources";
+pub const ENONET = @as(c_int, 64);
+pub const ENONET_STR = "Machine is not on the network";
+pub const ENOPKG = @as(c_int, 65);
+pub const ENOPKG_STR = "Package not installed";
+pub const EREMOTE = @as(c_int, 66);
+pub const EREMOTE_STR = "Object is remote";
+pub const ENOLINK = @as(c_int, 67);
+pub const ENOLINK_STR = "Link has been severed";
+pub const EADV = @as(c_int, 68);
+pub const EADV_STR = "Advertise error";
+pub const ESRMNT = @as(c_int, 69);
+pub const ESRMNT_STR = "Srmount error";
+pub const ECOMM = @as(c_int, 70);
+pub const ECOMM_STR = "Communication error on send";
+pub const EPROTO = @as(c_int, 71);
+pub const EPROTO_STR = "Protocol error";
+pub const EMULTIHOP = @as(c_int, 74);
+pub const EMULTIHOP_STR = "Multihop attempted";
+pub const ELBIN = @as(c_int, 75);
+pub const ELBIN_STR = "Inode is remote";
+pub const EDOTDOT = @as(c_int, 76);
+pub const EDOTDOT_STR = "RFS specific error";
+pub const EBADMSG = @as(c_int, 77);
+pub const EBADMSG_STR = "Not a data message";
+pub const EFTYPE = @as(c_int, 79);
+pub const EFTYPE_STR = "Inappropriate file type or format";
+pub const ENOTUNIQ = @as(c_int, 80);
+pub const ENOTUNIQ_STR = "Name not unique on network";
+pub const EBADFD = @as(c_int, 81);
+pub const EBADFD_STR = "File descriptor in bad state";
+pub const EREMCHG = @as(c_int, 82);
+pub const EREMCHG_STR = "Remote address changed";
+pub const ELIBACC = @as(c_int, 83);
+pub const ELIBACC_STR = "Can not access a needed shared library";
+pub const ELIBBAD = @as(c_int, 84);
+pub const ELIBBAD_STR = "Accessing a corrupted shared library";
+pub const ELIBSCN = @as(c_int, 85);
+pub const ELIBSCN_STR = ".lib section in a.out corrupted";
+pub const ELIBMAX = @as(c_int, 86);
+pub const ELIBMAX_STR = "Attempting to link in too many shared libraries";
+pub const ELIBEXEC = @as(c_int, 87);
+pub const ELIBEXEC_STR = "Cannot exec a shared library directly";
+pub const ENOSYS = @as(c_int, 88);
+pub const ENOSYS_STR = "Function not implemented";
+pub const ENMFILE = @as(c_int, 89);
+pub const ENMFILE_STR = "No more files";
+pub const ENOTEMPTY = @as(c_int, 90);
+pub const ENOTEMPTY_STR = "Directory not empty";
+pub const ENAMETOOLONG = @as(c_int, 91);
+pub const ENAMETOOLONG_STR = "File name too long";
+pub const ELOOP = @as(c_int, 92);
+pub const ELOOP_STR = "Too many symbolic links encountered";
+pub const EOPNOTSUPP = @as(c_int, 95);
+pub const EOPNOTSUPP_STR = "Operation not supported on transport endpoint";
+pub const EPFNOSUPPORT = @as(c_int, 96);
+pub const EPFNOSUPPORT_STR = "Protocol family not supported";
+pub const ECONNRESET = @as(c_int, 104);
+pub const ECONNRESET_STR = "Connection reset by peer";
+pub const ENOBUFS = @as(c_int, 105);
+pub const ENOBUFS_STR = "No buffer space available";
+pub const EAFNOSUPPORT = @as(c_int, 106);
+pub const EAFNOSUPPORT_STR = "Address family not supported by protocol";
+pub const EPROTOTYPE = @as(c_int, 107);
+pub const EPROTOTYPE_STR = "Protocol wrong type for socket";
+pub const ENOTSOCK = @as(c_int, 108);
+pub const ENOTSOCK_STR = "Socket operation on non-socket";
+pub const ENOPROTOOPT = @as(c_int, 109);
+pub const ENOPROTOOPT_STR = "Protocol not available";
+pub const ESHUTDOWN = @as(c_int, 110);
+pub const ESHUTDOWN_STR = "Cannot send after transport endpoint shutdown";
+pub const ECONNREFUSED = @as(c_int, 111);
+pub const ECONNREFUSED_STR = "Connection refused";
+pub const EADDRINUSE = @as(c_int, 112);
+pub const EADDRINUSE_STR = "Address already in use";
+pub const ECONNABORTED = @as(c_int, 113);
+pub const ECONNABORTED_STR = "Software caused connection abort";
+pub const ENETUNREACH = @as(c_int, 114);
+pub const ENETUNREACH_STR = "Network is unreachable";
+pub const ENETDOWN = @as(c_int, 115);
+pub const ENETDOWN_STR = "Network is down";
+pub const ETIMEDOUT = @as(c_int, 116);
+pub const ETIMEDOUT_STR = "Connection timed out";
+pub const EHOSTDOWN = @as(c_int, 117);
+pub const EHOSTDOWN_STR = "Host is down";
+pub const EHOSTUNREACH = @as(c_int, 118);
+pub const EHOSTUNREACH_STR = "No route to host";
+pub const EINPROGRESS = @as(c_int, 119);
+pub const EINPROGRESS_STR = "Operation now in progress";
+pub const EALREADY = @as(c_int, 120);
+pub const EALREADY_STR = "Socket already connected";
+pub const EDESTADDRREQ = @as(c_int, 121);
+pub const EDESTADDRREQ_STR = "Destination address required";
+pub const EMSGSIZE = @as(c_int, 122);
+pub const EMSGSIZE_STR = "Message too long";
+pub const EPROTONOSUPPORT = @as(c_int, 123);
+pub const EPROTONOSUPPORT_STR = "Protocol not supported";
+pub const ESOCKTNOSUPPORT = @as(c_int, 124);
+pub const ESOCKTNOSUPPORT_STR = "Socket type not supported";
+pub const EADDRNOTAVAIL = @as(c_int, 125);
+pub const EADDRNOTAVAIL_STR = "Cannot assign requested address";
+pub const ENETRESET = @as(c_int, 126);
+pub const ENETRESET_STR = "Network dropped connection because of reset";
+pub const EISCONN = @as(c_int, 127);
+pub const EISCONN_STR = "Transport endpoint is already connected";
+pub const ENOTCONN = @as(c_int, 128);
+pub const ENOTCONN_STR = "Transport endpoint is not connected";
+pub const ETOOMANYREFS = @as(c_int, 129);
+pub const ETOOMANYREFS_STR = "Too many references: cannot splice";
+pub const EPROCLIM = @as(c_int, 130);
+pub const EPROCLIM_STR = "Limit would be exceeded by attempted fork";
+pub const EUSERS = @as(c_int, 131);
+pub const EUSERS_STR = "Too many users";
+pub const EDQUOT = @as(c_int, 132);
+pub const EDQUOT_STR = "Quota exceeded";
+pub const ESTALE = @as(c_int, 133);
+pub const ESTALE_STR = "Stale NFS file handle";
+pub const ENOTSUP = @as(c_int, 134);
+pub const ENOTSUP_STR = "Not supported";
+pub const ENOMEDIUM = @as(c_int, 135);
+pub const ENOMEDIUM_STR = "No medium found";
+pub const ENOSHARE = @as(c_int, 136);
+pub const ENOSHARE_STR = "No such host or network path";
+pub const ECASECLASH = @as(c_int, 137);
+pub const ECASECLASH_STR = "Filename exists with different case";
+pub const EILSEQ = @as(c_int, 138);
+pub const EILSEQ_STR = "Illegal byte sequence";
+pub const EOVERFLOW = @as(c_int, 139);
+pub const EOVERFLOW_STR = "Value too large for defined data type";
+pub const ECANCELED = @as(c_int, 140);
+pub const ECANCELED_STR = "Operation cancelled";
+pub const ENOTRECOVERABLE = @as(c_int, 141);
+pub const ENOTRECOVERABLE_STR = "State not recoverable";
+pub const EOWNERDEAD = @as(c_int, 142);
+pub const EOWNERDEAD_STR = "Previous owner died";
+pub const ESTRPIPE = @as(c_int, 143);
+pub const ESTRPIPE_STR = "Streams pipe error";
+pub const __ELASTERROR = @as(c_int, 2000);
+pub const __INCLUDE_ASSERT_H = "";
+pub inline fn DEBUGPANIC() @TypeOf(PANIC()) {
+    return PANIC();
+}
+pub inline fn DEBUGASSERT(f: anytype) @TypeOf(ASSERT(f)) {
+    return ASSERT(f);
+}
+pub inline fn DEBUGVERIFY(f: anytype) @TypeOf(VERIFY(f)) {
+    return VERIFY(f);
+}
+pub inline fn assert(f: anytype) anyopaque {
+    return @import("std").zig.c_translation.cast(anyopaque, (@as(c_int, 1) != 0) or (f != 0));
+}
+pub const __INCLUDE_UNISTD_H = "";
+pub const __CLANG_LIMITS_H = "";
+pub const _GCC_LIMITS_H_ = "";
+pub const LONG_LONG_MAX = __LONG_LONG_MAX__;
+pub const LONG_LONG_MIN = -__LONG_LONG_MAX__ - @as(c_longlong, 1);
+pub const ULONG_LONG_MAX = (__LONG_LONG_MAX__ * @as(c_ulonglong, 2)) + @as(c_ulonglong, 1);
+pub const SEEK_SET = @as(c_int, 0);
+pub const SEEK_CUR = @as(c_int, 1);
+pub const SEEK_END = @as(c_int, 2);
+pub const F_OK = @as(c_int, 0);
+pub const X_OK = @as(c_int, 1);
+pub const W_OK = @as(c_int, 2);
+pub const R_OK = @as(c_int, 4);
+pub const POSIX_VERSION = "";
+pub const _POSIX_REALTIME_SIGNALS = @as(c_int, 1);
+pub const _POSIX_MESSAGE_PASSING = @as(c_int, 1);
+pub const _POSIX_PRIORITY_SCHEDULING = @as(c_int, 1);
+pub const _POSIX_TIMERS = @as(c_int, 1);
+pub const _POSIX_TIMEOUTS = @as(c_int, 1);
+pub const _POSIX_SYNCHRONIZED_IO = @as(c_int, 1);
+pub const _POSIX_SPORADIC_SERVER = -@as(c_int, 1);
+pub const _POSIX_THREAD_SPORADIC_SERVER = -@as(c_int, 1);
+pub const _POSIX_SYNC_IO = @as(c_int, 1);
+pub const _PC_2_SYMLINKS = @as(c_int, 0x0001);
+pub const _PC_ALLOC_SIZE_MIN = @as(c_int, 0x0002);
+pub const _PC_ASYNC_IO = @as(c_int, 0x0003);
+pub const _PC_CHOWN_RESTRICTED = @as(c_int, 0x0004);
+pub const _PC_FILESIZEBITS = @as(c_int, 0x0005);
+pub const _PC_LINK_MAX = @as(c_int, 0x0006);
+pub const _PC_MAX_CANON = @as(c_int, 0x0007);
+pub const _PC_MAX_INPUT = @as(c_int, 0x0008);
+pub const _PC_NAME_MAX = @as(c_int, 0x0009);
+pub const _PC_NO_TRUNC = @as(c_int, 0x000a);
+pub const _PC_PATH_MAX = @as(c_int, 0x000b);
+pub const _PC_PIPE_BUF = @as(c_int, 0x000c);
+pub const _PC_PRIO_IO = @as(c_int, 0x000d);
+pub const _PC_REC_INCR_XFER_SIZE = @as(c_int, 0x000e);
+pub const _PC_REC_MIN_XFER_SIZE = @as(c_int, 0x000f);
+pub const _PC_REC_XFER_ALIGN = @as(c_int, 0x0010);
+pub const _PC_SYMLINK_MAX = @as(c_int, 0x0011);
+pub const _PC_SYNC_IO = @as(c_int, 0x0012);
+pub const _PC_VDISABLE = @as(c_int, 0x0013);
+pub const _SC_2_C_BIND = @as(c_int, 0x0001);
+pub const _SC_2_C_DEV = @as(c_int, 0x0002);
+pub const _SC_2_CHAR_TERM = @as(c_int, 0x0003);
+pub const _SC_2_FORT_DEV = @as(c_int, 0x0004);
+pub const _SC_2_FORT_RUN = @as(c_int, 0x0005);
+pub const _SC_2_LOCALEDEF = @as(c_int, 0x0006);
+pub const _SC_2_PBS = @as(c_int, 0x0007);
+pub const _SC_2_PBS_ACCOUNTING = @as(c_int, 0x0008);
+pub const _SC_2_PBS_CHECKPOINT = @as(c_int, 0x0009);
+pub const _SC_2_PBS_LOCATE = @as(c_int, 0x000a);
+pub const _SC_2_PBS_MESSAGE = @as(c_int, 0x000b);
+pub const _SC_2_PBS_TRACK = @as(c_int, 0x000c);
+pub const _SC_2_SW_DEV = @as(c_int, 0x000d);
+pub const _SC_2_UPE = @as(c_int, 0x000e);
+pub const _SC_2_VERSION = @as(c_int, 0x000f);
+pub const _SC_ADVISORY_INFO = @as(c_int, 0x0010);
+pub const _SC_AIO_LISTIO_MAX = @as(c_int, 0x0011);
+pub const _SC_AIO_MAX = @as(c_int, 0x0012);
+pub const _SC_AIO_PRIO_DELTA_MAX = @as(c_int, 0x0013);
+pub const _SC_ARG_MAX = @as(c_int, 0x0014);
+pub const _SC_ASYNCHRONOUS_IO = @as(c_int, 0x0015);
+pub const _SC_ATEXIT_MAX = @as(c_int, 0x0016);
+pub const _SC_BARRIERS = @as(c_int, 0x0017);
+pub const _SC_BC_BASE_MAX = @as(c_int, 0x0018);
+pub const _SC_BC_DIM_MAX = @as(c_int, 0x0019);
+pub const _SC_BC_SCALE_MAX = @as(c_int, 0x001a);
+pub const _SC_BC_STRING_MAX = @as(c_int, 0x001b);
+pub const _SC_CHILD_MAX = @as(c_int, 0x001c);
+pub const _SC_CLK_TCK = @as(c_int, 0x001d);
+pub const _SC_CLOCK_SELECTION = @as(c_int, 0x001e);
+pub const _SC_COLL_WEIGHTS_MAX = @as(c_int, 0x001f);
+pub const _SC_CPUTIME = @as(c_int, 0x0020);
+pub const _SC_DELAYTIMER_MAX = @as(c_int, 0x0021);
+pub const _SC_EXPR_NEST_MAX = @as(c_int, 0x0022);
+pub const _SC_FSYNC = @as(c_int, 0x0023);
+pub const _SC_GETGR_R_SIZE_MAX = @as(c_int, 0x0024);
+pub const _SC_GETPW_R_SIZE_MAX = @as(c_int, 0x0025);
+pub const _SC_HOST_NAME_MAX = @as(c_int, 0x0026);
+pub const _SC_IOV_MAX = @as(c_int, 0x0027);
+pub const _SC_IPV6 = @as(c_int, 0x0028);
+pub const _SC_JOB_CONTROL = @as(c_int, 0x0029);
+pub const _SC_LINE_MAX = @as(c_int, 0x002a);
+pub const _SC_LOGIN_NAME_MAX = @as(c_int, 0x002b);
+pub const _SC_MAPPED_FILES = @as(c_int, 0x002c);
+pub const _SC_MEMLOCK = @as(c_int, 0x002d);
+pub const _SC_MEMLOCK_RANGE = @as(c_int, 0x002e);
+pub const _SC_MEMORY_PROTECTION = @as(c_int, 0x002f);
+pub const _SC_MESSAGE_PASSING = @as(c_int, 0x0030);
+pub const _SC_MONOTONIC_CLOCK = @as(c_int, 0x0031);
+pub const _SC_MQ_OPEN_MAX = @as(c_int, 0x0032);
+pub const _SC_MQ_PRIO_MAX = @as(c_int, 0x0033);
+pub const _SC_NGROUPS_MAX = @as(c_int, 0x0034);
+pub const _SC_OPEN_MAX = @as(c_int, 0x0035);
+pub const _SC_PAGE_SIZE = @as(c_int, 0x0036);
+pub const _SC_PAGESIZE = _SC_PAGE_SIZE;
+pub const _SC_PRIORITIZED_IO = @as(c_int, 0x0037);
+pub const _SC_PRIORITY_SCHEDULING = @as(c_int, 0x0038);
+pub const _SC_RAW_SOCKETS = @as(c_int, 0x0039);
+pub const _SC_RE_DUP_MAX = @as(c_int, 0x003a);
+pub const _SC_READER_WRITER_LOCKS = @as(c_int, 0x003b);
+pub const _SC_REALTIME_SIGNALS = @as(c_int, 0x003c);
+pub const _SC_REGEXP = @as(c_int, 0x003d);
+pub const _SC_RTSIG_MAX = @as(c_int, 0x003e);
+pub const _SC_SAVED_IDS = @as(c_int, 0x003f);
+pub const _SC_SEM_NSEMS_MAX = @as(c_int, 0x0040);
+pub const _SC_SEM_VALUE_MAX = @as(c_int, 0x0041);
+pub const _SC_SEMAPHORES = @as(c_int, 0x0042);
+pub const _SC_SHARED_MEMORY_OBJECTS = @as(c_int, 0x0043);
+pub const _SC_SHELL = @as(c_int, 0x0044);
+pub const _SC_SIGQUEUE_MAX = @as(c_int, 0x0045);
+pub const _SC_SPAWN = @as(c_int, 0x0046);
+pub const _SC_SPIN_LOCKS = @as(c_int, 0x0047);
+pub const _SC_SPORADIC_SERVER = @as(c_int, 0x0048);
+pub const _SC_SS_REPL_MAX = @as(c_int, 0x0049);
+pub const _SC_STREAM_MAX = @as(c_int, 0x004a);
+pub const _SC_SYMLOOP_MAX = @as(c_int, 0x004b);
+pub const _SC_SYNCHRONIZED_IO = @as(c_int, 0x004c);
+pub const _SC_THREAD_ATTR_STACKADDR = @as(c_int, 0x004d);
+pub const _SC_THREAD_ATTR_STACKSIZE = @as(c_int, 0x004e);
+pub const _SC_THREAD_CPUTIME = @as(c_int, 0x004f);
+pub const _SC_THREAD_DESTRUCTOR_ITERATIONS = @as(c_int, 0x0050);
+pub const _SC_THREAD_KEYS_MAX = @as(c_int, 0x0051);
+pub const _SC_THREAD_PRIO_INHERIT = @as(c_int, 0x0052);
+pub const _SC_THREAD_PRIO_PROTECT = @as(c_int, 0x0053);
+pub const _SC_THREAD_PRIORITY_SCHEDULING = @as(c_int, 0x0054);
+pub const _SC_THREAD_PROCESS_SHARED = @as(c_int, 0x0055);
+pub const _SC_THREAD_SAFE_FUNCTIONS = @as(c_int, 0x0056);
+pub const _SC_THREAD_SPORADIC_SERVER = @as(c_int, 0x0057);
+pub const _SC_THREAD_STACK_MIN = @as(c_int, 0x0058);
+pub const _SC_THREAD_THREADS_MAX = @as(c_int, 0x0059);
+pub const _SC_THREADS = @as(c_int, 0x005a);
+pub const _SC_TIMEOUTS = @as(c_int, 0x005b);
+pub const _SC_TIMER_MAX = @as(c_int, 0x005c);
+pub const _SC_TIMERS = @as(c_int, 0x005d);
+pub const _SC_TRACE = @as(c_int, 0x005e);
+pub const _SC_TRACE_EVENT_FILTER = @as(c_int, 0x005f);
+pub const _SC_TRACE_EVENT_NAME_MAX = @as(c_int, 0x0060);
+pub const _SC_TRACE_INHERIT = @as(c_int, 0x0061);
+pub const _SC_TRACE_LOG = @as(c_int, 0x0062);
+pub const _SC_TRACE_NAME_MAX = @as(c_int, 0x0063);
+pub const _SC_TRACE_SYS_MAX = @as(c_int, 0x0064);
+pub const _SC_TRACE_USER_EVENT_MAX = @as(c_int, 0x0065);
+pub const _SC_TTY_NAME_MAX = @as(c_int, 0x0066);
+pub const _SC_TYPED_MEMORY_OBJECTS = @as(c_int, 0x0067);
+pub const _SC_TZNAME_MAX = @as(c_int, 0x0068);
+pub const _SC_V6_ILP32_OFF32 = @as(c_int, 0x0069);
+pub const _SC_V6_ILP32_OFFBIG = @as(c_int, 0x006a);
+pub const _SC_V6_LP64_OFF64 = @as(c_int, 0x006b);
+pub const _SC_V6_LPBIG_OFFBIG = @as(c_int, 0x006c);
+pub const _SC_VERSION = @as(c_int, 0x006d);
+pub const _SC_XBS5_ILP32_OFF32 = @as(c_int, 0x006e);
+pub const _SC_XBS5_ILP32_OFFBIG = @as(c_int, 0x006f);
+pub const _SC_XBS5_LP64_OFF64 = @as(c_int, 0x0070);
+pub const _SC_XBS5_LPBIG_OFFBIG = @as(c_int, 0x0071);
+pub const _SC_XOPEN_CRYPT = @as(c_int, 0x0072);
+pub const _SC_XOPEN_ENH_I18N = @as(c_int, 0x0073);
+pub const _SC_XOPEN_LEGACY = @as(c_int, 0x0074);
+pub const _SC_XOPEN_REALTIME = @as(c_int, 0x0075);
+pub const _SC_XOPEN_REALTIME_THREADS = @as(c_int, 0x0076);
+pub const _SC_XOPEN_SHM = @as(c_int, 0x0077);
+pub const _SC_XOPEN_STREAMS = @as(c_int, 0x0078);
+pub const _SC_XOPEN_UNIX = @as(c_int, 0x0079);
+pub const _SC_XOPEN_VERSION = @as(c_int, 0x007a);
+pub const _SC_PHYS_PAGES = @as(c_int, 0x007b);
+pub const _SC_AVPHYS_PAGES = @as(c_int, 0x007c);
+pub const _SC_NPROCESSORS_CONF = @as(c_int, 0x007d);
+pub const _SC_NPROCESSORS_ONLN = @as(c_int, 0x007e);
+pub const STDERR_FILENO = @as(c_int, 2);
+pub const STDIN_FILENO = @as(c_int, 0);
+pub const STDOUT_FILENO = @as(c_int, 1);
+pub inline fn link(p1: anytype, p2: anytype) @TypeOf(symlink(p1, p2)) {
+    return symlink(p1, p2);
+}
+pub inline fn fdatasync(f: anytype) @TypeOf(fsync(f)) {
+    return fsync(f);
+}
+pub inline fn getdtablesize(f: anytype) c_int {
+    _ = f;
+    return @import("std").zig.c_translation.cast(c_int, sysconf(_SC_OPEN_MAX));
+}
+pub inline fn getpagesize(f: anytype) c_int {
+    _ = f;
+    return @import("std").zig.c_translation.cast(c_int, sysconf(_SC_PAGESIZE));
+}
+pub const optarg = getoptargp().*;
+pub const opterr = getopterrp().*;
+pub const optind = getoptindp().*;
+pub const optopt = getoptoptp().*;
+pub const __INCLUDE_NUTTX_SEMAPHORE_H = "";
+pub const __INCLUDE_SEMAPHORE_H = "";
+pub const SEM_PRIO_NONE = @as(c_int, 0);
+pub const SEM_PRIO_INHERIT = @as(c_int, 1);
+pub const SEM_PRIO_PROTECT = @as(c_int, 2);
+pub const PRIOINHERIT_FLAGS_DISABLE = @as(c_int, 1) << @as(c_int, 0);
+pub const __INCLUDE_NUTTX_CLOCK_H = "";
+pub const __HAVE_KERNEL_GLOBALS = @as(c_int, 1);
+pub const NSEC_PER_SEC = @as(c_long, 1000000000);
+pub const USEC_PER_SEC = @as(c_long, 1000000);
+pub const MSEC_PER_SEC = @as(c_int, 1000);
+pub const DSEC_PER_SEC = @as(c_int, 10);
+pub const HSEC_PER_SEC = @as(c_int, 2);
+pub const NSEC_PER_HSEC = @as(c_long, 500000000);
+pub const USEC_PER_HSEC = @as(c_long, 500000);
+pub const MSEC_PER_HSEC = @as(c_int, 500);
+pub const DSEC_PER_HSEC = @as(c_int, 5);
+pub const NSEC_PER_DSEC = @as(c_long, 100000000);
+pub const USEC_PER_DSEC = @as(c_long, 100000);
+pub const MSEC_PER_DSEC = @as(c_int, 100);
+pub const NSEC_PER_MSEC = @as(c_long, 1000000);
+pub const USEC_PER_MSEC = @as(c_int, 1000);
+pub const NSEC_PER_USEC = @as(c_int, 1000);
+pub const SEC_PER_MIN = @as(c_int, 60);
+pub const NSEC_PER_MIN = NSEC_PER_SEC * SEC_PER_MIN;
+pub const USEC_PER_MIN = USEC_PER_SEC * SEC_PER_MIN;
+pub const MSEC_PER_MIN = MSEC_PER_SEC * SEC_PER_MIN;
+pub const DSEC_PER_MIN = DSEC_PER_SEC * SEC_PER_MIN;
+pub const HSEC_PER_MIN = HSEC_PER_SEC * SEC_PER_MIN;
+pub const MIN_PER_HOUR = @as(c_int, 60);
+pub const NSEC_PER_HOUR = NSEC_PER_MIN * MIN_PER_HOUR;
+pub const USEC_PER_HOUR = USEC_PER_MIN * MIN_PER_HOUR;
+pub const MSEC_PER_HOUR = MSEC_PER_MIN * MIN_PER_HOUR;
+pub const DSEC_PER_HOUR = DSEC_PER_MIN * MIN_PER_HOUR;
+pub const HSEC_PER_HOUR = HSEC_PER_MIN * MIN_PER_HOUR;
+pub const SEC_PER_HOUR = SEC_PER_MIN * MIN_PER_HOUR;
+pub const HOURS_PER_DAY = @as(c_int, 24);
+pub const SEC_PER_DAY = HOURS_PER_DAY * SEC_PER_HOUR;
+pub const USEC_PER_TICK = CONFIG_USEC_PER_TICK;
+pub const TICK_PER_HOUR = USEC_PER_HOUR / USEC_PER_TICK;
+pub const TICK_PER_MIN = USEC_PER_MIN / USEC_PER_TICK;
+pub const TICK_PER_SEC = USEC_PER_SEC / USEC_PER_TICK;
+pub const TICK_PER_MSEC = USEC_PER_MSEC / USEC_PER_TICK;
+pub const TICK_PER_DSEC = USEC_PER_DSEC / USEC_PER_TICK;
+pub const TICK_PER_HSEC = USEC_PER_HSEC / USEC_PER_TICK;
+pub const MSEC_PER_TICK = USEC_PER_TICK / USEC_PER_MSEC;
+pub const NSEC_PER_TICK = USEC_PER_TICK * NSEC_PER_USEC;
+pub inline fn NSEC2TICK(nsec: anytype) @TypeOf((nsec + (NSEC_PER_TICK / @as(c_int, 2))) / NSEC_PER_TICK) {
+    return (nsec + (NSEC_PER_TICK / @as(c_int, 2))) / NSEC_PER_TICK;
+}
+pub inline fn USEC2TICK(usec: anytype) @TypeOf((usec + (USEC_PER_TICK / @as(c_int, 2))) / USEC_PER_TICK) {
+    return (usec + (USEC_PER_TICK / @as(c_int, 2))) / USEC_PER_TICK;
+}
+pub inline fn MSEC2TICK(msec: anytype) @TypeOf((msec + (MSEC_PER_TICK / @as(c_int, 2))) / MSEC_PER_TICK) {
+    return (msec + (MSEC_PER_TICK / @as(c_int, 2))) / MSEC_PER_TICK;
+}
+pub inline fn DSEC2TICK(dsec: anytype) @TypeOf(MSEC2TICK(dsec * MSEC_PER_DSEC)) {
+    return MSEC2TICK(dsec * MSEC_PER_DSEC);
+}
+pub inline fn HSEC2TICK(dsec: anytype) @TypeOf(MSEC2TICK(dsec * MSEC_PER_HSEC)) {
+    return MSEC2TICK(dsec * MSEC_PER_HSEC);
+}
+pub inline fn SEC2TICK(sec: anytype) @TypeOf(MSEC2TICK(sec * MSEC_PER_SEC)) {
+    return MSEC2TICK(sec * MSEC_PER_SEC);
+}
+pub inline fn TICK2NSEC(tick: anytype) @TypeOf(tick * NSEC_PER_TICK) {
+    return tick * NSEC_PER_TICK;
+}
+pub inline fn TICK2USEC(tick: anytype) @TypeOf(tick * USEC_PER_TICK) {
+    return tick * USEC_PER_TICK;
+}
+pub inline fn TICK2MSEC(tick: anytype) @TypeOf(tick * MSEC_PER_TICK) {
+    return tick * MSEC_PER_TICK;
+}
+pub inline fn TICK2DSEC(tick: anytype) @TypeOf((tick + (TICK_PER_DSEC / @as(c_int, 2))) / TICK_PER_DSEC) {
+    return (tick + (TICK_PER_DSEC / @as(c_int, 2))) / TICK_PER_DSEC;
+}
+pub inline fn TICK2HSEC(tick: anytype) @TypeOf((tick + (TICK_PER_HSEC / @as(c_int, 2))) / TICK_PER_HSEC) {
+    return (tick + (TICK_PER_HSEC / @as(c_int, 2))) / TICK_PER_HSEC;
+}
+pub inline fn TICK2SEC(tick: anytype) @TypeOf((tick + (TICK_PER_SEC / @as(c_int, 2))) / TICK_PER_SEC) {
+    return (tick + (TICK_PER_SEC / @as(c_int, 2))) / TICK_PER_SEC;
+}
+pub const INITIAL_SYSTEM_TIMER_TICKS = @as(c_int, 0);
+pub inline fn clock_systime_ticks() @TypeOf(g_system_timer) {
+    return g_system_timer;
+}
+pub inline fn _SEM_INIT(s: anytype, p: anytype, c: anytype) @TypeOf(sem_init(s, p, c)) {
+    return sem_init(s, p, c);
+}
+pub inline fn _SEM_DESTROY(s: anytype) @TypeOf(sem_destroy(s)) {
+    return sem_destroy(s);
+}
+pub inline fn _SEM_WAIT(s: anytype) @TypeOf(sem_wait(s)) {
+    return sem_wait(s);
+}
+pub inline fn _SEM_TRYWAIT(s: anytype) @TypeOf(sem_trywait(s)) {
+    return sem_trywait(s);
+}
+pub inline fn _SEM_TIMEDWAIT(s: anytype, t: anytype) @TypeOf(sem_timedwait(s, t)) {
+    return sem_timedwait(s, t);
+}
+pub inline fn _SEM_CLOCKWAIT(s: anytype, c: anytype, t: anytype) @TypeOf(sem_clockwait(s, c, t)) {
+    return sem_clockwait(s, c, t);
+}
+pub inline fn _SEM_GETVALUE(s: anytype, v: anytype) @TypeOf(sem_getvalue(s, v)) {
+    return sem_getvalue(s, v);
+}
+pub inline fn _SEM_POST(s: anytype) @TypeOf(sem_post(s)) {
+    return sem_post(s);
+}
+pub inline fn _SEM_GETPROTOCOL(s: anytype, p: anytype) @TypeOf(sem_getprotocol(s, p)) {
+    return sem_getprotocol(s, p);
+}
+pub inline fn _SEM_SETPROTOCOL(s: anytype, p: anytype) @TypeOf(sem_setprotocol(s, p)) {
+    return sem_setprotocol(s, p);
+}
+pub inline fn _SEM_ERRNO(r: anytype) @TypeOf(errno) {
+    _ = r;
+    return errno;
+}
+pub inline fn _SEM_ERRVAL(r: anytype) @TypeOf(-errno) {
+    _ = r;
+    return -errno;
+}
+pub inline fn nxsem_get_protocol(s: anytype, p: anytype) @TypeOf(sem_getprotocol(s, p)) {
+    return sem_getprotocol(s, p);
+}
+pub const NXRMUTEX_NO_HOLDER = @import("std").zig.c_translation.cast(pid_t, -@as(c_int, 1));
+pub const NXMUTEX_INITIALIZER = SEM_INITIALIZER(@as(c_int, 1));
+pub const _NX_OPEN = open;
+pub inline fn _NX_CLOSE(f: anytype) @TypeOf(close(f)) {
+    return close(f);
+}
+pub inline fn _NX_READ(f: anytype, b: anytype, s: anytype) @TypeOf(read(f, b, s)) {
+    return read(f, b, s);
+}
+pub inline fn _NX_WRITE(f: anytype, b: anytype, s: anytype) @TypeOf(write(f, b, s)) {
+    return write(f, b, s);
+}
+pub inline fn _NX_SEEK(f: anytype, o: anytype, w: anytype) @TypeOf(lseek(f, o, w)) {
+    return lseek(f, o, w);
+}
+pub inline fn _NX_IOCTL(f: anytype, r: anytype, a: anytype) @TypeOf(ioctl(f, r, a)) {
+    return ioctl(f, r, a);
+}
+pub inline fn _NX_STAT(p: anytype, s: anytype) @TypeOf(stat(p, s)) {
+    return stat(p, s);
+}
+pub inline fn _NX_GETERRNO(r: anytype) @TypeOf(errno) {
+    _ = r;
+    return errno;
+}
+pub const _NX_SETERRNO = @import("std").zig.c_translation.Macros.DISCARD;
+pub inline fn _NX_GETERRVAL(r: anytype) @TypeOf(-errno) {
+    _ = r;
+    return -errno;
+}
+pub const __FS_FLAG_EOF = @as(c_int, 1) << @as(c_int, 0);
+pub const __FS_FLAG_ERROR = @as(c_int, 1) << @as(c_int, 1);
+pub const __FS_FLAG_LBF = @as(c_int, 1) << @as(c_int, 2);
+pub const __FS_FLAG_UBF = @as(c_int, 1) << @as(c_int, 3);
+pub const FSNODEFLAG_TYPE_MASK = @as(c_int, 0x0000000f);
+pub const FSNODEFLAG_TYPE_PSEUDODIR = @as(c_int, 0x00000000);
+pub const FSNODEFLAG_TYPE_DRIVER = @as(c_int, 0x00000001);
+pub const FSNODEFLAG_TYPE_BLOCK = @as(c_int, 0x00000002);
+pub const FSNODEFLAG_TYPE_MOUNTPT = @as(c_int, 0x00000003);
+pub const FSNODEFLAG_TYPE_NAMEDSEM = @as(c_int, 0x00000004);
+pub const FSNODEFLAG_TYPE_MQUEUE = @as(c_int, 0x00000005);
+pub const FSNODEFLAG_TYPE_SHM = @as(c_int, 0x00000006);
+pub const FSNODEFLAG_TYPE_MTD = @as(c_int, 0x00000007);
+pub const FSNODEFLAG_TYPE_SOFTLINK = @as(c_int, 0x00000008);
+pub const FSNODEFLAG_TYPE_SOCKET = @as(c_int, 0x00000009);
+pub const FSNODEFLAG_DELETED = @as(c_int, 0x00000010);
+pub inline fn INODE_IS_TYPE(i: anytype, t: anytype) @TypeOf((i.*.i_flags & FSNODEFLAG_TYPE_MASK) == t) {
+    return (i.*.i_flags & FSNODEFLAG_TYPE_MASK) == t;
+}
+pub inline fn INODE_IS_PSEUDODIR(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_PSEUDODIR)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_PSEUDODIR);
+}
+pub inline fn INODE_IS_DRIVER(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_DRIVER)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_DRIVER);
+}
+pub inline fn INODE_IS_BLOCK(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_BLOCK)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_BLOCK);
+}
+pub inline fn INODE_IS_MOUNTPT(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT);
+}
+pub inline fn INODE_IS_NAMEDSEM(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM);
+}
+pub inline fn INODE_IS_MQUEUE(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MQUEUE)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MQUEUE);
+}
+pub inline fn INODE_IS_SHM(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SHM)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SHM);
+}
+pub inline fn INODE_IS_MTD(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MTD)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MTD);
+}
+pub inline fn INODE_IS_SOFTLINK(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK);
+}
+pub inline fn INODE_IS_SOCKET(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOCKET)) {
+    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOCKET);
+}
+pub inline fn INODE_GET_TYPE(i: anytype) @TypeOf(i.*.i_flags & FSNODEFLAG_TYPE_MASK) {
+    return i.*.i_flags & FSNODEFLAG_TYPE_MASK;
+}
+pub inline fn INODE_SET_DRIVER(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_DRIVER)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_DRIVER);
+}
+pub inline fn INODE_SET_BLOCK(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_BLOCK)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_BLOCK);
+}
+pub inline fn INODE_SET_MOUNTPT(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT);
+}
+pub inline fn INODE_SET_NAMEDSEM(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM);
+}
+pub inline fn INODE_SET_MQUEUE(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MQUEUE)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MQUEUE);
+}
+pub inline fn INODE_SET_SHM(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SHM)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SHM);
+}
+pub inline fn INODE_SET_MTD(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MTD)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MTD);
+}
+pub inline fn INODE_SET_SOFTLINK(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK);
+}
+pub inline fn INODE_SET_SOCKET(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOCKET)) {
+    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOCKET);
+}
+pub const DIRENTFLAGS_PSEUDONODE = @as(c_int, 1);
+pub inline fn DIRENT_ISPSEUDONODE(f: anytype) @TypeOf((f & DIRENTFLAGS_PSEUDONODE) != @as(c_int, 0)) {
+    return (f & DIRENTFLAGS_PSEUDONODE) != @as(c_int, 0);
+}
+pub const CH_STAT_MODE = @as(c_int, 1) << @as(c_int, 0);
+pub const CH_STAT_UID = @as(c_int, 1) << @as(c_int, 1);
+pub const CH_STAT_GID = @as(c_int, 1) << @as(c_int, 2);
+pub const CH_STAT_ATIME = @as(c_int, 1) << @as(c_int, 3);
+pub const CH_STAT_MTIME = @as(c_int, 1) << @as(c_int, 4);
+pub inline fn FSNODE_SIZE(n: anytype) @TypeOf(@import("std").zig.c_translation.sizeof(struct_inode) + n) {
+    return @import("std").zig.c_translation.sizeof(struct_inode) + n;
 }
 pub const __INCLUDE_NUTTX_SENSORS_IOCTL_H = "";
 pub const __INCLUDE_NUTTX_FS_IOCTL_H = "";
@@ -3006,6 +3754,7 @@ pub const BIOC_DEBUGCMD = _BIOC(@as(c_int, 0x000b));
 pub const BIOC_GEOMETRY = _BIOC(@as(c_int, 0x000c));
 pub const BIOC_FLUSH = _BIOC(@as(c_int, 0x000d));
 pub const BIOC_PARTINFO = _BIOC(@as(c_int, 0x000e));
+pub const BIOC_BLKSSZGET = _BIOC(@as(c_int, 0x000f));
 pub inline fn _MTDIOCVALID(c: anytype) @TypeOf(_IOC_TYPE(c) == _MTDIOCBASE) {
     return _IOC_TYPE(c) == _MTDIOCBASE;
 }
@@ -3362,7 +4111,6 @@ pub const SNIOC_ABCLOGIC = _SNIOC(@as(c_int, 0x0041));
 pub const SNIOC_LSM6DSLSENSORREAD = _SNIOC(@as(c_int, 0x0046));
 pub const SNIOC_LSM303AGRSENSORREAD = _SNIOC(@as(c_int, 0x0051));
 pub const SNIOC_CHANGE_SMBUSADDR = _SNIOC(@as(c_int, 0x0053));
-pub const SNIOC_SET_INTERVAL = _SNIOC(@as(c_int, 0x0054));
 pub const SNIOC_SET_TEMP_OFFSET = _SNIOC(@as(c_int, 0x0055));
 pub const SNIOC_SET_PRESSURE_COMP = _SNIOC(@as(c_int, 0x0056));
 pub const SNIOC_SET_ALTITUDE_COMP = _SNIOC(@as(c_int, 0x0057));
@@ -3384,13 +4132,16 @@ pub const SNIOC_SET_RANGE = _SNIOC(@as(c_int, 0x0066));
 pub const SNIOC_READADDR = SNIOC_READID;
 pub const SNIOC_READROMCODE = _SNIOC(@as(c_int, 0x0067));
 pub const SNIOC_SETALARM = _SNIOC(@as(c_int, 0x0068));
-pub const SNIOC_ACTIVATE = _SNIOC(@as(c_int, 0x0080));
+pub const SNIOC_GET_STATE = _SNIOC(@as(c_int, 0x0080));
+pub const SNIOC_SET_INTERVAL = _SNIOC(@as(c_int, 0x0081));
 pub const SNIOC_BATCH = _SNIOC(@as(c_int, 0x0082));
-pub const SNIOC_GET_NEVENTBUF = _SNIOC(@as(c_int, 0x0083));
+pub const SNIOC_SET_USERPRIV = _SNIOC(@as(c_int, 0x0083));
 pub const SNIOC_SET_BUFFER_NUMBER = _SNIOC(@as(c_int, 0x0084));
 pub const SNIOC_GET_POSITION = _SNIOC(@as(c_int, 0x0085));
 pub const SNIOC_SELFTEST = _SNIOC(@as(c_int, 0x0086));
 pub const SNIOC_SET_CALIBVALUE = _SNIOC(@as(c_int, 0x0087));
+pub const SNIOC_UPDATED = _SNIOC(@as(c_int, 0x0091));
+pub const SNIOC_GET_USTATE = _SNIOC(@as(c_int, 0x0092));
 pub const SENSOR_TYPE_CUSTOM = @as(c_int, 0);
 pub const SENSOR_TYPE_ACCELEROMETER = @as(c_int, 1);
 pub const SENSOR_TYPE_MAGNETIC_FIELD = @as(c_int, 2);
@@ -3422,7 +4173,11 @@ pub const SENSOR_TYPE_PPGQ = @as(c_int, 27);
 pub const SENSOR_TYPE_IMPEDANCE = @as(c_int, 28);
 pub const SENSOR_TYPE_OTS = @as(c_int, 29);
 pub const SENSOR_TYPE_GPS_SATELLITE = @as(c_int, 30);
-pub const SENSOR_TYPE_COUNT = @as(c_int, 31);
+pub const SENSOR_TYPE_WAKE_GESTURE = @as(c_int, 31);
+pub const SENSOR_TYPE_CAP = @as(c_int, 32);
+pub const SENSOR_TYPE_COUNT = @as(c_int, 33);
+pub const SENSOR_REMOTE = @as(c_int, 1) << @as(c_int, 31);
+pub const SENSOR_PERSIST = @as(c_int, 1) << @as(c_int, 30);
 pub const __INCLUDE_SYS_IOCTL_H = "";
 pub const __CLANG_INTTYPES_H = "";
 pub const __INCLUDE_INTTYPES_H = "";
@@ -3608,201 +4363,11 @@ pub const SCNiOFF = SCNi32;
 pub const SCNoOFF = SCNo32;
 pub const SCNuOFF = SCNu32;
 pub const SCNxOFF = SCNx32;
-pub const __INCLUDE_UNISTD_H = "";
-pub const __CLANG_LIMITS_H = "";
-pub const _GCC_LIMITS_H_ = "";
-pub const LONG_LONG_MAX = __LONG_LONG_MAX__;
-pub const LONG_LONG_MIN = -__LONG_LONG_MAX__ - @as(c_longlong, 1);
-pub const ULONG_LONG_MAX = (__LONG_LONG_MAX__ * @as(c_ulonglong, 2)) + @as(c_ulonglong, 1);
-pub const SEEK_SET = @as(c_int, 0);
-pub const SEEK_CUR = @as(c_int, 1);
-pub const SEEK_END = @as(c_int, 2);
-pub const F_OK = @as(c_int, 0);
-pub const X_OK = @as(c_int, 1);
-pub const W_OK = @as(c_int, 2);
-pub const R_OK = @as(c_int, 4);
-pub const POSIX_VERSION = "";
-pub const _POSIX_REALTIME_SIGNALS = @as(c_int, 1);
-pub const _POSIX_MESSAGE_PASSING = @as(c_int, 1);
-pub const _POSIX_PRIORITY_SCHEDULING = @as(c_int, 1);
-pub const _POSIX_TIMERS = @as(c_int, 1);
-pub const _POSIX_TIMEOUTS = @as(c_int, 1);
-pub const _POSIX_SYNCHRONIZED_IO = @as(c_int, 1);
-pub const _POSIX_SPORADIC_SERVER = -@as(c_int, 1);
-pub const _POSIX_THREAD_SPORADIC_SERVER = -@as(c_int, 1);
-pub const _POSIX_SYNC_IO = @as(c_int, 1);
-pub const _PC_2_SYMLINKS = @as(c_int, 0x0001);
-pub const _PC_ALLOC_SIZE_MIN = @as(c_int, 0x0002);
-pub const _PC_ASYNC_IO = @as(c_int, 0x0003);
-pub const _PC_CHOWN_RESTRICTED = @as(c_int, 0x0004);
-pub const _PC_FILESIZEBITS = @as(c_int, 0x0005);
-pub const _PC_LINK_MAX = @as(c_int, 0x0006);
-pub const _PC_MAX_CANON = @as(c_int, 0x0007);
-pub const _PC_MAX_INPUT = @as(c_int, 0x0008);
-pub const _PC_NAME_MAX = @as(c_int, 0x0009);
-pub const _PC_NO_TRUNC = @as(c_int, 0x000a);
-pub const _PC_PATH_MAX = @as(c_int, 0x000b);
-pub const _PC_PIPE_BUF = @as(c_int, 0x000c);
-pub const _PC_PRIO_IO = @as(c_int, 0x000d);
-pub const _PC_REC_INCR_XFER_SIZE = @as(c_int, 0x000e);
-pub const _PC_REC_MIN_XFER_SIZE = @as(c_int, 0x000f);
-pub const _PC_REC_XFER_ALIGN = @as(c_int, 0x0010);
-pub const _PC_SYMLINK_MAX = @as(c_int, 0x0011);
-pub const _PC_SYNC_IO = @as(c_int, 0x0012);
-pub const _PC_VDISABLE = @as(c_int, 0x0013);
-pub const _SC_2_C_BIND = @as(c_int, 0x0001);
-pub const _SC_2_C_DEV = @as(c_int, 0x0002);
-pub const _SC_2_CHAR_TERM = @as(c_int, 0x0003);
-pub const _SC_2_FORT_DEV = @as(c_int, 0x0004);
-pub const _SC_2_FORT_RUN = @as(c_int, 0x0005);
-pub const _SC_2_LOCALEDEF = @as(c_int, 0x0006);
-pub const _SC_2_PBS = @as(c_int, 0x0007);
-pub const _SC_2_PBS_ACCOUNTING = @as(c_int, 0x0008);
-pub const _SC_2_PBS_CHECKPOINT = @as(c_int, 0x0009);
-pub const _SC_2_PBS_LOCATE = @as(c_int, 0x000a);
-pub const _SC_2_PBS_MESSAGE = @as(c_int, 0x000b);
-pub const _SC_2_PBS_TRACK = @as(c_int, 0x000c);
-pub const _SC_2_SW_DEV = @as(c_int, 0x000d);
-pub const _SC_2_UPE = @as(c_int, 0x000e);
-pub const _SC_2_VERSION = @as(c_int, 0x000f);
-pub const _SC_ADVISORY_INFO = @as(c_int, 0x0010);
-pub const _SC_AIO_LISTIO_MAX = @as(c_int, 0x0011);
-pub const _SC_AIO_MAX = @as(c_int, 0x0012);
-pub const _SC_AIO_PRIO_DELTA_MAX = @as(c_int, 0x0013);
-pub const _SC_ARG_MAX = @as(c_int, 0x0014);
-pub const _SC_ASYNCHRONOUS_IO = @as(c_int, 0x0015);
-pub const _SC_ATEXIT_MAX = @as(c_int, 0x0016);
-pub const _SC_BARRIERS = @as(c_int, 0x0017);
-pub const _SC_BC_BASE_MAX = @as(c_int, 0x0018);
-pub const _SC_BC_DIM_MAX = @as(c_int, 0x0019);
-pub const _SC_BC_SCALE_MAX = @as(c_int, 0x001a);
-pub const _SC_BC_STRING_MAX = @as(c_int, 0x001b);
-pub const _SC_CHILD_MAX = @as(c_int, 0x001c);
-pub const _SC_CLK_TCK = @as(c_int, 0x001d);
-pub const _SC_CLOCK_SELECTION = @as(c_int, 0x001e);
-pub const _SC_COLL_WEIGHTS_MAX = @as(c_int, 0x001f);
-pub const _SC_CPUTIME = @as(c_int, 0x0020);
-pub const _SC_DELAYTIMER_MAX = @as(c_int, 0x0021);
-pub const _SC_EXPR_NEST_MAX = @as(c_int, 0x0022);
-pub const _SC_FSYNC = @as(c_int, 0x0023);
-pub const _SC_GETGR_R_SIZE_MAX = @as(c_int, 0x0024);
-pub const _SC_GETPW_R_SIZE_MAX = @as(c_int, 0x0025);
-pub const _SC_HOST_NAME_MAX = @as(c_int, 0x0026);
-pub const _SC_IOV_MAX = @as(c_int, 0x0027);
-pub const _SC_IPV6 = @as(c_int, 0x0028);
-pub const _SC_JOB_CONTROL = @as(c_int, 0x0029);
-pub const _SC_LINE_MAX = @as(c_int, 0x002a);
-pub const _SC_LOGIN_NAME_MAX = @as(c_int, 0x002b);
-pub const _SC_MAPPED_FILES = @as(c_int, 0x002c);
-pub const _SC_MEMLOCK = @as(c_int, 0x002d);
-pub const _SC_MEMLOCK_RANGE = @as(c_int, 0x002e);
-pub const _SC_MEMORY_PROTECTION = @as(c_int, 0x002f);
-pub const _SC_MESSAGE_PASSING = @as(c_int, 0x0030);
-pub const _SC_MONOTONIC_CLOCK = @as(c_int, 0x0031);
-pub const _SC_MQ_OPEN_MAX = @as(c_int, 0x0032);
-pub const _SC_MQ_PRIO_MAX = @as(c_int, 0x0033);
-pub const _SC_NGROUPS_MAX = @as(c_int, 0x0034);
-pub const _SC_OPEN_MAX = @as(c_int, 0x0035);
-pub const _SC_PAGE_SIZE = @as(c_int, 0x0036);
-pub const _SC_PAGESIZE = _SC_PAGE_SIZE;
-pub const _SC_PRIORITIZED_IO = @as(c_int, 0x0037);
-pub const _SC_PRIORITY_SCHEDULING = @as(c_int, 0x0038);
-pub const _SC_RAW_SOCKETS = @as(c_int, 0x0039);
-pub const _SC_RE_DUP_MAX = @as(c_int, 0x003a);
-pub const _SC_READER_WRITER_LOCKS = @as(c_int, 0x003b);
-pub const _SC_REALTIME_SIGNALS = @as(c_int, 0x003c);
-pub const _SC_REGEXP = @as(c_int, 0x003d);
-pub const _SC_RTSIG_MAX = @as(c_int, 0x003e);
-pub const _SC_SAVED_IDS = @as(c_int, 0x003f);
-pub const _SC_SEM_NSEMS_MAX = @as(c_int, 0x0040);
-pub const _SC_SEM_VALUE_MAX = @as(c_int, 0x0041);
-pub const _SC_SEMAPHORES = @as(c_int, 0x0042);
-pub const _SC_SHARED_MEMORY_OBJECTS = @as(c_int, 0x0043);
-pub const _SC_SHELL = @as(c_int, 0x0044);
-pub const _SC_SIGQUEUE_MAX = @as(c_int, 0x0045);
-pub const _SC_SPAWN = @as(c_int, 0x0046);
-pub const _SC_SPIN_LOCKS = @as(c_int, 0x0047);
-pub const _SC_SPORADIC_SERVER = @as(c_int, 0x0048);
-pub const _SC_SS_REPL_MAX = @as(c_int, 0x0049);
-pub const _SC_STREAM_MAX = @as(c_int, 0x004a);
-pub const _SC_SYMLOOP_MAX = @as(c_int, 0x004b);
-pub const _SC_SYNCHRONIZED_IO = @as(c_int, 0x004c);
-pub const _SC_THREAD_ATTR_STACKADDR = @as(c_int, 0x004d);
-pub const _SC_THREAD_ATTR_STACKSIZE = @as(c_int, 0x004e);
-pub const _SC_THREAD_CPUTIME = @as(c_int, 0x004f);
-pub const _SC_THREAD_DESTRUCTOR_ITERATIONS = @as(c_int, 0x0050);
-pub const _SC_THREAD_KEYS_MAX = @as(c_int, 0x0051);
-pub const _SC_THREAD_PRIO_INHERIT = @as(c_int, 0x0052);
-pub const _SC_THREAD_PRIO_PROTECT = @as(c_int, 0x0053);
-pub const _SC_THREAD_PRIORITY_SCHEDULING = @as(c_int, 0x0054);
-pub const _SC_THREAD_PROCESS_SHARED = @as(c_int, 0x0055);
-pub const _SC_THREAD_SAFE_FUNCTIONS = @as(c_int, 0x0056);
-pub const _SC_THREAD_SPORADIC_SERVER = @as(c_int, 0x0057);
-pub const _SC_THREAD_STACK_MIN = @as(c_int, 0x0058);
-pub const _SC_THREAD_THREADS_MAX = @as(c_int, 0x0059);
-pub const _SC_THREADS = @as(c_int, 0x005a);
-pub const _SC_TIMEOUTS = @as(c_int, 0x005b);
-pub const _SC_TIMER_MAX = @as(c_int, 0x005c);
-pub const _SC_TIMERS = @as(c_int, 0x005d);
-pub const _SC_TRACE = @as(c_int, 0x005e);
-pub const _SC_TRACE_EVENT_FILTER = @as(c_int, 0x005f);
-pub const _SC_TRACE_EVENT_NAME_MAX = @as(c_int, 0x0060);
-pub const _SC_TRACE_INHERIT = @as(c_int, 0x0061);
-pub const _SC_TRACE_LOG = @as(c_int, 0x0062);
-pub const _SC_TRACE_NAME_MAX = @as(c_int, 0x0063);
-pub const _SC_TRACE_SYS_MAX = @as(c_int, 0x0064);
-pub const _SC_TRACE_USER_EVENT_MAX = @as(c_int, 0x0065);
-pub const _SC_TTY_NAME_MAX = @as(c_int, 0x0066);
-pub const _SC_TYPED_MEMORY_OBJECTS = @as(c_int, 0x0067);
-pub const _SC_TZNAME_MAX = @as(c_int, 0x0068);
-pub const _SC_V6_ILP32_OFF32 = @as(c_int, 0x0069);
-pub const _SC_V6_ILP32_OFFBIG = @as(c_int, 0x006a);
-pub const _SC_V6_LP64_OFF64 = @as(c_int, 0x006b);
-pub const _SC_V6_LPBIG_OFFBIG = @as(c_int, 0x006c);
-pub const _SC_VERSION = @as(c_int, 0x006d);
-pub const _SC_XBS5_ILP32_OFF32 = @as(c_int, 0x006e);
-pub const _SC_XBS5_ILP32_OFFBIG = @as(c_int, 0x006f);
-pub const _SC_XBS5_LP64_OFF64 = @as(c_int, 0x0070);
-pub const _SC_XBS5_LPBIG_OFFBIG = @as(c_int, 0x0071);
-pub const _SC_XOPEN_CRYPT = @as(c_int, 0x0072);
-pub const _SC_XOPEN_ENH_I18N = @as(c_int, 0x0073);
-pub const _SC_XOPEN_LEGACY = @as(c_int, 0x0074);
-pub const _SC_XOPEN_REALTIME = @as(c_int, 0x0075);
-pub const _SC_XOPEN_REALTIME_THREADS = @as(c_int, 0x0076);
-pub const _SC_XOPEN_SHM = @as(c_int, 0x0077);
-pub const _SC_XOPEN_STREAMS = @as(c_int, 0x0078);
-pub const _SC_XOPEN_UNIX = @as(c_int, 0x0079);
-pub const _SC_XOPEN_VERSION = @as(c_int, 0x007a);
-pub const _SC_PHYS_PAGES = @as(c_int, 0x007b);
-pub const _SC_AVPHYS_PAGES = @as(c_int, 0x007c);
-pub const _SC_NPROCESSORS_CONF = @as(c_int, 0x007d);
-pub const _SC_NPROCESSORS_ONLN = @as(c_int, 0x007e);
-pub const STDERR_FILENO = @as(c_int, 2);
-pub const STDIN_FILENO = @as(c_int, 0);
-pub const STDOUT_FILENO = @as(c_int, 1);
-pub inline fn link(p1: anytype, p2: anytype) @TypeOf(symlink(p1, p2)) {
-    return symlink(p1, p2);
-}
-pub inline fn fdatasync(f: anytype) @TypeOf(fsync(f)) {
-    return fsync(f);
-}
-pub inline fn getdtablesize(f: anytype) c_int {
-    _ = f;
-    return @import("std").zig.c_translation.cast(c_int, sysconf(_SC_OPEN_MAX));
-}
-pub inline fn getpagesize(f: anytype) c_int {
-    _ = f;
-    return @import("std").zig.c_translation.cast(c_int, sysconf(_SC_PAGESIZE));
-}
-pub const optarg = getoptargp().*;
-pub const opterr = getopterrp().*;
-pub const optind = getoptindp().*;
-pub const optopt = getoptoptp().*;
 pub const __INCLUDE_STDLIB_H = "";
 pub const EXIT_SUCCESS = @as(c_int, 0);
 pub const EXIT_FAILURE = @as(c_int, 1);
 pub const RAND_MAX = INT_MAX;
-pub const MB_CUR_MAX = @as(c_int, 1);
+pub const MB_CUR_MAX = @as(c_int, 4);
 pub const environ = NULL;
 pub inline fn strtof_l(s: anytype, e: anytype, l: anytype) @TypeOf(strtof(s, e)) {
     _ = l;
@@ -3828,532 +4393,6 @@ pub inline fn srandom(s: anytype) @TypeOf(srand(s)) {
     return srand(s);
 }
 pub const __INCLUDE_STDIO_H = "";
-pub const __STDARG_H = "";
-pub const _VA_LIST = "";
-pub const __GNUC_VA_LIST = @as(c_int, 1);
-pub const __INCLUDE_NUTTX_FS_FS_H = "";
-pub const __INCLUDE_NUTTX_MUTEX_H = "";
-pub const __INCLUDE_ERRNO_H = "";
-pub const errno = __errno().*;
-pub inline fn get_errno() @TypeOf(errno) {
-    return errno;
-}
-pub const EPERM = @as(c_int, 1);
-pub const EPERM_STR = "Operation not permitted";
-pub const ENOENT = @as(c_int, 2);
-pub const ENOENT_STR = "No such file or directory";
-pub const ESRCH = @as(c_int, 3);
-pub const ESRCH_STR = "No such process";
-pub const EINTR = @as(c_int, 4);
-pub const EINTR_STR = "Interrupted system call";
-pub const EIO = @as(c_int, 5);
-pub const EIO_STR = "I/O error";
-pub const ENXIO = @as(c_int, 6);
-pub const ENXIO_STR = "No such device or address";
-pub const E2BIG = @as(c_int, 7);
-pub const E2BIG_STR = "Arg list too long";
-pub const ENOEXEC = @as(c_int, 8);
-pub const ENOEXEC_STR = "Exec format error";
-pub const EBADF = @as(c_int, 9);
-pub const EBADF_STR = "Bad file number";
-pub const ECHILD = @as(c_int, 10);
-pub const ECHILD_STR = "No child processes";
-pub const EAGAIN = @as(c_int, 11);
-pub const EWOULDBLOCK = EAGAIN;
-pub const EAGAIN_STR = "Try again";
-pub const ENOMEM = @as(c_int, 12);
-pub const ENOMEM_STR = "Out of memory";
-pub const EACCES = @as(c_int, 13);
-pub const EACCES_STR = "Permission denied";
-pub const EFAULT = @as(c_int, 14);
-pub const EFAULT_STR = "Bad address";
-pub const ENOTBLK = @as(c_int, 15);
-pub const ENOTBLK_STR = "Block device required";
-pub const EBUSY = @as(c_int, 16);
-pub const EBUSY_STR = "Device or resource busy";
-pub const EEXIST = @as(c_int, 17);
-pub const EEXIST_STR = "File exists";
-pub const EXDEV = @as(c_int, 18);
-pub const EXDEV_STR = "Cross-device link";
-pub const ENODEV = @as(c_int, 19);
-pub const ENODEV_STR = "No such device";
-pub const ENOTDIR = @as(c_int, 20);
-pub const ENOTDIR_STR = "Not a directory";
-pub const EISDIR = @as(c_int, 21);
-pub const EISDIR_STR = "Is a directory";
-pub const EINVAL = @as(c_int, 22);
-pub const EINVAL_STR = "Invalid argument";
-pub const ENFILE = @as(c_int, 23);
-pub const ENFILE_STR = "File table overflow";
-pub const EMFILE = @as(c_int, 24);
-pub const EMFILE_STR = "Too many open files";
-pub const ENOTTY = @as(c_int, 25);
-pub const ENOTTY_STR = "Not a typewriter";
-pub const ETXTBSY = @as(c_int, 26);
-pub const ETXTBSY_STR = "Text file busy";
-pub const EFBIG = @as(c_int, 27);
-pub const EFBIG_STR = "File too large";
-pub const ENOSPC = @as(c_int, 28);
-pub const ENOSPC_STR = "No space left on device";
-pub const ESPIPE = @as(c_int, 29);
-pub const ESPIPE_STR = "Illegal seek";
-pub const EROFS = @as(c_int, 30);
-pub const EROFS_STR = "Read-only file system";
-pub const EMLINK = @as(c_int, 31);
-pub const EMLINK_STR = "Too many links";
-pub const EPIPE = @as(c_int, 32);
-pub const EPIPE_STR = "Broken pipe";
-pub const EDOM = @as(c_int, 33);
-pub const EDOM_STR = "Math argument out of domain of func";
-pub const ERANGE = @as(c_int, 34);
-pub const ERANGE_STR = "Math result not representable";
-pub const ENOMSG = @as(c_int, 35);
-pub const ENOMSG_STR = "No message of desired type";
-pub const EIDRM = @as(c_int, 36);
-pub const EIDRM_STR = "Identifier removed";
-pub const ECHRNG = @as(c_int, 37);
-pub const ECHRNG_STR = "Channel number out of range";
-pub const EL2NSYNC = @as(c_int, 38);
-pub const EL2NSYNC_STR = "Level 2 not synchronized";
-pub const EL3HLT = @as(c_int, 39);
-pub const EL3HLT_STR = "Level 3 halted";
-pub const EL3RST = @as(c_int, 40);
-pub const EL3RST_STR = "Level 3 reset";
-pub const ELNRNG = @as(c_int, 41);
-pub const ELNRNG_STR = "Link number out of range";
-pub const EUNATCH = @as(c_int, 42);
-pub const EUNATCH_STR = "Protocol driver not attached";
-pub const ENOCSI = @as(c_int, 43);
-pub const ENOCSI_STR = "No CSI structure available";
-pub const EL2HLT = @as(c_int, 44);
-pub const EL2HLT_STR = "Level 2 halted";
-pub const EDEADLK = @as(c_int, 45);
-pub const EDEADLK_STR = "Resource deadlock would occur";
-pub const ENOLCK = @as(c_int, 46);
-pub const ENOLCK_STR = "No record locks available";
-pub const EBADE = @as(c_int, 50);
-pub const EBADE_STR = "Invalid exchange";
-pub const EBADR = @as(c_int, 51);
-pub const EBADR_STR = "Invalid request descriptor";
-pub const EXFULL = @as(c_int, 52);
-pub const EXFULL_STR = "Exchange full";
-pub const ENOANO = @as(c_int, 53);
-pub const ENOANO_STR = "No anode";
-pub const EBADRQC = @as(c_int, 54);
-pub const EBADRQC_STR = "Invalid request code";
-pub const EBADSLT = @as(c_int, 55);
-pub const EBADSLT_STR = "Invalid slot";
-pub const EDEADLOCK = @as(c_int, 56);
-pub const EDEADLOCK_STR = "File locking deadlock error";
-pub const EBFONT = @as(c_int, 57);
-pub const EBFONT_STR = "Bad font file format";
-pub const ENOSTR = @as(c_int, 60);
-pub const ENOSTR_STR = "Device not a stream";
-pub const ENODATA = @as(c_int, 61);
-pub const ENODATA_STR = "No data available";
-pub const ETIME = @as(c_int, 62);
-pub const ETIME_STR = "Timer expired";
-pub const ENOSR = @as(c_int, 63);
-pub const ENOSR_STR = "Out of streams resources";
-pub const ENONET = @as(c_int, 64);
-pub const ENONET_STR = "Machine is not on the network";
-pub const ENOPKG = @as(c_int, 65);
-pub const ENOPKG_STR = "Package not installed";
-pub const EREMOTE = @as(c_int, 66);
-pub const EREMOTE_STR = "Object is remote";
-pub const ENOLINK = @as(c_int, 67);
-pub const ENOLINK_STR = "Link has been severed";
-pub const EADV = @as(c_int, 68);
-pub const EADV_STR = "Advertise error";
-pub const ESRMNT = @as(c_int, 69);
-pub const ESRMNT_STR = "Srmount error";
-pub const ECOMM = @as(c_int, 70);
-pub const ECOMM_STR = "Communication error on send";
-pub const EPROTO = @as(c_int, 71);
-pub const EPROTO_STR = "Protocol error";
-pub const EMULTIHOP = @as(c_int, 74);
-pub const EMULTIHOP_STR = "Multihop attempted";
-pub const ELBIN = @as(c_int, 75);
-pub const ELBIN_STR = "Inode is remote";
-pub const EDOTDOT = @as(c_int, 76);
-pub const EDOTDOT_STR = "RFS specific error";
-pub const EBADMSG = @as(c_int, 77);
-pub const EBADMSG_STR = "Not a data message";
-pub const EFTYPE = @as(c_int, 79);
-pub const EFTYPE_STR = "Inappropriate file type or format";
-pub const ENOTUNIQ = @as(c_int, 80);
-pub const ENOTUNIQ_STR = "Name not unique on network";
-pub const EBADFD = @as(c_int, 81);
-pub const EBADFD_STR = "File descriptor in bad state";
-pub const EREMCHG = @as(c_int, 82);
-pub const EREMCHG_STR = "Remote address changed";
-pub const ELIBACC = @as(c_int, 83);
-pub const ELIBACC_STR = "Can not access a needed shared library";
-pub const ELIBBAD = @as(c_int, 84);
-pub const ELIBBAD_STR = "Accessing a corrupted shared library";
-pub const ELIBSCN = @as(c_int, 85);
-pub const ELIBSCN_STR = ".lib section in a.out corrupted";
-pub const ELIBMAX = @as(c_int, 86);
-pub const ELIBMAX_STR = "Attempting to link in too many shared libraries";
-pub const ELIBEXEC = @as(c_int, 87);
-pub const ELIBEXEC_STR = "Cannot exec a shared library directly";
-pub const ENOSYS = @as(c_int, 88);
-pub const ENOSYS_STR = "Function not implemented";
-pub const ENMFILE = @as(c_int, 89);
-pub const ENMFILE_STR = "No more files";
-pub const ENOTEMPTY = @as(c_int, 90);
-pub const ENOTEMPTY_STR = "Directory not empty";
-pub const ENAMETOOLONG = @as(c_int, 91);
-pub const ENAMETOOLONG_STR = "File name too long";
-pub const ELOOP = @as(c_int, 92);
-pub const ELOOP_STR = "Too many symbolic links encountered";
-pub const EOPNOTSUPP = @as(c_int, 95);
-pub const EOPNOTSUPP_STR = "Operation not supported on transport endpoint";
-pub const EPFNOSUPPORT = @as(c_int, 96);
-pub const EPFNOSUPPORT_STR = "Protocol family not supported";
-pub const ECONNRESET = @as(c_int, 104);
-pub const ECONNRESET_STR = "Connection reset by peer";
-pub const ENOBUFS = @as(c_int, 105);
-pub const ENOBUFS_STR = "No buffer space available";
-pub const EAFNOSUPPORT = @as(c_int, 106);
-pub const EAFNOSUPPORT_STR = "Address family not supported by protocol";
-pub const EPROTOTYPE = @as(c_int, 107);
-pub const EPROTOTYPE_STR = "Protocol wrong type for socket";
-pub const ENOTSOCK = @as(c_int, 108);
-pub const ENOTSOCK_STR = "Socket operation on non-socket";
-pub const ENOPROTOOPT = @as(c_int, 109);
-pub const ENOPROTOOPT_STR = "Protocol not available";
-pub const ESHUTDOWN = @as(c_int, 110);
-pub const ESHUTDOWN_STR = "Cannot send after transport endpoint shutdown";
-pub const ECONNREFUSED = @as(c_int, 111);
-pub const ECONNREFUSED_STR = "Connection refused";
-pub const EADDRINUSE = @as(c_int, 112);
-pub const EADDRINUSE_STR = "Address already in use";
-pub const ECONNABORTED = @as(c_int, 113);
-pub const ECONNABORTED_STR = "Software caused connection abort";
-pub const ENETUNREACH = @as(c_int, 114);
-pub const ENETUNREACH_STR = "Network is unreachable";
-pub const ENETDOWN = @as(c_int, 115);
-pub const ENETDOWN_STR = "Network is down";
-pub const ETIMEDOUT = @as(c_int, 116);
-pub const ETIMEDOUT_STR = "Connection timed out";
-pub const EHOSTDOWN = @as(c_int, 117);
-pub const EHOSTDOWN_STR = "Host is down";
-pub const EHOSTUNREACH = @as(c_int, 118);
-pub const EHOSTUNREACH_STR = "No route to host";
-pub const EINPROGRESS = @as(c_int, 119);
-pub const EINPROGRESS_STR = "Operation now in progress";
-pub const EALREADY = @as(c_int, 120);
-pub const EALREADY_STR = "Socket already connected";
-pub const EDESTADDRREQ = @as(c_int, 121);
-pub const EDESTADDRREQ_STR = "Destination address required";
-pub const EMSGSIZE = @as(c_int, 122);
-pub const EMSGSIZE_STR = "Message too long";
-pub const EPROTONOSUPPORT = @as(c_int, 123);
-pub const EPROTONOSUPPORT_STR = "Protocol not supported";
-pub const ESOCKTNOSUPPORT = @as(c_int, 124);
-pub const ESOCKTNOSUPPORT_STR = "Socket type not supported";
-pub const EADDRNOTAVAIL = @as(c_int, 125);
-pub const EADDRNOTAVAIL_STR = "Cannot assign requested address";
-pub const ENETRESET = @as(c_int, 126);
-pub const ENETRESET_STR = "Network dropped connection because of reset";
-pub const EISCONN = @as(c_int, 127);
-pub const EISCONN_STR = "Transport endpoint is already connected";
-pub const ENOTCONN = @as(c_int, 128);
-pub const ENOTCONN_STR = "Transport endpoint is not connected";
-pub const ETOOMANYREFS = @as(c_int, 129);
-pub const ETOOMANYREFS_STR = "Too many references: cannot splice";
-pub const EPROCLIM = @as(c_int, 130);
-pub const EPROCLIM_STR = "Limit would be exceeded by attempted fork";
-pub const EUSERS = @as(c_int, 131);
-pub const EUSERS_STR = "Too many users";
-pub const EDQUOT = @as(c_int, 132);
-pub const EDQUOT_STR = "Quota exceeded";
-pub const ESTALE = @as(c_int, 133);
-pub const ESTALE_STR = "Stale NFS file handle";
-pub const ENOTSUP = @as(c_int, 134);
-pub const ENOTSUP_STR = "Not supported";
-pub const ENOMEDIUM = @as(c_int, 135);
-pub const ENOMEDIUM_STR = "No medium found";
-pub const ENOSHARE = @as(c_int, 136);
-pub const ENOSHARE_STR = "No such host or network path";
-pub const ECASECLASH = @as(c_int, 137);
-pub const ECASECLASH_STR = "Filename exists with different case";
-pub const EILSEQ = @as(c_int, 138);
-pub const EILSEQ_STR = "Illegal byte sequence";
-pub const EOVERFLOW = @as(c_int, 139);
-pub const EOVERFLOW_STR = "Value too large for defined data type";
-pub const ECANCELED = @as(c_int, 140);
-pub const ECANCELED_STR = "Operation cancelled";
-pub const ENOTRECOVERABLE = @as(c_int, 141);
-pub const ENOTRECOVERABLE_STR = "State not recoverable";
-pub const EOWNERDEAD = @as(c_int, 142);
-pub const EOWNERDEAD_STR = "Previous owner died";
-pub const ESTRPIPE = @as(c_int, 143);
-pub const ESTRPIPE_STR = "Streams pipe error";
-pub const __ELASTERROR = @as(c_int, 2000);
-pub const __INCLUDE_ASSERT_H = "";
-pub inline fn DEBUGPANIC() @TypeOf(PANIC()) {
-    return PANIC();
-}
-pub inline fn DEBUGASSERT(f: anytype) @TypeOf(ASSERT(f)) {
-    return ASSERT(f);
-}
-pub inline fn DEBUGVERIFY(f: anytype) @TypeOf(VERIFY(f)) {
-    return VERIFY(f);
-}
-pub inline fn assert(f: anytype) anyopaque {
-    return @import("std").zig.c_translation.cast(anyopaque, (@as(c_int, 1) != 0) or (f != 0));
-}
-pub const __INCLUDE_NUTTX_SEMAPHORE_H = "";
-pub const __INCLUDE_SEMAPHORE_H = "";
-pub const SEM_PRIO_NONE = @as(c_int, 0);
-pub const SEM_PRIO_INHERIT = @as(c_int, 1);
-pub const SEM_PRIO_PROTECT = @as(c_int, 2);
-pub const PRIOINHERIT_FLAGS_DISABLE = @as(c_int, 1) << @as(c_int, 0);
-pub const __INCLUDE_NUTTX_CLOCK_H = "";
-pub const __HAVE_KERNEL_GLOBALS = @as(c_int, 1);
-pub const NSEC_PER_SEC = @as(c_long, 1000000000);
-pub const USEC_PER_SEC = @as(c_long, 1000000);
-pub const MSEC_PER_SEC = @as(c_int, 1000);
-pub const DSEC_PER_SEC = @as(c_int, 10);
-pub const HSEC_PER_SEC = @as(c_int, 2);
-pub const NSEC_PER_HSEC = @as(c_long, 500000000);
-pub const USEC_PER_HSEC = @as(c_long, 500000);
-pub const MSEC_PER_HSEC = @as(c_int, 500);
-pub const DSEC_PER_HSEC = @as(c_int, 5);
-pub const NSEC_PER_DSEC = @as(c_long, 100000000);
-pub const USEC_PER_DSEC = @as(c_long, 100000);
-pub const MSEC_PER_DSEC = @as(c_int, 100);
-pub const NSEC_PER_MSEC = @as(c_long, 1000000);
-pub const USEC_PER_MSEC = @as(c_int, 1000);
-pub const NSEC_PER_USEC = @as(c_int, 1000);
-pub const SEC_PER_MIN = @as(c_int, 60);
-pub const NSEC_PER_MIN = NSEC_PER_SEC * SEC_PER_MIN;
-pub const USEC_PER_MIN = USEC_PER_SEC * SEC_PER_MIN;
-pub const MSEC_PER_MIN = MSEC_PER_SEC * SEC_PER_MIN;
-pub const DSEC_PER_MIN = DSEC_PER_SEC * SEC_PER_MIN;
-pub const HSEC_PER_MIN = HSEC_PER_SEC * SEC_PER_MIN;
-pub const MIN_PER_HOUR = @as(c_int, 60);
-pub const NSEC_PER_HOUR = NSEC_PER_MIN * MIN_PER_HOUR;
-pub const USEC_PER_HOUR = USEC_PER_MIN * MIN_PER_HOUR;
-pub const MSEC_PER_HOUR = MSEC_PER_MIN * MIN_PER_HOUR;
-pub const DSEC_PER_HOUR = DSEC_PER_MIN * MIN_PER_HOUR;
-pub const HSEC_PER_HOUR = HSEC_PER_MIN * MIN_PER_HOUR;
-pub const SEC_PER_HOUR = SEC_PER_MIN * MIN_PER_HOUR;
-pub const HOURS_PER_DAY = @as(c_int, 24);
-pub const SEC_PER_DAY = HOURS_PER_DAY * SEC_PER_HOUR;
-pub const USEC_PER_TICK = CONFIG_USEC_PER_TICK;
-pub const TICK_PER_HOUR = USEC_PER_HOUR / USEC_PER_TICK;
-pub const TICK_PER_MIN = USEC_PER_MIN / USEC_PER_TICK;
-pub const TICK_PER_SEC = USEC_PER_SEC / USEC_PER_TICK;
-pub const TICK_PER_MSEC = USEC_PER_MSEC / USEC_PER_TICK;
-pub const TICK_PER_DSEC = USEC_PER_DSEC / USEC_PER_TICK;
-pub const TICK_PER_HSEC = USEC_PER_HSEC / USEC_PER_TICK;
-pub const MSEC_PER_TICK = USEC_PER_TICK / USEC_PER_MSEC;
-pub const NSEC_PER_TICK = USEC_PER_TICK * NSEC_PER_USEC;
-pub inline fn NSEC2TICK(nsec: anytype) @TypeOf((nsec + (NSEC_PER_TICK / @as(c_int, 2))) / NSEC_PER_TICK) {
-    return (nsec + (NSEC_PER_TICK / @as(c_int, 2))) / NSEC_PER_TICK;
-}
-pub inline fn USEC2TICK(usec: anytype) @TypeOf((usec + (USEC_PER_TICK / @as(c_int, 2))) / USEC_PER_TICK) {
-    return (usec + (USEC_PER_TICK / @as(c_int, 2))) / USEC_PER_TICK;
-}
-pub inline fn MSEC2TICK(msec: anytype) @TypeOf((msec + (MSEC_PER_TICK / @as(c_int, 2))) / MSEC_PER_TICK) {
-    return (msec + (MSEC_PER_TICK / @as(c_int, 2))) / MSEC_PER_TICK;
-}
-pub inline fn DSEC2TICK(dsec: anytype) @TypeOf(MSEC2TICK(dsec * MSEC_PER_DSEC)) {
-    return MSEC2TICK(dsec * MSEC_PER_DSEC);
-}
-pub inline fn HSEC2TICK(dsec: anytype) @TypeOf(MSEC2TICK(dsec * MSEC_PER_HSEC)) {
-    return MSEC2TICK(dsec * MSEC_PER_HSEC);
-}
-pub inline fn SEC2TICK(sec: anytype) @TypeOf(MSEC2TICK(sec * MSEC_PER_SEC)) {
-    return MSEC2TICK(sec * MSEC_PER_SEC);
-}
-pub inline fn TICK2NSEC(tick: anytype) @TypeOf(tick * NSEC_PER_TICK) {
-    return tick * NSEC_PER_TICK;
-}
-pub inline fn TICK2USEC(tick: anytype) @TypeOf(tick * USEC_PER_TICK) {
-    return tick * USEC_PER_TICK;
-}
-pub inline fn TICK2MSEC(tick: anytype) @TypeOf(tick * MSEC_PER_TICK) {
-    return tick * MSEC_PER_TICK;
-}
-pub inline fn TICK2DSEC(tick: anytype) @TypeOf((tick + (TICK_PER_DSEC / @as(c_int, 2))) / TICK_PER_DSEC) {
-    return (tick + (TICK_PER_DSEC / @as(c_int, 2))) / TICK_PER_DSEC;
-}
-pub inline fn TICK2HSEC(tick: anytype) @TypeOf((tick + (TICK_PER_HSEC / @as(c_int, 2))) / TICK_PER_HSEC) {
-    return (tick + (TICK_PER_HSEC / @as(c_int, 2))) / TICK_PER_HSEC;
-}
-pub inline fn TICK2SEC(tick: anytype) @TypeOf((tick + (TICK_PER_SEC / @as(c_int, 2))) / TICK_PER_SEC) {
-    return (tick + (TICK_PER_SEC / @as(c_int, 2))) / TICK_PER_SEC;
-}
-pub const INITIAL_SYSTEM_TIMER_TICKS = @as(c_int, 0);
-pub inline fn clock_systime_ticks() @TypeOf(g_system_timer) {
-    return g_system_timer;
-}
-pub inline fn _SEM_INIT(s: anytype, p: anytype, c: anytype) @TypeOf(sem_init(s, p, c)) {
-    return sem_init(s, p, c);
-}
-pub inline fn _SEM_DESTROY(s: anytype) @TypeOf(sem_destroy(s)) {
-    return sem_destroy(s);
-}
-pub inline fn _SEM_WAIT(s: anytype) @TypeOf(sem_wait(s)) {
-    return sem_wait(s);
-}
-pub inline fn _SEM_TRYWAIT(s: anytype) @TypeOf(sem_trywait(s)) {
-    return sem_trywait(s);
-}
-pub inline fn _SEM_TIMEDWAIT(s: anytype, t: anytype) @TypeOf(sem_timedwait(s, t)) {
-    return sem_timedwait(s, t);
-}
-pub inline fn _SEM_CLOCKWAIT(s: anytype, c: anytype, t: anytype) @TypeOf(sem_clockwait(s, c, t)) {
-    return sem_clockwait(s, c, t);
-}
-pub inline fn _SEM_GETVALUE(s: anytype, v: anytype) @TypeOf(sem_getvalue(s, v)) {
-    return sem_getvalue(s, v);
-}
-pub inline fn _SEM_POST(s: anytype) @TypeOf(sem_post(s)) {
-    return sem_post(s);
-}
-pub inline fn _SEM_GETPROTOCOL(s: anytype, p: anytype) @TypeOf(sem_getprotocol(s, p)) {
-    return sem_getprotocol(s, p);
-}
-pub inline fn _SEM_SETPROTOCOL(s: anytype, p: anytype) @TypeOf(sem_setprotocol(s, p)) {
-    return sem_setprotocol(s, p);
-}
-pub inline fn _SEM_ERRNO(r: anytype) @TypeOf(errno) {
-    _ = r;
-    return errno;
-}
-pub inline fn _SEM_ERRVAL(r: anytype) @TypeOf(-errno) {
-    _ = r;
-    return -errno;
-}
-pub inline fn nxsem_get_protocol(s: anytype, p: anytype) @TypeOf(sem_getprotocol(s, p)) {
-    return sem_getprotocol(s, p);
-}
-pub const NXRMUTEX_NO_HOLDER = @import("std").zig.c_translation.cast(pid_t, -@as(c_int, 1));
-pub const NXMUTEX_INITIALIZER = SEM_INITIALIZER(@as(c_int, 1));
-pub const _NX_OPEN = open;
-pub inline fn _NX_CLOSE(f: anytype) @TypeOf(close(f)) {
-    return close(f);
-}
-pub inline fn _NX_READ(f: anytype, b: anytype, s: anytype) @TypeOf(read(f, b, s)) {
-    return read(f, b, s);
-}
-pub inline fn _NX_WRITE(f: anytype, b: anytype, s: anytype) @TypeOf(write(f, b, s)) {
-    return write(f, b, s);
-}
-pub inline fn _NX_SEEK(f: anytype, o: anytype, w: anytype) @TypeOf(lseek(f, o, w)) {
-    return lseek(f, o, w);
-}
-pub inline fn _NX_IOCTL(f: anytype, r: anytype, a: anytype) @TypeOf(ioctl(f, r, a)) {
-    return ioctl(f, r, a);
-}
-pub inline fn _NX_STAT(p: anytype, s: anytype) @TypeOf(stat(p, s)) {
-    return stat(p, s);
-}
-pub inline fn _NX_GETERRNO(r: anytype) @TypeOf(errno) {
-    _ = r;
-    return errno;
-}
-pub const _NX_SETERRNO = @import("std").zig.c_translation.Macros.DISCARD;
-pub inline fn _NX_GETERRVAL(r: anytype) @TypeOf(-errno) {
-    _ = r;
-    return -errno;
-}
-pub const __FS_FLAG_EOF = @as(c_int, 1) << @as(c_int, 0);
-pub const __FS_FLAG_ERROR = @as(c_int, 1) << @as(c_int, 1);
-pub const __FS_FLAG_LBF = @as(c_int, 1) << @as(c_int, 2);
-pub const __FS_FLAG_UBF = @as(c_int, 1) << @as(c_int, 3);
-pub const FSNODEFLAG_TYPE_MASK = @as(c_int, 0x0000000f);
-pub const FSNODEFLAG_TYPE_PSEUDODIR = @as(c_int, 0x00000000);
-pub const FSNODEFLAG_TYPE_DRIVER = @as(c_int, 0x00000001);
-pub const FSNODEFLAG_TYPE_BLOCK = @as(c_int, 0x00000002);
-pub const FSNODEFLAG_TYPE_MOUNTPT = @as(c_int, 0x00000003);
-pub const FSNODEFLAG_TYPE_NAMEDSEM = @as(c_int, 0x00000004);
-pub const FSNODEFLAG_TYPE_MQUEUE = @as(c_int, 0x00000005);
-pub const FSNODEFLAG_TYPE_SHM = @as(c_int, 0x00000006);
-pub const FSNODEFLAG_TYPE_MTD = @as(c_int, 0x00000007);
-pub const FSNODEFLAG_TYPE_SOFTLINK = @as(c_int, 0x00000008);
-pub const FSNODEFLAG_TYPE_SOCKET = @as(c_int, 0x00000009);
-pub const FSNODEFLAG_DELETED = @as(c_int, 0x00000010);
-pub inline fn INODE_IS_TYPE(i: anytype, t: anytype) @TypeOf((i.*.i_flags & FSNODEFLAG_TYPE_MASK) == t) {
-    return (i.*.i_flags & FSNODEFLAG_TYPE_MASK) == t;
-}
-pub inline fn INODE_IS_PSEUDODIR(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_PSEUDODIR)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_PSEUDODIR);
-}
-pub inline fn INODE_IS_DRIVER(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_DRIVER)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_DRIVER);
-}
-pub inline fn INODE_IS_BLOCK(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_BLOCK)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_BLOCK);
-}
-pub inline fn INODE_IS_MOUNTPT(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT);
-}
-pub inline fn INODE_IS_NAMEDSEM(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM);
-}
-pub inline fn INODE_IS_MQUEUE(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MQUEUE)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MQUEUE);
-}
-pub inline fn INODE_IS_SHM(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SHM)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SHM);
-}
-pub inline fn INODE_IS_MTD(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MTD)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_MTD);
-}
-pub inline fn INODE_IS_SOFTLINK(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK);
-}
-pub inline fn INODE_IS_SOCKET(i: anytype) @TypeOf(INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOCKET)) {
-    return INODE_IS_TYPE(i, FSNODEFLAG_TYPE_SOCKET);
-}
-pub inline fn INODE_GET_TYPE(i: anytype) @TypeOf(i.*.i_flags & FSNODEFLAG_TYPE_MASK) {
-    return i.*.i_flags & FSNODEFLAG_TYPE_MASK;
-}
-pub inline fn INODE_SET_DRIVER(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_DRIVER)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_DRIVER);
-}
-pub inline fn INODE_SET_BLOCK(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_BLOCK)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_BLOCK);
-}
-pub inline fn INODE_SET_MOUNTPT(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MOUNTPT);
-}
-pub inline fn INODE_SET_NAMEDSEM(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_NAMEDSEM);
-}
-pub inline fn INODE_SET_MQUEUE(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MQUEUE)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MQUEUE);
-}
-pub inline fn INODE_SET_SHM(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SHM)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SHM);
-}
-pub inline fn INODE_SET_MTD(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MTD)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_MTD);
-}
-pub inline fn INODE_SET_SOFTLINK(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOFTLINK);
-}
-pub inline fn INODE_SET_SOCKET(i: anytype) @TypeOf(INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOCKET)) {
-    return INODE_SET_TYPE(i, FSNODEFLAG_TYPE_SOCKET);
-}
-pub const DIRENTFLAGS_PSEUDONODE = @as(c_int, 1);
-pub inline fn DIRENT_ISPSEUDONODE(f: anytype) @TypeOf((f & DIRENTFLAGS_PSEUDONODE) != @as(c_int, 0)) {
-    return (f & DIRENTFLAGS_PSEUDONODE) != @as(c_int, 0);
-}
-pub const CH_STAT_MODE = @as(c_int, 1) << @as(c_int, 0);
-pub const CH_STAT_UID = @as(c_int, 1) << @as(c_int, 1);
-pub const CH_STAT_GID = @as(c_int, 1) << @as(c_int, 2);
-pub const CH_STAT_ATIME = @as(c_int, 1) << @as(c_int, 3);
-pub const CH_STAT_MTIME = @as(c_int, 1) << @as(c_int, 4);
-pub inline fn FSNODE_SIZE(n: anytype) @TypeOf(@import("std").zig.c_translation.sizeof(struct_inode) + n) {
-    return @import("std").zig.c_translation.sizeof(struct_inode) + n;
-}
 pub const __INCLUDE_NUTTX_SCHED_H = "";
 pub const __INCLUDE_QUEUE_H = "";
 pub inline fn sq_next(p: anytype) @TypeOf(p.*.flink) {
@@ -5154,7 +5193,7 @@ pub const TCB_FLAG_SIGNAL_ACTION = @as(c_int, 1) << @as(c_int, 9);
 pub const TCB_FLAG_SYSCALL = @as(c_int, 1) << @as(c_int, 10);
 pub const TCB_FLAG_EXIT_PROCESSING = @as(c_int, 1) << @as(c_int, 11);
 pub const TCB_FLAG_FREE_STACK = @as(c_int, 1) << @as(c_int, 12);
-pub const TCB_FLAG_MEM_CHECK = @as(c_int, 1) << @as(c_int, 13);
+pub const TCB_FLAG_HEAPCHECK = @as(c_int, 1) << @as(c_int, 13);
 pub const GROUP_FLAG_NOCLDWAIT = @as(c_int, 1) << @as(c_int, 0);
 pub const GROUP_FLAG_ADDRENV = @as(c_int, 1) << @as(c_int, 1);
 pub const GROUP_FLAG_PRIVILEGED = @as(c_int, 1) << @as(c_int, 2);
@@ -5282,7 +5321,7 @@ pub const POLLFD = @as(c_int, 0x00);
 pub const POLLFILE = @as(c_int, 0x40);
 pub const POLLSOCK = @as(c_int, 0x80);
 pub const POLLMASK = @as(c_int, 0xC0);
-pub const DEVNAME_FMT = "/dev/sensor/%s";
+pub const DEVNAME_FMT = "/dev/sensor/sensor_%s";
 pub const DEVNAME_MAX = @as(c_int, 64);
 pub const timespec = struct_timespec;
 pub const tm = struct_tm;
@@ -5290,44 +5329,6 @@ pub const itimerspec = struct_itimerspec;
 pub const sigval = union_sigval;
 pub const pthread_attr_s = struct_pthread_attr_s;
 pub const sigevent = struct_sigevent;
-pub const winsize = struct_winsize;
-pub const serial_rs485 = struct_serial_rs485;
-pub const sensor_event_accel = struct_sensor_event_accel;
-pub const sensor_event_gyro = struct_sensor_event_gyro;
-pub const sensor_event_mag = struct_sensor_event_mag;
-pub const sensor_event_baro = struct_sensor_event_baro;
-pub const sensor_event_prox = struct_sensor_event_prox;
-pub const sensor_event_light = struct_sensor_event_light;
-pub const sensor_event_humi = struct_sensor_event_humi;
-pub const sensor_event_temp = struct_sensor_event_temp;
-pub const sensor_event_rgb = struct_sensor_event_rgb;
-pub const sensor_event_hall = struct_sensor_event_hall;
-pub const sensor_event_ir = struct_sensor_event_ir;
-pub const sensor_event_gps = struct_sensor_event_gps;
-pub const sensor_event_uv = struct_sensor_event_uv;
-pub const sensor_event_noise = struct_sensor_event_noise;
-pub const sensor_event_pm25 = struct_sensor_event_pm25;
-pub const sensor_event_pm10 = struct_sensor_event_pm10;
-pub const sensor_event_pm1p0 = struct_sensor_event_pm1p0;
-pub const sensor_event_co2 = struct_sensor_event_co2;
-pub const sensor_event_hcho = struct_sensor_event_hcho;
-pub const sensor_event_tvoc = struct_sensor_event_tvoc;
-pub const sensor_event_ph = struct_sensor_event_ph;
-pub const sensor_event_dust = struct_sensor_event_dust;
-pub const sensor_event_hrate = struct_sensor_event_hrate;
-pub const sensor_event_hbeat = struct_sensor_event_hbeat;
-pub const sensor_event_ecg = struct_sensor_event_ecg;
-pub const sensor_event_ppgd = struct_sensor_event_ppgd;
-pub const sensor_event_ppgq = struct_sensor_event_ppgq;
-pub const sensor_event_impd = struct_sensor_event_impd;
-pub const sensor_event_ots = struct_sensor_event_ots;
-pub const satellite = struct_satellite;
-pub const sensor_event_gps_satellite = struct_sensor_event_gps_satellite;
-pub const sensor_ops_s = struct_sensor_ops_s;
-pub const sensor_lowerhalf_s = struct_sensor_lowerhalf_s;
-pub const div_s = struct_div_s;
-pub const ldiv_s = struct_ldiv_s;
-pub const lldiv_s = struct_lldiv_s;
 pub const sem_s = struct_sem_s;
 pub const rmutex_s = struct_rmutex_s;
 pub const pollfd = struct_pollfd;
@@ -5357,6 +5358,49 @@ pub const siginfo = struct_siginfo;
 pub const mqueue_inode_s = struct_mqueue_inode_s;
 pub const xcptcontext = struct_xcptcontext;
 pub const tcb_s = struct_tcb_s;
+pub const winsize = struct_winsize;
+pub const serial_rs485 = struct_serial_rs485;
+pub const sensor_accel = struct_sensor_accel;
+pub const sensor_gyro = struct_sensor_gyro;
+pub const sensor_mag = struct_sensor_mag;
+pub const sensor_baro = struct_sensor_baro;
+pub const sensor_prox = struct_sensor_prox;
+pub const sensor_light = struct_sensor_light;
+pub const sensor_humi = struct_sensor_humi;
+pub const sensor_temp = struct_sensor_temp;
+pub const sensor_rgb = struct_sensor_rgb;
+pub const sensor_hall = struct_sensor_hall;
+pub const sensor_ir = struct_sensor_ir;
+pub const sensor_gps = struct_sensor_gps;
+pub const sensor_uv = struct_sensor_uv;
+pub const sensor_noise = struct_sensor_noise;
+pub const sensor_pm25 = struct_sensor_pm25;
+pub const sensor_pm10 = struct_sensor_pm10;
+pub const sensor_pm1p0 = struct_sensor_pm1p0;
+pub const sensor_co2 = struct_sensor_co2;
+pub const sensor_hcho = struct_sensor_hcho;
+pub const sensor_tvoc = struct_sensor_tvoc;
+pub const sensor_ph = struct_sensor_ph;
+pub const sensor_dust = struct_sensor_dust;
+pub const sensor_hrate = struct_sensor_hrate;
+pub const sensor_hbeat = struct_sensor_hbeat;
+pub const sensor_ecg = struct_sensor_ecg;
+pub const sensor_ppgd = struct_sensor_ppgd;
+pub const sensor_ppgq = struct_sensor_ppgq;
+pub const sensor_impd = struct_sensor_impd;
+pub const sensor_ots = struct_sensor_ots;
+pub const satellite = struct_satellite;
+pub const sensor_gps_satellite = struct_sensor_gps_satellite;
+pub const sensor_wake_gesture = struct_sensor_wake_gesture;
+pub const sensor_cap = struct_sensor_cap;
+pub const sensor_ops_s = struct_sensor_ops_s;
+pub const sensor_lowerhalf_s = struct_sensor_lowerhalf_s;
+pub const sensor_state_s = struct_sensor_state_s;
+pub const sensor_ustate_s = struct_sensor_ustate_s;
+pub const sensor_ioctl_s = struct_sensor_ioctl_s;
+pub const div_s = struct_div_s;
+pub const ldiv_s = struct_ldiv_s;
+pub const lldiv_s = struct_lldiv_s;
 pub const dq_entry_s = struct_dq_entry_s;
 pub const dq_queue_s = struct_dq_queue_s;
 pub const sched_param = struct_sched_param;
