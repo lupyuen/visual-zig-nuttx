@@ -99,22 +99,6 @@ pub fn main() !void {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Types
-
-/// Sensor Info
-const sensor_info = struct {
-    /// Print function for Sensor Data
-    print: data_print,
-    /// Size of Sensor Data
-    esize: u8,
-    /// Name of Sensor Type
-    name: []const u8,
-};
-
-/// Sensor Data Print Function
-const data_print = fn ([]const align(8) u8, []const u8) void;
-
-///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions
 
 /// Aliases for Sensor Definitions
