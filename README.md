@@ -1006,11 +1006,21 @@ humidity=68.67
 End main
 ```
 
+# Customise Blockly
+
+Next we customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App.
+
+Read the article...
+
+-   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
+
+![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
+
 # Debug Logger Crashes
 
-_(Note: We observed this issue with Zig Compiler version 0.10.0, it might have been fixed in later versions of the compiler)_
+__UPDATE:__ This crashing seems to be caused by our Zig Sensor App running out of Stack Space. We fixed iy by increasing ["Sensor Driver Test Stack Size"](https://lupyuen.github.io/articles/bme280#configure-nuttx) from 2048 to 4096.
 
-TODO: Calling the `debug` logger inside `print_valf2` causes weird crashes...
+Calling the `debug` logger inside `print_valf2` causes weird crashes...
 
 ```zig
 debug("timestamp: {}", .{ event.*.timestamp });
@@ -1102,15 +1112,3 @@ riscv_registerdump: SP: 4201beb0 FP: 00000000 TP: 23001478 RA: 230080c2
 This crashes inside `free` when deallocating the Sensor Data Buffer, might be due to a Heap Problem.
 
 For safety, we converted the Heap Buffer to a Static Buffer.
-
-TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`?
-
-# Customise Blockly
-
-Next we customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App.
-
-Read the article...
-
--   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
-
-![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
