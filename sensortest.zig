@@ -64,8 +64,8 @@ fn test_sensor() !void {
 
     // Open the Sensor Device
     const fd = c.open(
-        "/dev/sensor/sensor_baro0",       // Path of Sensor Device
-        c.O_RDONLY | c.O_NONBLOCK  // Open for read-only
+        "/dev/sensor/sensor_baro0",  // Path of Sensor Device
+        c.O_RDONLY | c.O_NONBLOCK    // Open for read-only
     );
 
     // Check for error
@@ -99,35 +99,46 @@ fn test_sensor() !void {
         return error.BatchError;
     }
 
-    // Prepare to poll Sensor
+    // Poll for Sensor Data
     var fds = std.mem.zeroes(c.struct_pollfd);
     fds.fd = fd;
     fds.events = c.POLLIN;
+    ret = c.poll(&fds, 1, -1);
 
-    // If Sensor Data is available...
-    if (c.poll(&fds, 1, -1) > 0) {
+    // Check if Sensor Data is available
+    if (ret <= 0) {
+        std.log.err("Sensor data not available", .{});
+        return error.DataError;
+    }
 
-        // Define the Sensor Data Type
-        var sensor_data = std.mem.zeroes(c.struct_sensor_baro);
-        const len = @sizeOf(@TypeOf(sensor_data));
+    // Define the Sensor Data Type
+    var sensor_data = std.mem.zeroes(
+        c.struct_sensor_baro
+    );
+    const len = @sizeOf(
+        @TypeOf(sensor_data)
+    );
 
-        // Read the Sensor Data
-        if (c.read(fd, &sensor_data, len) >= len) {
+    // Read the Sensor Data
+    const read_len = c.read(fd, &sensor_data, len);
 
-            // Convert the Sensor Data to Fixed-Point Numbers
-            const pressure    = floatToFixed(sensor_data.pressure);
-            const temperature = floatToFixed(sensor_data.temperature);
+    // Check size of Sensor Data
+    if (read_len < len) {
+        std.log.err("Sensor data incorrect size", .{});
+        return error.SizeError;
+    }
 
-            // Print the Sensor Data
-            debug("pressure:{}", .{
-                pressure
-            });
-            debug("temperature:{}", .{
-                temperature
-            });
-            
-        } else { std.log.err("Sensor data incorrect size", .{}); }
-    } else { std.log.err("Sensor data not available", .{}); }
+    // Convert the Sensor Data to Fixed-Point Numbers
+    const pressure    = floatToFixed(sensor_data.pressure);
+    const temperature = floatToFixed(sensor_data.temperature);
+
+    // Print the Sensor Data
+    debug("pressure:{}", .{
+        pressure
+    });
+    debug("temperature:{}", .{
+        temperature
+    });
 }
 
 /// Read Humidity from Humidity Sensor "/dev/sensor/sensor_humi0"
@@ -136,8 +147,8 @@ fn test_sensor2() !void {
 
     // Open the Sensor Device
     const fd = c.open(
-        "/dev/sensor/sensor_humi0",       // Path of Sensor Device
-        c.O_RDONLY | c.O_NONBLOCK  // Open for read-only
+        "/dev/sensor/sensor_humi0",  // Path of Sensor Device
+        c.O_RDONLY | c.O_NONBLOCK    // Open for read-only
     );
 
     // Check for error
@@ -171,31 +182,42 @@ fn test_sensor2() !void {
         return error.BatchError;
     }
 
-    // Prepare to poll Sensor
+    // Poll for Sensor Data
     var fds = std.mem.zeroes(c.struct_pollfd);
     fds.fd = fd;
     fds.events = c.POLLIN;
+    ret = c.poll(&fds, 1, -1);
 
-    // If Sensor Data is available...
-    if (c.poll(&fds, 1, -1) > 0) {
+    // Check if Sensor Data is available
+    if (ret <= 0) {
+        std.log.err("Sensor data not available", .{});
+        return error.DataError;
+    }
 
-        // Define the Sensor Data Type
-        var sensor_data = std.mem.zeroes(c.struct_sensor_humi);
-        const len = @sizeOf(@TypeOf(sensor_data));
+    // Define the Sensor Data Type
+    var sensor_data = std.mem.zeroes(
+        c.struct_sensor_humi
+    );
+    const len = @sizeOf(
+        @TypeOf(sensor_data)
+    );
 
-        // Read the Sensor Data
-        if (c.read(fd, &sensor_data, len) >= len) {
+    // Read the Sensor Data
+    const read_len = c.read(fd, &sensor_data, len);
 
-            // Convert the Sensor Data to Fixed-Point Numbers
-            const humidity = floatToFixed(sensor_data.humidity);
+    // Check size of Sensor Data
+    if (read_len < len) {
+        std.log.err("Sensor data incorrect size", .{});
+        return error.SizeError;
+    }
 
-            // Print the Sensor Data
-            debug("humidity:{}", .{
-                humidity
-            });
+    // Convert the Sensor Data to Fixed-Point Numbers
+    const humidity = floatToFixed(sensor_data.humidity);
 
-        } else { std.log.err("Sensor data incorrect size", .{}); }
-    } else { std.log.err("Sensor data not available", .{}); }
+    // Print the Sensor Data
+    debug("humidity:{}", .{
+        humidity
+    });
 }
 
 /// Print the Command-Line Options

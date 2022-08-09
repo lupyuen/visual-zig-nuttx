@@ -129,7 +129,14 @@ pub fn test_multisensor(
                 received += 1;
                 const sensor = g_sensor_info[idx];
                 sensor.print(&sensor_data, name);
+            } else {
+                std.log.err("Sensor data incorrect size", .{});
+                return error.SizeError;
             }
+
+        } else {
+            std.log.err("Sensor data not available", .{});
+            return error.DataError;
         }
     }
     debug("SensorTest: Received message: {s}, number:{}/{}", .{ name, received, count });

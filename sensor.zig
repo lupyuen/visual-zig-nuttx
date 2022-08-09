@@ -82,4 +82,6 @@ pub const SensorError = error{
     OpenError,      // Failed to open device
     IntervalError,  // Failed to set sensor interval
     BatchError,     // Failed to set sensor batch
+    DataError,      // Data unavailable
+    SizeError,      // Invalid size for data
 };
