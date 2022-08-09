@@ -928,6 +928,84 @@ test_sensor2
 humidity:78.81
 ```
 
+# Zig Generics
+
+With Zig Generics and `comptime`, we can greatly simplify the reading of Sensor Data...
+
+```zig
+// Read the Temperature
+const temperature: f32 = try sen.read_sensor(
+    c.struct_sensor_baro,       // Sensor Data Struct to be read
+    "temperature",              // Sensor Data Field to be returned
+    "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+);
+
+// Print the Temperature
+debug("temperature={}", .{ floatToFixed(temperature) });
+```
+
+[(Source)](visual.zig#L15-L62)
+
+Here's the implementation of `read_sensor`...
+
+https://github.com/lupyuen/visual-zig-nuttx/blob/a7404eae71dc37850e323848180414aa6ef7e0f7/sensor.zig#L34-L108
+
+Note that the Sensor Data Struct Type and the Sensor Data Field are declared as `comptime`...
+
+```zig
+/// Read a Sensor and return the Sensor Data
+pub fn read_sensor(
+    comptime SensorType: type,        // Sensor Data Struct to be read, like c.struct_sensor_baro
+    comptime field_name: []const u8,  // Sensor Data Field to be returned, like "temperature"
+    device_path: []const u8           // Path of Sensor Device, like "/dev/sensor/sensor_baro0"
+) !f32 { ...
+```
+
+Which means that the values will be substituted at Compile-Time. (Works like a C Macro)
+
+We can then refer to the Sensor Data Struct `sensor_baro` like this...
+
+```zig
+    // Define the Sensor Data Type
+    var sensor_data = std.mem.zeroes(
+        SensorType
+    );
+```
+
+And return a field `temperature` like this...
+
+```zig
+    // Return the Sensor Data Field
+    return @field(sensor_data, field_name);
+```
+
+Thus this program...
+
+https://github.com/lupyuen/visual-zig-nuttx/blob/a7404eae71dc37850e323848180414aa6ef7e0f7/visual.zig#L15-L62
+
+Produces this output...
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest visual
+Zig Sensor Test
+Start main
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+temperature=30.18
+pressure=1007.69
+humidity=68.67
+End main
+```
+
 # Debug Logger Crashes
 
 _(Note: We observed this issue with Zig Compiler version 0.10.0, it might have been fixed in later versions of the compiler)_
@@ -1035,25 +1113,4 @@ Read the article...
 
 -   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
-Here's the output...
-
-```text
-NuttShell (NSH) NuttX-10.3.0
-nsh> sensortest visual
-Zig Sensor Test
-Start main
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-temperature=30.18
-pressure=1007.69
-humidity=68.67
-End main
-```
+![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
