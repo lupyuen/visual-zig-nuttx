@@ -25,81 +25,39 @@ pub fn main() !void {
     }
 
     // Read the Temperature
-    const temperature: f32 = blk: {
-
-        // Open the Sensor Device
-        const fd = c.open(
-            "/dev/sensor/sensor_baro0",       // Path of Sensor Device
-            c.O_RDONLY | c.O_NONBLOCK  // Open for read-only
-        );
-
-        // Check for error
-        if (fd < 0) {
-            std.log.err("Failed to open device:{s}", .{ c.strerror(errno()) });
-            return error.OpenError;
-        }
-
-        // Close the Sensor Device when this block returns
-        defer {
-            _ = c.close(fd);
-        }
-
-        // Set Standby Interval
-        var interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
-        var ret = c.ioctl(fd, c.SNIOC_SET_INTERVAL, interval);
-
-        // Check for error
-        if (ret < 0 and errno() != c.ENOTSUP) {
-            std.log.err("Failed to set interval:{s}", .{ c.strerror(errno()) });
-            return error.IntervalError;
-        }
-
-        // Set Batch Latency
-        var latency: c_uint = 0;  // No latency
-        ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
-
-        // Check for error
-        if (ret < 0 and errno() != c.ENOTSUP) {
-            std.log.err("Failed to batch:{s}", .{ c.strerror(errno()) });
-            return error.BatchError;
-        }
-
-        // Poll for Sensor Data
-        var fds = std.mem.zeroes(c.struct_pollfd);
-        fds.fd = fd;
-        fds.events = c.POLLIN;
-        ret = c.poll(&fds, 1, -1);
-
-        // Check if Sensor Data is available
-        if (ret <= 0) {
-            std.log.err("Sensor data not available", .{});
-            return error.DataError;
-        }
-
-        // Define the Sensor Data Type
-        var sensor_data = std.mem.zeroes(
-            c.struct_sensor_baro
-        );
-        const len = @sizeOf(
-            @TypeOf(sensor_data)
-        );
-
-        // Read the Sensor Data
-        const read_len = c.read(fd, &sensor_data, len);
-
-        // Check size of Sensor Data
-        if (read_len < len) {
-            std.log.err("Sensor data incorrect size", .{});
-            return error.SizeError;
-        }
-
-        // Return the Sensor Value
-        break :blk sensor_data.temperature;
-    };
+    const temperature: f32 = try sen.read_sensor(
+        c.struct_sensor_baro,       // Sensor Data Struct to be read
+        "temperature",              // Sensor Data Field to be returned
+        "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+    );
 
     // Print the Temperature
     debug("temperature={}", .{
         floatToFixed(temperature)
+    });
+
+    // Read the Pressure
+    const pressure: f32 = try sen.read_sensor(
+        c.struct_sensor_baro,       // Sensor Data Struct to be read
+        "pressure",                 // Sensor Data Field to be returned
+        "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+    );
+
+    // Print the Pressure
+    debug("pressure={}", .{
+        floatToFixed(pressure)
+    });
+
+    // Read the Humidity
+    const humidity: f32 = try sen.read_sensor(
+        c.struct_sensor_humi,       // Sensor Data Struct to be read
+        "humidity",                 // Sensor Data Field to be returned
+        "/dev/sensor/sensor_humi0"  // Path of Sensor Device
+    );
+
+    // Print the Humidity
+    debug("humidity={}", .{
+        floatToFixed(humidity)
     });
 }
 
@@ -107,8 +65,6 @@ pub fn main() !void {
 //  Imported Functions
 
 /// Aliases for Sensor Definitions
-const FixedPoint = sen.FixedPoint;
-const errno = sen.errno;
 const floatToFixed = sen.floatToFixed;
 
 /// Aliases for Zig Standard Library

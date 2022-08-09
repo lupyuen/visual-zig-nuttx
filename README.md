@@ -1035,4 +1035,25 @@ Read the article...
 
 -   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
-![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
+Here's the output...
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest visual
+Zig Sensor Test
+Start main
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+temperature=30.18
+pressure=1007.69
+humidity=68.67
+End main
+```
