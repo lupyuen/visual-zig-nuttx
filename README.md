@@ -2,7 +2,9 @@
 
 # Visual Programming for Zig with NuttX Sensors
 
-Read the article...
+Read the articles...
+
+-   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
 -   ["Read NuttX Sensor Data with Zig"](https://lupyuen.github.io/articles/sensor)
 
@@ -31,17 +33,14 @@ Here are the steps for reading a NuttX Sensor...
 ```c
 // From https://lupyuen.github.io/articles/bme280#sensor-test-app
 // Open the Sensor Device.
-// devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+// devname looks like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 fd = open(devname, O_RDONLY | O_NONBLOCK);
 
 // Set Standby Interval
-ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+ioctl(fd, SNIOC_SET_INTERVAL, interval);
 
 // Set Batch Latency
-ioctl(fd, SNIOC_BATCH, &latency);
-
-// Enable Sensor and switch to Normal Power Mode
-ioctl(fd, SNIOC_ACTIVATE, 1);
+ioctl(fd, SNIOC_BATCH, latency);
 
 //  If Sensor Data is available...
 if (poll(&fds, 1, -1) > 0) {
@@ -63,9 +62,6 @@ if (poll(&fds, 1, -1) > 0) {
     );
   }
 }
-
-// Disable Sensor and switch to Low Power Mode
-ioctl(fd, SNIOC_ACTIVATE, 0);
 
 // Close the Sensor Device and free the buffer
 close(fd);
@@ -323,7 +319,7 @@ Zig seems to have a problem passing the Pressure and Temperature values (both `f
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu value1:%.2f value2:%.2f\n", 
        name, 
        event.*.timestamp, 
@@ -339,7 +335,7 @@ The workaround is to convert the Float values to Integer AND split into two call
 
 ```c
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
@@ -358,13 +354,13 @@ Now our Zig Sensor App prints the correct values, but truncated as Integers...
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 baro0: timestamp:42610000 value1:1003 value2:31
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_humi0 with interval(1000000us), latency(0us)
 humi0: timestamp:32420000 value:68
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -388,7 +384,7 @@ Then we pass the Floats to `print_float` for printing...
 
 ```zig
 fn print_valf2(buffer: [*c]const u8, name: [*c]const u8) void {
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
     _ = printf("%s: timestamp:%llu ", 
         name, 
         event.*.timestamp, 
@@ -406,13 +402,13 @@ Finally we see the Pressure (`value1`), Temperature (`value2`) and Humidity (`va
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 baro0: timestamp:17780000 value1:1006.12 value2:29.65
 SensorTest: Received message: baro0, number:1/1
 
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/humi0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_humi0 with interval(1000000us), latency(0us)
 humi0: timestamp:28580000 value:77.44
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -466,7 +462,7 @@ _(Note: We observed this issue with Zig Compiler version 0.10.0, it might have b
 When we call the Zig Debug Logger `debug` to print Floating-Point Numbers (32-bit)...
 
 ```zig
-var event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+var event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
 debug("pressure: {}",    .{ event.*.pressure });
 debug("temperature: {}", .{ event.*.temperature });
 ```
@@ -519,7 +515,7 @@ Let's convert Floating-Point Numbers to Fixed-Point Numbers (2 decimal places) a
 ```zig
 /// Convert the float to a fixed-point number (`int`.`frac`) with 2 decimal places.
 /// We do this because `debug` has a problem with floats.
-pub fn float_to_fixed(f: f32) struct { int: i32, frac: u8 } {
+pub fn floatToFixed(f: f32) struct { int: i32, frac: u8 } {
     const scaled = @floatToInt(i32, f * 100.0);
     const rem = @rem(scaled, 100);
     const rem_abs = if (rem < 0) -rem else rem;
@@ -538,9 +534,9 @@ This is how we print Floating-Point Numbers as Fixed-Point Numbers...
 /// Print 2 floats
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
-    const pressure = float_to_fixed(event.*.pressure);
-    const temperature = float_to_fixed(event.*.temperature);
+    const event = @ptrCast(*const c.struct_sensor_baro, &buffer[0]);
+    const pressure = floatToFixed(event.*.pressure);
+    const temperature = floatToFixed(event.*.temperature);
     debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
     debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
 }
@@ -607,7 +603,7 @@ pub export fn sensortest_main(...) {
 To a Static Buffer...
 
 ```zig
-/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// Device Name, like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 /// (Aligned to 8 bytes because it's passed to C)
 var devname align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 ```
@@ -651,7 +647,7 @@ It triggers a Zig Panic due to Incorrect Aligment...
 ```text
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
-SensorTest: Test /dev/sensor/baro0 with interval(1000000us), latency(0us)
+SensorTest: Test /dev/sensor/sensor_baro0 with interval(1000000us), latency(0us)
 
 !ZIG PANIC!
 incorrect alignment
@@ -664,7 +660,7 @@ RISC-V Disassembly shows that it's checking `andi a0,a0,7`...
 
 ```text
 nuttx/visual-zig-nuttx/sensortest.zig:196
-    const event = @intToPtr([*c]c.struct_sensor_event_baro, @ptrToInt(buffer));
+    const event = @intToPtr([*c]c.struct_sensor_baro, @ptrToInt(buffer));
 23014f2a: 85aa     mv      a1,a0
 23014f2c: fcb42e23 sw      a1,-36(s0)
 23014f30: 891d     andi    a0,a0,7
@@ -691,7 +687,7 @@ var sensor_data align(8) = std.mem.zeroes([256]u8);
 
 [(Source)](https://github.com/lupyuen/visual-zig-nuttx/blob/4ccb0cd9b2a55464b76b8a0fcbcf9f106d608f2f/sensortest.zig#L493-L495)
 
-Probably because `struct_sensor_event_baro` contains a `timestamp` field that's a 64-bit Integer.
+Probably because `struct_sensor_baro` contains a `timestamp` field that's a 64-bit Integer.
 
 # Clean Up
 
@@ -798,7 +794,7 @@ NuttX 10.3.0 32c8fdf272 Jul 18 2022 16:38:47 risc-v bl602evb
 nsh> sensortest -n 1 baro0
 Zig Sensor Test
 test_multisensor
-SensorTest: Test /dev/sensor/baro0  with interval(1000000), latency(0)
+SensorTest: Test /dev/sensor/sensor_baro0  with interval(1000000), latency(0)
 value1:1007.65
 value2:27.68
 SensorTest: Received message: baro0, number:1/1
@@ -806,7 +802,7 @@ SensorTest: Received message: baro0, number:1/1
 nsh> sensortest -n 1 humi0
 Zig Sensor Test
 test_multisensor
-SensorTest: Test /dev/sensor/humi0  with interval(1000000), latency(0)
+SensorTest: Test /dev/sensor/sensor_humi0  with interval(1000000), latency(0)
 value:78.91
 SensorTest: Received message: humi0, number:1/1
 ```
@@ -817,16 +813,16 @@ We also check that errors are handled correctly...
 nsh> sensortest -n 1 baro
 Zig Sensor Test
 test_multisensor
-Failed to open device:/dev/sensor/baro , ret:No such file or directory
+Failed to open device:/dev/sensor/sensor_baro , ret:No such file or directory
 
 nsh> sensortest -n 1 invalid
 Zig Sensor Test
 test_multisensor
 The sensor node name:invalid is invalid
 sensortest test
- Test barometer sensor (/dev/sensor/baro0)
+ Test barometer sensor (/dev/sensor/sensor_baro0)
 sensortest test2
- Test humidity sensor (/dev/sensor/humi0)
+ Test humidity sensor (/dev/sensor/sensor_humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -836,14 +832,14 @@ sensortest [arguments...] <command>
         [-n <val>]  The number of output data
                     default: 0
  Commands:
-        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
+        <sensor_node_name> ex, accel0(/dev/sensor/sensor_accel0)
 
 nsh> sensortest
 Zig Sensor Test
 sensortest test
- Test barometer sensor (/dev/sensor/baro0)
+ Test barometer sensor (/dev/sensor/sensor_baro0)
 sensortest test2
- Test humidity sensor (/dev/sensor/humi0)
+ Test humidity sensor (/dev/sensor/sensor_humi0)
 sensortest [arguments...] <command>
         [-h      ]  sensortest commands help
         [-i <val>]  The output data period of sensor in us
@@ -853,7 +849,7 @@ sensortest [arguments...] <command>
         [-n <val>]  The number of output data
                     default: 0
  Commands:
-        <sensor_node_name> ex, accel0(/dev/sensor/accel0)
+        <sensor_node_name> ex, accel0(/dev/sensor/sensor_accel0)
 ```
 
 # Read Barometer Sensor
@@ -864,15 +860,15 @@ Reading Sensor Data from a single sensor looks a lot simpler (because we don't n
 // Omitted: Open the Sensor Device, enable the Sensor and poll for Sensor Data
 ...
 // Define the Sensor Data Type
-var sensor_data = std.mem.zeroes(c.struct_sensor_event_baro);
+var sensor_data = std.mem.zeroes(c.struct_sensor_baro);
 const len = @sizeOf(@TypeOf(sensor_data));
 
 // Read the Sensor Data
 if (c.read(fd, &sensor_data, len) >= len) {
 
     // Convert the Sensor Data to Fixed-Point Numbers
-    const pressure    = float_to_fixed(sensor_data.pressure);
-    const temperature = float_to_fixed(sensor_data.temperature);
+    const pressure    = floatToFixed(sensor_data.pressure);
+    const temperature = floatToFixed(sensor_data.temperature);
 
     // Print the Sensor Data
     debug("pressure:{}.{:0>2}", .{
@@ -904,14 +900,14 @@ To read a Humidity Sensor (like BME280), the code looks highly similar...
 
 ```zig
 // Define the Sensor Data Type
-var sensor_data = std.mem.zeroes(c.struct_sensor_event_humi);
+var sensor_data = std.mem.zeroes(c.struct_sensor_humi);
 const len = @sizeOf(@TypeOf(sensor_data));
 
 // Read the Sensor Data
 if (c.read(fd, &sensor_data, len) >= len) {
 
     // Convert the Sensor Data to Fixed-Point Numbers
-    const humidity = float_to_fixed(sensor_data.humidity);
+    const humidity = floatToFixed(sensor_data.humidity);
 
     // Print the Sensor Data
     debug("humidity:{}.{:0>2}", .{
@@ -1033,8 +1029,31 @@ TODO: Why the weird crashes when we call the `debug` logger inside `print_valf2`
 
 # Customise Blockly
 
-TODO: Customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App
+Next we customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App.
 
-[Blockly Source Code: lupyuen3/blockly-zig-nuttx](https://github.com/lupyuen3/blockly-zig-nuttx)
+Read the article...
 
-![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
+-   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
+
+Here's the output...
+
+```text
+NuttShell (NSH) NuttX-10.3.0
+nsh> sensortest visual
+Zig Sensor Test
+Start main
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+a=123.45
+temperature=30.18
+pressure=1007.69
+humidity=68.67
+End main
+```

@@ -72,10 +72,10 @@ pub fn test_multisensor(
         return error.NameError;
     }
 
-    // Compose the Device Name. devname looks like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+    // Compose the Device Name. devname looks like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
     const devname = std.fmt.bufPrint(
         &devname_buffer,
-        "/dev/sensor/{s}\x00",
+        "/dev/sensor/sensor_{s}\x00",
         .{ name }
     ) catch { std.log.err("Path overflow", .{}); return error.OpenError; };
 
@@ -96,26 +96,17 @@ pub fn test_multisensor(
     }
 
     // Set Standby Interval
-    // TODO: Remove this definition when SNIOC_SET_INTERVAL has been been fixed: https://github.com/apache/incubator-nuttx/issues/6642
-    const SNIOC_SET_INTERVAL = c._SNIOC(0x0081);
-    ret = c.ioctl(fd, SNIOC_SET_INTERVAL, &interval);
+    ret = c.ioctl(fd, c.SNIOC_SET_INTERVAL, interval);
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to set interval for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.IntervalError;
     }
 
     // Set Batch Latency
-    ret = c.ioctl(fd, c.SNIOC_BATCH, &latency);
+    ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
     if (ret < 0 and errno() != c.ENOTSUP) {
         std.log.err("Failed to batch for sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
         return error.BatchError;
-    }
-
-    // Enable Sensor and switch to Normal Power Mode
-    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 1));
-    if (ret < 0 and errno() != c.ENOTSUP) {
-        std.log.err("Failed to enable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return error.EnableError;
     }
 
     // Prepare to poll Sensor
@@ -138,17 +129,17 @@ pub fn test_multisensor(
                 received += 1;
                 const sensor = g_sensor_info[idx];
                 sensor.print(&sensor_data, name);
+            } else {
+                std.log.err("Sensor data incorrect size", .{});
+                return error.SizeError;
             }
+
+        } else {
+            std.log.err("Sensor data not available", .{});
+            return error.DataError;
         }
     }
     debug("SensorTest: Received message: {s}, number:{}/{}", .{ name, received, count });
-
-    // Disable Sensor and switch to Low Power Mode
-    ret = c.ioctl(fd, c.SNIOC_ACTIVATE, @as(c_int, 0));
-    if (ret < 0) {
-        std.log.err("Failed to disable sensor:{s}, ret:{s}", .{ devname, c.strerror(errno()) });
-        return error.DisableError;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,58 +148,58 @@ pub fn test_multisensor(
 /// Print X, Y, Z, Temperature
 fn print_vec3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_accel, &buffer[0]);
-    const x = float_to_fixed(event.*.x);
-    const y = float_to_fixed(event.*.y);
-    const z = float_to_fixed(event.*.z);
-    const temperature = float_to_fixed(event.*.temperature);
-    debug("x:{}.{:0>2}", .{ x.int, x.frac });
-    debug("y:{}.{:0>2}", .{ y.int, y.frac });
-    debug("z:{}.{:0>2}", .{ z.int, z.frac });
-    debug("temperature:{}.{:0>2}", .{ temperature.int, temperature.frac });
+    const event = @ptrCast(*const c.struct_sensor_accel, &buffer[0]);
+    const x = floatToFixed(event.*.x);
+    const y = floatToFixed(event.*.y);
+    const z = floatToFixed(event.*.z);
+    const temperature = floatToFixed(event.*.temperature);
+    debug("x:{}", .{ x });
+    debug("y:{}", .{ y });
+    debug("z:{}", .{ z });
+    debug("temperature:{}", .{ temperature });
 }
 
 /// Print 3 floats
 fn print_valf3(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_rgb, &buffer[0]);
-    const r = float_to_fixed(event.*.r);
-    const g = float_to_fixed(event.*.g);
-    const b = float_to_fixed(event.*.b);
-    debug("value1:{}.{:0>2}", .{ r.int, r.frac });
-    debug("value2:{}.{:0>2}", .{ g.int, g.frac }); 
-    debug("value3:{}.{:0>2}", .{ b.int, b.frac });
+    const event = @ptrCast(*const c.struct_sensor_rgb, &buffer[0]);
+    const r = floatToFixed(event.*.r);
+    const g = floatToFixed(event.*.g);
+    const b = floatToFixed(event.*.b);
+    debug("value1:{}", .{ r });
+    debug("value2:{}", .{ g }); 
+    debug("value3:{}", .{ b });
 }
 
 /// Print 2 floats
 fn print_valf2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_baro, &buffer[0]);
-    const pressure = float_to_fixed(event.*.pressure);
-    const temperature = float_to_fixed(event.*.temperature);
-    debug("value1:{}.{:0>2}", .{ pressure.int, pressure.frac });
-    debug("value2:{}.{:0>2}", .{ temperature.int, temperature.frac });
+    const event = @ptrCast(*const c.struct_sensor_baro, &buffer[0]);
+    const pressure = floatToFixed(event.*.pressure);
+    const temperature = floatToFixed(event.*.temperature);
+    debug("value1:{}", .{ pressure });
+    debug("value2:{}", .{ temperature });
 }
 
 /// Print a float
 fn print_valf(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_prox, &buffer[0]);
-    const proximity = float_to_fixed(event.*.proximity);
-    debug("value:{}.{:0>2}", .{ proximity.int, proximity.frac });
+    const event = @ptrCast(*const c.struct_sensor_prox, &buffer[0]);
+    const proximity = floatToFixed(event.*.proximity);
+    debug("value:{}", .{ proximity });
 }
 
 /// Print a boolean
 fn print_valb(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_hall, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_hall, &buffer[0]);
     debug("value:{}", .{ @as(c_int, @boolToInt(event.*.hall)) });
 }
 
 /// Print 2 integers
 fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ots, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ots, &buffer[0]);
     debug("value1:{}", .{ event.*.x });
     debug("value2:{}", .{ event.*.y });
 }
@@ -216,7 +207,7 @@ fn print_vali2(buffer: []const align(8) u8, name: []const u8) void {
 /// Print PPGD
 fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ppgd, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ppgd, &buffer[0]);
     debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
     debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
     debug("current:{}", .{ event.*.current });
@@ -227,7 +218,7 @@ fn print_ppgd(buffer: []const align(8) u8, name: []const u8) void {
 /// Print PPGQ
 fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_ppgq, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_ppgq, &buffer[0]);
     debug("ppg1:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 0))] });
     debug("ppg2:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 1))] });
     debug("ppg3:{}", .{ event.*.ppg[@intCast(c_uint, @as(c_int, 2))] });
@@ -242,35 +233,35 @@ fn print_ppgq(buffer: []const align(8) u8, name: []const u8) void {
 /// Print GPS
 fn print_gps(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_gps, &buffer[0]);
-    const latitude = float_to_fixed(event.*.latitude);
-    const longitude = float_to_fixed(event.*.longitude);
-    const altitude = float_to_fixed(event.*.altitude);
-    const altitude_ellipsoid = float_to_fixed(event.*.altitude_ellipsoid);
-    const eph = float_to_fixed(event.*.eph);
-    const epv = float_to_fixed(event.*.epv);
-    const hdop = float_to_fixed(event.*.hdop);
-    const vdop = float_to_fixed(event.*.vdop);
-    const ground_speed = float_to_fixed(event.*.ground_speed);
-    const course = float_to_fixed(event.*.course);
+    const event = @ptrCast(*const c.struct_sensor_gps, &buffer[0]);
+    const latitude = floatToFixed(event.*.latitude);
+    const longitude = floatToFixed(event.*.longitude);
+    const altitude = floatToFixed(event.*.altitude);
+    const altitude_ellipsoid = floatToFixed(event.*.altitude_ellipsoid);
+    const eph = floatToFixed(event.*.eph);
+    const epv = floatToFixed(event.*.epv);
+    const hdop = floatToFixed(event.*.hdop);
+    const vdop = floatToFixed(event.*.vdop);
+    const ground_speed = floatToFixed(event.*.ground_speed);
+    const course = floatToFixed(event.*.course);
     debug("time_utc:{}", .{ event.*.time_utc });
-    debug("latitude:{}.{:0>2}", .{ latitude.int, latitude.frac });
-    debug("longitude:{}.{:0>2}", .{ longitude.int, longitude.frac });
-    debug("altitude:{}.{:0>2}", .{ altitude.int, altitude.frac });
-    debug("altitude_ellipsoid:{}.{:0>2}", .{ altitude_ellipsoid.int, altitude_ellipsoid.frac });
-    debug("eph:{}.{:0>2}", .{ eph.int, eph.frac });
-    debug("epv:{}.{:0>2}", .{ epv.int, epv.frac });
-    debug("hdop:{}.{:0>2}", .{ hdop.int, hdop.frac });
-    debug("vdop:{}.{:0>2}", .{ vdop.int, vdop.frac }); 
-    debug("ground_speed:{}.{:0>2}", .{ ground_speed.int, ground_speed.frac });
-    debug("course:{}.{:0>2}", .{ course.int, course.frac });
+    debug("latitude:{}", .{ latitude });
+    debug("longitude:{}", .{ longitude });
+    debug("altitude:{}", .{ altitude });
+    debug("altitude_ellipsoid:{}", .{ altitude_ellipsoid });
+    debug("eph:{}", .{ eph });
+    debug("epv:{}", .{ epv });
+    debug("hdop:{}", .{ hdop });
+    debug("vdop:{}", .{ vdop }); 
+    debug("ground_speed:{}", .{ ground_speed });
+    debug("course:{}", .{ course });
     debug("satellites_used:{}", .{ event.*.satellites_used });
 }
 
 /// Print GPS Count
 fn print_gps_satellite(buffer: []const align(8) u8, name: []const u8) void {
     _ = name;
-    const event = @ptrCast(*const c.struct_sensor_event_gps_satellite, &buffer[0]);
+    const event = @ptrCast(*const c.struct_sensor_gps_satellite, &buffer[0]);
     debug("count:{}", .{ event.*.count });
     debug("satellites:{}", .{ event.*.satellites });
 }
@@ -288,152 +279,152 @@ export fn exit_handler(signo: c_int) void {
 const g_sensor_info = [30]sensor_info{
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_accel),
+        .esize = @sizeOf(c.struct_sensor_accel),
         .name = "accel",
     },
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_mag),
+        .esize = @sizeOf(c.struct_sensor_mag),
         .name = "mag",
     },
     sensor_info{
         .print = print_vec3,
-        .esize = @sizeOf(c.struct_sensor_event_gyro),
+        .esize = @sizeOf(c.struct_sensor_gyro),
         .name = "gyro",
     },
     sensor_info{
         .print = print_valf2,
-        .esize = @sizeOf(c.struct_sensor_event_baro),
+        .esize = @sizeOf(c.struct_sensor_baro),
         .name = "baro",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_light),
+        .esize = @sizeOf(c.struct_sensor_light),
         .name = "light",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_prox),
+        .esize = @sizeOf(c.struct_sensor_prox),
         .name = "prox",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_humi),
+        .esize = @sizeOf(c.struct_sensor_humi),
         .name = "humi",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_temp),
+        .esize = @sizeOf(c.struct_sensor_temp),
         .name = "temp",
     },
     sensor_info{
         .print = print_valf3,
-        .esize = @sizeOf(c.struct_sensor_event_rgb),
+        .esize = @sizeOf(c.struct_sensor_rgb),
         .name = "rgb",
     },
     sensor_info{
         .print = print_valb,
-        .esize = @sizeOf(c.struct_sensor_event_hall),
+        .esize = @sizeOf(c.struct_sensor_hall),
         .name = "hall",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ir),
+        .esize = @sizeOf(c.struct_sensor_ir),
         .name = "ir",
     },
     sensor_info{
         .print = print_gps,
-        .esize = @sizeOf(c.struct_sensor_event_gps),
+        .esize = @sizeOf(c.struct_sensor_gps),
         .name = "gps",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_uv),
+        .esize = @sizeOf(c.struct_sensor_uv),
         .name = "uv",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_noise),
+        .esize = @sizeOf(c.struct_sensor_noise),
         .name = "noise",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm25),
+        .esize = @sizeOf(c.struct_sensor_pm25),
         .name = "pm25",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm1p0),
+        .esize = @sizeOf(c.struct_sensor_pm1p0),
         .name = "pm1p0",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_pm10),
+        .esize = @sizeOf(c.struct_sensor_pm10),
         .name = "pm10",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_co2),
+        .esize = @sizeOf(c.struct_sensor_co2),
         .name = "co2",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hcho),
+        .esize = @sizeOf(c.struct_sensor_hcho),
         .name = "hcho",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_tvoc),
+        .esize = @sizeOf(c.struct_sensor_tvoc),
         .name = "tvoc",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ph),
+        .esize = @sizeOf(c.struct_sensor_ph),
         .name = "ph",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_dust),
+        .esize = @sizeOf(c.struct_sensor_dust),
         .name = "dust",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hrate),
+        .esize = @sizeOf(c.struct_sensor_hrate),
         .name = "hrate",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_hbeat),
+        .esize = @sizeOf(c.struct_sensor_hbeat),
         .name = "hbeat",
     },
     sensor_info{
         .print = print_valf,
-        .esize = @sizeOf(c.struct_sensor_event_ecg),
+        .esize = @sizeOf(c.struct_sensor_ecg),
         .name = "ecg",
     },
     sensor_info{
         .print = print_ppgd,
-        .esize = @sizeOf(c.struct_sensor_event_ppgd),
+        .esize = @sizeOf(c.struct_sensor_ppgd),
         .name = "ppgd",
     },
     sensor_info{
         .print = print_ppgq,
-        .esize = @sizeOf(c.struct_sensor_event_ppgq),
+        .esize = @sizeOf(c.struct_sensor_ppgq),
         .name = "ppgq",
     },
     sensor_info{
         .print = print_valf2,
-        .esize = @sizeOf(c.struct_sensor_event_impd),
+        .esize = @sizeOf(c.struct_sensor_impd),
         .name = "impd",
     },
     sensor_info{
         .print = print_vali2,
-        .esize = @sizeOf(c.struct_sensor_event_ots),
+        .esize = @sizeOf(c.struct_sensor_ots),
         .name = "ots",
     },
     sensor_info{
         .print = print_gps_satellite,
-        .esize = @sizeOf(c.struct_sensor_event_gps_satellite),
+        .esize = @sizeOf(c.struct_sensor_gps_satellite),
         .name = "gps_satellite",
     },
 };
@@ -442,7 +433,7 @@ const g_sensor_info = [30]sensor_info{
 /// (Aligned to 8 bytes because it's passed to C)
 var sensor_data align(8) = std.mem.zeroes([256]u8);
 
-/// Device Name, like "/dev/sensor/baro0" or "/dev/sensor/humi0"
+/// Device Name, like "/dev/sensor/sensor_baro0" or "/dev/sensor/sensor_humi0"
 /// (Aligned to 8 bytes because it's passed to C)
 var devname_buffer align(8) = std.mem.zeroes([c.PATH_MAX]u8);
 
@@ -470,7 +461,7 @@ const data_print = fn ([]const align(8) u8, []const u8) void;
 
 /// Aliases for Sensor Definitions
 const errno = sen.errno;
-const float_to_fixed = sen.float_to_fixed;
+const floatToFixed = sen.floatToFixed;
 
 /// Aliases for Zig Standard Library
 const assert = std.debug.assert;
