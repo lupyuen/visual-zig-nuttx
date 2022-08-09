@@ -55,7 +55,7 @@ pub fn read_sensor(
     }
 
     // Set Standby Interval
-    var interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
+    const interval: c_uint = 1_000_000;  // 1,000,000 microseconds (1 second)
     var ret = c.ioctl(fd, c.SNIOC_SET_INTERVAL, interval);
 
     // Check for error
@@ -65,7 +65,7 @@ pub fn read_sensor(
     }
 
     // Set Batch Latency
-    var latency: c_uint = 0;  // No latency
+    const latency: c_uint = 0;  // No latency
     ret = c.ioctl(fd, c.SNIOC_BATCH, latency);
 
     // Check for error
