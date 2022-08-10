@@ -32,7 +32,7 @@ pub const c = @cImport({
 //  Exported Functions
 
 /// Read a Sensor and return the Sensor Data
-pub fn read_sensor(
+pub fn readSensor(
     comptime SensorType: type,        // Sensor Data Struct to be read, like c.struct_sensor_baro
     comptime field_name: []const u8,  // Sensor Data Field to be returned, like "temperature"
     device_path: []const u8           // Path of Sensor Device, like "/dev/sensor/sensor_baro0"

@@ -25,7 +25,7 @@ pub fn main() !void {
     }
 
     // Read the Temperature
-    const temperature: f32 = try sen.read_sensor(
+    const temperature: f32 = try sen.readSensor(
         c.struct_sensor_baro,       // Sensor Data Struct to be read
         "temperature",              // Sensor Data Field to be returned
         "/dev/sensor/sensor_baro0"  // Path of Sensor Device
@@ -37,7 +37,7 @@ pub fn main() !void {
     });
 
     // Read the Pressure
-    const pressure: f32 = try sen.read_sensor(
+    const pressure: f32 = try sen.readSensor(
         c.struct_sensor_baro,       // Sensor Data Struct to be read
         "pressure",                 // Sensor Data Field to be returned
         "/dev/sensor/sensor_baro0"  // Path of Sensor Device
@@ -49,7 +49,7 @@ pub fn main() !void {
     });
 
     // Read the Humidity
-    const humidity: f32 = try sen.read_sensor(
+    const humidity: f32 = try sen.readSensor(
         c.struct_sensor_humi,       // Sensor Data Struct to be read
         "humidity",                 // Sensor Data Field to be returned
         "/dev/sensor/sensor_humi0"  // Path of Sensor Device
