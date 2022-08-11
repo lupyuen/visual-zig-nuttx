@@ -25,7 +25,7 @@ pub fn main() !void {
     }
 
     // Test Sensor Program
-    // Every 10 seconds...
+    // Every 30 seconds...
     while (true) {
         const temperature = try sen.readSensor(  // Read BME280 Sensor
             c.struct_sensor_baro,       // Sensor Data Struct
@@ -54,8 +54,8 @@ pub fn main() !void {
         // Transmit message to LoRaWAN
         try transmitLorawan(msg);
 
-        // Wait 10 seconds
-        _ = c.sleep(10);
+        // Wait 30 seconds
+        _ = c.sleep(30);
     }    
 }
 
@@ -64,9 +64,9 @@ fn composeCbor(fields: anytype) !CborMessage {
     debug("composeCbor", .{});
     debug("fields.len={}", .{ fields.len }); 
     debug("fields[0] type={}", .{ @TypeOf(fields[0]) }); 
-    debug("fields[1] type={}", .{ floatToFixed(@as(f32, fields[1])) });
+    debug("fields[1] type={}", .{ @TypeOf(fields[1]) }); 
     debug("fields[0]={s}", .{ @as([]const u8, fields[0]) });
-    debug("fields[1]={}", .{ @TypeOf(fields[1]) }); 
+    debug("fields[1]={}", .{ floatToFixed(@as(f32, fields[1])) });
     return CborMessage{}; 
 }
 
