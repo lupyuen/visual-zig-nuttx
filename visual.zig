@@ -24,42 +24,60 @@ pub fn main() !void {
         debug("a={}", .{ floatToFixed(a) });
     }
 
-    // Read the Temperature
-    const temperature: f32 = try sen.readSensor(
-        c.struct_sensor_baro,       // Sensor Data Struct to be read
-        "temperature",              // Sensor Data Field to be returned
-        "/dev/sensor/sensor_baro0"  // Path of Sensor Device
-    );
+    // Test Sensor Program
+    // Every 10 seconds...
+    while (true) {
+        const temperature = try sen.readSensor(  // Read BME280 Sensor
+            c.struct_sensor_baro,       // Sensor Data Struct
+            "temperature",              // Sensor Data Field
+            "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+        );
+        debug("temperature={}", .{ floatToFixed(temperature) });
+        const pressure = try sen.readSensor(  // Read BME280 Sensor
+            c.struct_sensor_baro,       // Sensor Data Struct
+            "pressure",                 // Sensor Data Field
+            "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+        );
+        debug("pressure={}", .{ floatToFixed(pressure) });
+        const humidity = try sen.readSensor(  // Read BME280 Sensor
+            c.struct_sensor_humi,       // Sensor Data Struct
+            "humidity",                 // Sensor Data Field
+            "/dev/sensor/sensor_humi0"  // Path of Sensor Device
+        );
+        debug("humidity={}", .{ floatToFixed(humidity) });
+        const msg = try composeCbor(.{  // Compose CBOR Message
+            "t", temperature,
+            "p", pressure,
+            "h", humidity,
+        });
 
-    // Print the Temperature
-    debug("temperature={}", .{
-        floatToFixed(temperature)
-    });
+        // Transmit message to LoRaWAN
+        try transmitLorawan(msg);
 
-    // Read the Pressure
-    const pressure: f32 = try sen.readSensor(
-        c.struct_sensor_baro,       // Sensor Data Struct to be read
-        "pressure",                 // Sensor Data Field to be returned
-        "/dev/sensor/sensor_baro0"  // Path of Sensor Device
-    );
-
-    // Print the Pressure
-    debug("pressure={}", .{
-        floatToFixed(pressure)
-    });
-
-    // Read the Humidity
-    const humidity: f32 = try sen.readSensor(
-        c.struct_sensor_humi,       // Sensor Data Struct to be read
-        "humidity",                 // Sensor Data Field to be returned
-        "/dev/sensor/sensor_humi0"  // Path of Sensor Device
-    );
-
-    // Print the Humidity
-    debug("humidity={}", .{
-        floatToFixed(humidity)
-    });
+        // Wait 10 seconds
+        _ = c.sleep(10);
+    }    
 }
+
+/// TODO: Compose CBOR Message
+fn composeCbor(fields: anytype) !CborMessage { 
+    debug("composeCbor", .{});
+    debug("fields.len={}", .{ fields.len }); 
+    debug("fields[0] type={}", .{ @TypeOf(fields[0]) }); 
+    debug("fields[1] type={}", .{ floatToFixed(@as(f32, fields[1])) });
+    debug("fields[0]={s}", .{ @as([]const u8, fields[0]) });
+    debug("fields[1]={}", .{ @TypeOf(fields[1]) }); 
+    return CborMessage{}; 
+}
+
+/// TODO: Transmit message to LoRaWAN
+fn transmitLorawan(msg: CborMessage) !void { 
+    _ = msg;
+    debug("transmitLorawan", .{});
+}
+
+/// TODO: CBOR Message
+const CborMessage = struct{};
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions
