@@ -981,7 +981,7 @@ And return a field `temperature` like this...
 
 Thus this program...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/a7404eae71dc37850e323848180414aa6ef7e0f7/visual.zig#L15-L62
+https://github.com/lupyuen/visual-zig-nuttx/blob/a7404eae71dc37850e323848180414aa6ef7e0f7/visual.zig#L27-L61
 
 Produces this output...
 
@@ -990,16 +990,7 @@ NuttShell (NSH) NuttX-10.3.0
 nsh> sensortest visual
 Zig Sensor Test
 Start main
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
-a=123.45
+...
 temperature=30.18
 pressure=1007.69
 humidity=68.67
