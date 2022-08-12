@@ -59,25 +59,47 @@ pub fn main() !void {
     }    
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  CBOR Encoding
+
 /// TODO: Compose CBOR Message
-fn composeCbor(fields: anytype) !CborMessage { 
+/// https://lupyuen.github.io/articles/cbor2
+fn composeCbor(args: anytype) !CborMessage {
     debug("composeCbor", .{});
-    debug("fields.len={}", .{ fields.len }); 
-    debug("fields[0] type={}", .{ @TypeOf(fields[0]) }); 
-    debug("fields[1] type={}", .{ @TypeOf(fields[1]) }); 
-    debug("fields[0]={s}", .{ @as([]const u8, fields[0]) });
-    debug("fields[1]={}", .{ floatToFixed(@as(f32, fields[1])) });
+    comptime {
+        assert(args.len % 2 == 0);  // Must have even number of (name, value) args
+    }
+
+    // Process each field...
+    comptime var i: usize = 0;
+    inline while (i < args.len) : (i += 2) {
+
+        // Get the field name and value
+        const name  = args[i];
+        const value = args[i + 1];
+
+        // Print the field name and value
+        debug("  {s}: {}", .{
+            @as([]const u8, name),
+            floatToFixed(@as(f32, value))
+        });
+    }
     return CborMessage{}; 
 }
 
+/// TODO: CBOR Message
+/// https://lupyuen.github.io/articles/cbor2
+const CborMessage = struct{};
+
+///////////////////////////////////////////////////////////////////////////////
+//  Transmit To LoRaWAN
+
 /// TODO: Transmit message to LoRaWAN
+/// https://lupyuen.github.io/articles/iot
 fn transmitLorawan(msg: CborMessage) !void { 
     _ = msg;
     debug("transmitLorawan", .{});
 }
-
-/// TODO: CBOR Message
-const CborMessage = struct{};
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Imported Functions
