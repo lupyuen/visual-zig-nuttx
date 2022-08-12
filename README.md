@@ -999,9 +999,7 @@ End main
 
 # CBOR Encoding
 
-TODO
-
-[visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig)
+Blockly will emit the Zig code below for a typical IoT Sensor App: [visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig)
 
 ```zig
 // Read Temperature from BME280 Sensor
@@ -1036,9 +1034,11 @@ const msg = try composeCbor(.{
 try transmitLorawan(msg);
 ```
 
-TODO
+This reads the Temperature, Pressure and Humidity from BME280 Sensor, composes a CBOR Message that's encoded with the Sensor Data, and transmits the CBOR Message to LoRaWAN.
 
-[visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig#L65-L108)
+_`composeCbor` will work for a variable number of arguments? Strings as well as numbers?_
+
+Yep, here's the implementation of `composeCbor`: [visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig#L65-L108)
 
 ```zig
 /// TODO: Compose CBOR Message with Key-Value Pairs
@@ -1085,6 +1085,44 @@ const CborMessage = struct {
     buf: [256]u8 = undefined,  // Limit to 256 chars
     len: usize = 0,
 };
+```
+
+Note that `composeCbor` is declared as `anytype`...
+
+```zig
+fn composeCbor(args: anytype) { ...
+```
+
+That's why `composeCbor` accepts a variable number of arguments with different types.
+
+To handle each argument, this `inline` / `comptime` loop is unrolled at Compile-Time...
+
+```zig
+    // Process each field...
+    comptime var i: usize = 0;
+    inline while (i < args.len) : (i += 2) {
+
+        // Get the key and value
+        const key   = args[i];
+        const value = args[i + 1];
+
+        // Print the key and value
+        debug("  {s}: {}", .{
+            @as([]const u8, key),
+            floatToFixed(value)
+        });
+        ...
+    }
+```
+
+_What happens if we omit a Key or a Value when calling `composeCbor`?_
+
+This `comptime` assertion check will fail at Compile-Time...
+
+```zig
+comptime {
+    assert(args.len % 2 == 0);  // Missing Key or Value
+}
 ```
 
 # Customise Blockly
