@@ -62,25 +62,25 @@ pub fn main() !void {
 ///////////////////////////////////////////////////////////////////////////////
 //  CBOR Encoding
 
-/// TODO: Compose CBOR Message
+/// TODO: Compose CBOR Message with Key-Value Pairs
 /// https://lupyuen.github.io/articles/cbor2
 fn composeCbor(args: anytype) !CborMessage {
     debug("composeCbor", .{});
     comptime {
-        assert(args.len % 2 == 0);  // Must have even number of (name, value) args
+        assert(args.len % 2 == 0);  // Missing Key or Value
     }
 
     // Process each field...
     comptime var i: usize = 0;
     inline while (i < args.len) : (i += 2) {
 
-        // Get the field name and value
-        const name  = args[i];
+        // Get the key and value
+        const key   = args[i];
         const value = args[i + 1];
 
-        // Print the field name and value
+        // Print the key and value
         debug("  {s}: {}", .{
-            @as([]const u8, name),
+            @as([]const u8, key),
             floatToFixed(@as(f32, value))
         });
     }
