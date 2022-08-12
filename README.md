@@ -934,7 +934,7 @@ With Zig Generics and `comptime`, we can greatly simplify the reading of Sensor 
 
 ```zig
 // Read the Temperature
-const temperature: f32 = try sen.read_sensor(
+const temperature: f32 = try sen.readSensor(
     c.struct_sensor_baro,       // Sensor Data Struct to be read
     "temperature",              // Sensor Data Field to be returned
     "/dev/sensor/sensor_baro0"  // Path of Sensor Device
@@ -946,15 +946,15 @@ debug("temperature={}", .{ floatToFixed(temperature) });
 
 [(Source)](visual.zig#L15-L62)
 
-Here's the implementation of `read_sensor`...
+Here's the implementation of `readSensor`...
 
-https://github.com/lupyuen/visual-zig-nuttx/blob/a7404eae71dc37850e323848180414aa6ef7e0f7/sensor.zig#L34-L108
+https://github.com/lupyuen/visual-zig-nuttx/blob/1bb1c69ea4a9310e42b149e04ac26a7e4a1f4b58/sensor.zig#L34-L108
 
 Note that the Sensor Data Struct Type and the Sensor Data Field are declared as `comptime`...
 
 ```zig
 /// Read a Sensor and return the Sensor Data
-pub fn read_sensor(
+pub fn readSensor(
     comptime SensorType: type,        // Sensor Data Struct to be read, like c.struct_sensor_baro
     comptime field_name: []const u8,  // Sensor Data Field to be returned, like "temperature"
     device_path: []const u8           // Path of Sensor Device, like "/dev/sensor/sensor_baro0"
