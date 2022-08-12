@@ -72,6 +72,7 @@ fn composeCbor(args: anytype) !CborMessage {
 
     // Process each field...
     comptime var i: usize = 0;
+    var msg = CborMessage{};
     inline while (i < args.len) : (i += 2) {
 
         // Get the key and value
@@ -83,22 +84,36 @@ fn composeCbor(args: anytype) !CborMessage {
             @as([]const u8, key),
             floatToFixed(value)
         });
+
+        // Format the message for testing
+        var slice = std.fmt.bufPrint(
+            msg.buf[msg.len..], 
+            "{s}:{},",
+            .{
+                @as([]const u8, key),
+                floatToFixed(value)
+            }
+        ) catch { _ = std.log.err("Error: buf too small", .{}); return error.Overflow; };
+        msg.len += slice.len;
     }
-    return CborMessage{}; 
+    debug("  msg={s}", .{ msg.buf[0..msg.len] });
+    return msg;
 }
 
 /// TODO: CBOR Message
 /// https://lupyuen.github.io/articles/cbor2
-const CborMessage = struct{};
+const CborMessage = struct {
+    buf: [256]u8 = undefined,  // Limit to 256 chars
+    len: usize = 0,
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Transmit To LoRaWAN
 
 /// TODO: Transmit message to LoRaWAN
-/// https://lupyuen.github.io/articles/iot
 fn transmitLorawan(msg: CborMessage) !void { 
-    _ = msg;
     debug("transmitLorawan", .{});
+    debug("  msg={s}", .{ msg.buf[0..msg.len] });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
