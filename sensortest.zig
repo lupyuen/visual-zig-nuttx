@@ -128,16 +128,12 @@ fn test_sensor() !void {
         return error.SizeError;
     }
 
-    // Convert the Sensor Data to Fixed-Point Numbers
-    const pressure    = floatToFixed(sensor_data.pressure);
-    const temperature = floatToFixed(sensor_data.temperature);
-
     // Print the Sensor Data
     debug("pressure:{}", .{
-        pressure
+        sensor_data.pressure
     });
     debug("temperature:{}", .{
-        temperature
+        sensor_data.temperature
     });
 }
 
@@ -211,12 +207,9 @@ fn test_sensor2() !void {
         return error.SizeError;
     }
 
-    // Convert the Sensor Data to Fixed-Point Numbers
-    const humidity = floatToFixed(sensor_data.humidity);
-
     // Print the Sensor Data
     debug("humidity:{}", .{
-        humidity
+        sensor_data.humidity
     });
 }
 
@@ -282,8 +275,25 @@ pub fn log(
     _ = _message_level;
     _ = _scope;
 
+    // We can't print floats on NuttX BL602 due to Linker Errors, so we convert to Fixed-Point.
+    // TODO: Handle multiple args
+    const args2 =
+        if (args.len == 1 and @TypeOf(args[0]) == f32)
+            .{ floatToFixed(args[0]) }  // Convert float to Fixed-Point
+        else
+            args;  // Skip non-float
+
+    // Disallow printing of floats on NuttX BL602 because it causes Linker Errors, use floatToFixed(f) instead
+    comptime var i: usize = 0;
+    inline while (i < args2.len) : (i += 1) {
+        const arg = args2[i];
+        comptime {
+            assert(@TypeOf(arg) != f32);  // Use floatToFixed(f) to print floats
+        }
+    }
+
     // Format the message
-    var slice = std.fmt.bufPrint(&log_buf, format, args)
+    var slice = std.fmt.bufPrint(&log_buf, format, args2)
         catch { _ = puts("*** Error: log_buf too small"); return; };
 
     // Replace all nulls by spaces and terminate with a null

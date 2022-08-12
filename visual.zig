@@ -21,7 +21,7 @@ pub fn main() !void {
     var count: usize = 0;
     while (count < 10) : (count += 1) {
         const a: f32 = 123.45;
-        debug("a={}", .{ floatToFixed(a) });
+        debug("a={}", .{ a });
     }
 
     // Test Sensor Program
@@ -32,19 +32,19 @@ pub fn main() !void {
             "temperature",              // Sensor Data Field
             "/dev/sensor/sensor_baro0"  // Path of Sensor Device
         );
-        debug("temperature={}", .{ floatToFixed(temperature) });
+        debug("temperature={}", .{ temperature });
         const pressure = try sen.readSensor(  // Read BME280 Sensor
             c.struct_sensor_baro,       // Sensor Data Struct
             "pressure",                 // Sensor Data Field
             "/dev/sensor/sensor_baro0"  // Path of Sensor Device
         );
-        debug("pressure={}", .{ floatToFixed(pressure) });
+        debug("pressure={}", .{ pressure });
         const humidity = try sen.readSensor(  // Read BME280 Sensor
             c.struct_sensor_humi,       // Sensor Data Struct
             "humidity",                 // Sensor Data Field
             "/dev/sensor/sensor_humi0"  // Path of Sensor Device
         );
-        debug("humidity={}", .{ floatToFixed(humidity) });
+        debug("humidity={}", .{ humidity });
         const msg = try composeCbor(.{  // Compose CBOR Message
             "t", temperature,
             "p", pressure,
@@ -81,7 +81,7 @@ fn composeCbor(args: anytype) !CborMessage {
         // Print the key and value
         debug("  {s}: {}", .{
             @as([]const u8, key),
-            floatToFixed(@as(f32, value))
+            floatToFixed(value)
         });
     }
     return CborMessage{}; 
