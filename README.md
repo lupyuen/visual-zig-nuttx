@@ -1005,6 +1005,10 @@ Read the article...
 
 -   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
+Here's how we added Custom Blocks to Blockly...
+
+-   ["Custom Block"](https://github.com/lupyuen3/blockly-zig-nuttx#custom-block)
+
 ![Visual Programming for Zig with NuttX Sensors](https://lupyuen.github.io/images/sensor-visual.jpg)
 
 # Debug Logger Crashes
