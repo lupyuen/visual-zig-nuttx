@@ -997,6 +997,96 @@ humidity=68.67
 End main
 ```
 
+# CBOR Encoding
+
+TODO
+
+[visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig)
+
+```zig
+// Read Temperature from BME280 Sensor
+const temperature = try sen.readSensor(  // Read BME280 Sensor
+    c.struct_sensor_baro,       // Sensor Data Struct
+    "temperature",              // Sensor Data Field
+    "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+);
+
+// Read Pressure from BME280 Sensor
+const pressure = try sen.readSensor(  // Read BME280 Sensor
+    c.struct_sensor_baro,       // Sensor Data Struct
+    "pressure",                 // Sensor Data Field
+    "/dev/sensor/sensor_baro0"  // Path of Sensor Device
+);
+
+// Read Humidity from BME280 Sensor
+const humidity = try sen.readSensor(  // Read BME280 Sensor
+    c.struct_sensor_humi,       // Sensor Data Struct
+    "humidity",                 // Sensor Data Field
+    "/dev/sensor/sensor_humi0"  // Path of Sensor Device
+);
+
+// Compose CBOR Message with Temperature, Pressure and Humidity
+const msg = try composeCbor(.{
+    "t", temperature,
+    "p", pressure,
+    "h", humidity,
+});
+
+// Transmit message to LoRaWAN
+try transmitLorawan(msg);
+```
+
+TODO
+
+[visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig#L65-L108)
+
+```zig
+/// TODO: Compose CBOR Message with Key-Value Pairs
+/// https://lupyuen.github.io/articles/cbor2
+fn composeCbor(args: anytype) !CborMessage {
+    debug("composeCbor", .{});
+    comptime {
+        assert(args.len % 2 == 0);  // Missing Key or Value
+    }
+
+    // Process each field...
+    comptime var i: usize = 0;
+    var msg = CborMessage{};
+    inline while (i < args.len) : (i += 2) {
+
+        // Get the key and value
+        const key   = args[i];
+        const value = args[i + 1];
+
+        // Print the key and value
+        debug("  {s}: {}", .{
+            @as([]const u8, key),
+            floatToFixed(value)
+        });
+
+        // Format the message for testing
+        var slice = std.fmt.bufPrint(
+            msg.buf[msg.len..], 
+            "{s}:{},",
+            .{
+                @as([]const u8, key),
+                floatToFixed(value)
+            }
+        ) catch { _ = std.log.err("Error: buf too small", .{}); return error.Overflow; };
+        msg.len += slice.len;
+    }
+    debug("  msg={s}", .{ msg.buf[0..msg.len] });
+    return msg;
+}
+
+/// TODO: CBOR Message
+/// https://lupyuen.github.io/articles/cbor2
+const CborMessage = struct {
+    buf: [256]u8 = undefined,  // Limit to 256 chars
+    len: usize = 0,
+};
+```
+
 # Customise Blockly
 
 Next we customise [Blockly](https://github.com/lupyuen3/blockly-zig-nuttx) to generate the Zig Sensor App.
