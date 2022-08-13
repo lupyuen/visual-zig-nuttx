@@ -1,8 +1,10 @@
-![Pine64 PineCone BL602 RISC-V Board connected to Bosch BME280 Sensor](https://lupyuen.github.io/images/sensor-title.jpg)
+![Visual Programming with Zig and NuttX Sensors on Blockly](https://lupyuen.github.io/images/visual-title.jpg)
 
 # Visual Programming for Zig with NuttX Sensors
 
 Read the articles...
+
+-   ["Visual Programming with Zig and NuttX Sensors"](https://lupyuen.github.io/articles/visual)
 
 -   ["Zig Visual Programming with Blockly"](https://lupyuen.github.io/articles/blockly)
 
