@@ -1001,7 +1001,7 @@ End main
 
 # CBOR Encoding
 
-Blockly will emit the Zig code below for a typical IoT Sensor App: [visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig)
+Blockly will emit the Zig code below for a typical IoT Sensor App: [visual.zig](visual.zig)
 
 ```zig
 // Read Temperature from BME280 Sensor
@@ -1040,7 +1040,7 @@ This reads the Temperature, Pressure and Humidity from BME280 Sensor, composes a
 
 _`composeCbor` will work for a variable number of arguments? Strings as well as numbers?_
 
-Yep, here's the implementation of `composeCbor`: [visual.zig](https://github.com/lupyuen/visual-zig-nuttx/blob/main/visual.zig#L65-L108)
+Yep, here's the implementation of `composeCbor`: [visual.zig](visual.zig#L65-L108)
 
 ```zig
 /// TODO: Compose CBOR Message with Key-Value Pairs
