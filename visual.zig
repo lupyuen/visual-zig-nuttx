@@ -17,14 +17,8 @@ pub fn main() !void {
     debug("Start main", .{});
     defer { debug("End main", .{}); }
 
-    // Test Visual Program
-    var count: usize = 0;
-    while (count < 10) : (count += 1) {
-        const a: f32 = 123.45;
-        debug("a={}", .{ a });
-    }
+    // Paste Visual Program here...
 
-    // Test Sensor Program
     // Every 30 seconds...
     while (true) {
         const temperature = try sen.readSensor(  // Read BME280 Sensor
