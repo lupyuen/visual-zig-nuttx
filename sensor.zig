@@ -35,7 +35,7 @@ pub const c = @cImport({
 pub fn readSensor(
     comptime SensorType: type,        // Sensor Data Struct to be read, like c.struct_sensor_baro
     comptime field_name: []const u8,  // Sensor Data Field to be returned, like "temperature"
-    device_path: []const u8           // Path of Sensor Device, like "/dev/sensor/sensor_baro0"
+    device_path: []const u8           // Path of Sensor Device, like "/dev/uorb/sensor_baro0"
 ) !f32 {
     // Open the Sensor Device
     const fd = c.open(

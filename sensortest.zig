@@ -58,13 +58,13 @@ pub export fn sensortest_main(
     return 0;
 }
 
-/// Read Pressure and Temperature from Barometer Sensor "/dev/sensor/sensor_baro0"
+/// Read Pressure and Temperature from Barometer Sensor "/dev/uorb/sensor_baro0"
 fn test_sensor() !void {
     debug("test_sensor", .{});
 
     // Open the Sensor Device
     const fd = c.open(
-        "/dev/sensor/sensor_baro0",  // Path of Sensor Device
+        "/dev/uorb/sensor_baro0",  // Path of Sensor Device
         c.O_RDONLY | c.O_NONBLOCK    // Open for read-only
     );
 
@@ -137,13 +137,13 @@ fn test_sensor() !void {
     });
 }
 
-/// Read Humidity from Humidity Sensor "/dev/sensor/sensor_humi0"
+/// Read Humidity from Humidity Sensor "/dev/uorb/sensor_humi0"
 fn test_sensor2() !void {
     debug("test_sensor2", .{});
 
     // Open the Sensor Device
     const fd = c.open(
-        "/dev/sensor/sensor_humi0",  // Path of Sensor Device
+        "/dev/uorb/sensor_humi0",  // Path of Sensor Device
         c.O_RDONLY | c.O_NONBLOCK    // Open for read-only
     );
 
@@ -217,9 +217,9 @@ fn test_sensor2() !void {
 fn usage() void {
     const err = std.log.err;
     err("sensortest test", .{});
-    err(" Test barometer sensor (/dev/sensor/sensor_baro0)", .{});
+    err(" Test barometer sensor (/dev/uorb/sensor_baro0)", .{});
     err("sensortest test2", .{});
-    err(" Test humidity sensor (/dev/sensor/sensor_humi0)", .{});
+    err(" Test humidity sensor (/dev/uorb/sensor_humi0)", .{});
     err("sensortest visual", .{});
     err(" Run visual program", .{});
     err("sensortest [arguments...] <command>", .{});
@@ -231,7 +231,7 @@ fn usage() void {
     err("\t[-n <val>]  The number of output data", .{});
     err("\t            default: 0", .{});
     err(" Commands:", .{});
-    err("\t<sensor_node_name> ex, accel0(/dev/sensor/sensor_accel0)", .{});
+    err("\t<sensor_node_name> ex, accel0(/dev/uorb/sensor_accel0)", .{});
 }
 
 ///////////////////////////////////////////////////////////////////////////////
